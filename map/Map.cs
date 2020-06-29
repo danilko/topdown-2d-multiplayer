@@ -364,7 +364,7 @@ public class Map : Node2D
         foreach (KeyValuePair<int, SpawnBot> spawnBot in spawnBots)
         {
             // Locate the bot node
-            Enemy enemyNode = (Enemy)GetNode("Bot_" + spawnBot.Key);
+            Enemy enemyNode = (Enemy)GetNode("bot_" + spawnBot.Key);
 
             if (enemyNode == null)
             {
@@ -519,7 +519,7 @@ public class Map : Node2D
 
             while (spawnBots.Count < bot_count)
             {
-                spawnBots.Add(spawnBots.Count, new SpawnBot("Bot_" + spawnBots.Count, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
+                spawnBots.Add(spawnBots.Count, new SpawnBot("bot_" + spawnBots.Count, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
 
                 Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
                 bot.Position = new Vector2(100, 100 + (100 * (spawnBots.Count - 1)));
