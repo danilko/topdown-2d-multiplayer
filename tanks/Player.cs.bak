@@ -1,0 +1,157 @@
+using Godot;
+using System;
+
+public class Player : Tank
+{
+
+    int max_dist = 2000;
+
+    [Puppet]
+    public Vector2 replVelocity { get; set; }
+    [Puppet]
+    public Vector2 replPosition { get; set; }
+    [Puppet]
+    public float replRotation { get; set; }
+    [Puppet]
+    public bool replPrimaryWeapon { get; set; }
+    [Puppet]
+    public bool replSecondaryWeapon { get; set; }
+
+    public void handleBeam()
+    {
+        Physics2DDirectSpaceState ray = GetWorld2d().DirectSpaceState;
+        Node2D muzzle = (Node2D)GetNode("Turret/Muzzle");
+        Godot.Collections.Dictionary hit = ray.IntersectRay(muzzle.GlobalPosition, muzzle.GlobalPosition + Transform.x * max_dist, new Godot.Collections.Array() { this }, 1, true, true);
+        Node2D laser = (Node2D)GetNode("Turret/Laser");
+
+        if (hit.Count > 0)
+        {
+            Vector2 hit_position = (Vector2)hit["position"];
+
+            float laserLength = laser.GlobalPosition.DistanceTo(hit_position);
+            Vector2 laserScale = laser.Scale;
+            laserScale.x = laserLength;
+            laser.Scale = laserScale;
+
+        }
+        else
+        {
+            Vector2 laserScale = laser.Scale;
+            laserScale.x = max_dist;
+            laser.Scale = laserScale;
+        }
+    }
+
+    public void cleanBeam()
+    {
+        Node2D laser = (Node2D)GetNode("Turret/Laser");
+        Vector2 laserScale = laser.Scale;
+        laserScale.x = 0;
+        laser.Scale = laserScale;
+    }
+
+    [Remote]
+    public void serverGetPlayerInput(String input)
+    {
+        if (GetTree().IsNetworkServer())
+        {
+
+        }
+    }
+
+    [Remote]
+    public void clientGetPlayerUpdate(Vector2 position)
+    {
+        Position = position;
+    }
+
+    public override void _Control(float delta)
+    {
+        //Node2D turret = (Node2D)GetNode("Turret");
+        //turret.LookAt(GetGlobalMousePosition());
+        //float rotation_dir = 0;
+
+        if (IsNetworkMaster())
+        {
+            this.LookAt(GetGlobalMousePosition());
+            float yAxisMove = 0;
+            float xAxisMove = 0;
+
+            if (Input.IsActionPressed("turn_right"))
+            {
+                xAxisMove = MaxSpeed;
+                //rotation_dir +=1;
+            }
+            if (Input.IsActionPressed("turn_left"))
+            {
+                //rotation_dir -=1;
+                xAxisMove = -MaxSpeed;
+            }
+
+            //Rotation = Rotation + (RotationSpeed * rotation_dir * delta); 
+
+
+            Velocity = new Vector2();
+
+            if (Input.IsActionPressed("forward"))
+            {
+                // Velocity = (new Vector2(MaxSpeed, 0)).Rotated(Rotation);
+                yAxisMove = -MaxSpeed;
+            }
+
+            if (Input.IsActionPressed("backward"))
+            {
+                // Velocity = (new Vector2(-MaxSpeed/2, 0)).Rotated(Rotation);
+                yAxisMove = MaxSpeed;
+            }
+            Velocity = (new Vector2(xAxisMove, yAxisMove));
+
+            if (Input.IsActionPressed("left_click"))
+            {
+                Rset(nameof(replPrimaryWeapon), true);
+                _shoot(GunShot, GunSpread, null);
+            }
+            else
+            {
+                Rset(nameof(replPrimaryWeapon), false);
+            }
+
+            if (Input.IsActionPressed("right_click"))
+            {
+                Rset(nameof(replSecondaryWeapon), true);
+                handleBeam();
+            }
+            else
+            {
+                Rset(nameof(replSecondaryWeapon), false);
+                cleanBeam();
+            }
+
+            Rset(nameof(replVelocity), Velocity);
+            Rset(nameof(replPosition), Position);
+            Rset(nameof(replRotation), Rotation);
+        }
+        else
+        {
+            if (replPrimaryWeapon)
+            {
+                _shoot(GunShot, GunSpread, null);
+            }
+
+            if (replSecondaryWeapon)
+            {
+                handleBeam();
+            }
+            else
+            {
+                cleanBeam();
+            }
+
+            Position = replPosition;
+            Velocity = replVelocity;
+            Rotation = replRotation;
+
+
+        }
+    }
+}

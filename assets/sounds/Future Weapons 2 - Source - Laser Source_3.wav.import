@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Future Weapons 2 - Source - Laser Source_3.wav-8bd50a9f27369e070306e6635b0cf00c.sample"
+
+[deps]
+
+source_file="res://assets/sounds/Future Weapons 2 - Source - Laser Source_3.wav"
+dest_files=[ "res://.import/Future Weapons 2 - Source - Laser Source_3.wav-8bd50a9f27369e070306e6635b0cf00c.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

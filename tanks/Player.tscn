@@ -1,0 +1,50 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://tanks/Tank.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
+[ext_resource path="res://tanks/Player.cs" type="Script" id=3]
+[ext_resource path="res://bullets/PlayerBullet.tscn" type="PackedScene" id=4]
+[ext_resource path="res://assets/laser_head.png" type="Texture" id=5]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 39.4285, 9.34732 )
+
+[node name="Player" instance=ExtResource( 1 )]
+collision_layer = 2
+script = ExtResource( 3 )
+Bullet = ExtResource( 4 )
+MaxSpeed = 50000
+RotationSpeed = 5.0
+GunCooldown = 0.1
+MaxHealth = 500
+MaxAmmo = -1
+
+[node name="Body" parent="." index="0"]
+texture = ExtResource( 2 )
+region_enabled = true
+region_rect = Rect2( 1031, 168, 79, 82 )
+
+[node name="CollisionShape2D" parent="." index="1"]
+scale = Vector2( 1, 3.99872 )
+shape = SubResource( 1 )
+
+[node name="Turret" parent="." index="2"]
+texture = ExtResource( 2 )
+offset = Vector2( 20, 0 )
+region_enabled = true
+region_rect = Rect2( 895, 16, 60, 25 )
+
+[node name="Muzzle" parent="Turret" index="0"]
+position = Vector2( 100, 0 )
+
+[node name="Flash" parent="Turret" index="1"]
+position = Vector2( 80, 0 )
+texture = ExtResource( 2 )
+region_rect = Rect2( 55, 62, 49, 40 )
+
+[node name="Laser" type="Sprite" parent="Turret" index="2"]
+modulate = Color( 50, 1, 1, 1 )
+position = Vector2( 103.226, 0 )
+scale = Vector2( 1e-05, 1 )
+texture = ExtResource( 5 )
+offset = Vector2( 0.5, 0 )

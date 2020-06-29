@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/sci-fi_device_item_power_up_flash_01.wav-2bc1020f4c1df0174f92e7901cf0d855.sample"
+
+[deps]
+
+source_file="res://assets/sounds/sci-fi_device_item_power_up_flash_01.wav"
+dest_files=[ "res://.import/sci-fi_device_item_power_up_flash_01.wav-2bc1020f4c1df0174f92e7901cf0d855.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

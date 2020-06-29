@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Bullet Impact 22.wav-021f5143df4baa85d0d42476d79ff953.sample"
+
+[deps]
+
+source_file="res://assets/sounds/Bullet Impact 22.wav"
+dest_files=[ "res://.import/Bullet Impact 22.wav-021f5143df4baa85d0d42476d79ff953.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

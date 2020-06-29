@@ -1,0 +1,61 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://tanks/Tank.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
+[ext_resource path="res://tanks/Enemy.cs" type="Script" id=3]
+[ext_resource path="res://bullets/EnemyBullet.tscn" type="PackedScene" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 47.1943, 48.4166 )
+
+[node name="Enemy" instance=ExtResource( 1 )]
+collision_layer = 4
+script = ExtResource( 3 )
+Bullet = ExtResource( 4 )
+MaxSpeed = 250
+RotationSpeed = 5.0
+GunCooldown = 0.5
+MaxHealth = 30
+TurretSpeed = 10
+
+[node name="Body" parent="." index="0"]
+texture = ExtResource( 2 )
+region_enabled = true
+region_rect = Rect2( 567, 98, 79, 76 )
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource( 1 )
+
+[node name="Turret" parent="." index="2"]
+position = Vector2( -0.237823, -0.475662 )
+texture = ExtResource( 2 )
+offset = Vector2( 20, 0 )
+region_enabled = true
+region_rect = Rect2( 360, 68, 60, 32 )
+
+[node name="Muzzle" parent="Turret" index="0"]
+position = Vector2( 100, 0 )
+
+[node name="Flash" parent="Turret" index="1"]
+position = Vector2( 94.9825, 0 )
+texture = ExtResource( 2 )
+region_rect = Rect2( 432, 70, 76, 39 )
+
+[node name="DetectRadius" type="Area2D" parent="." index="4"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectRadius" index="0"]
+scale = Vector2( 22.44, 22.44 )
+
+[node name="LookAhead1" type="RayCast2D" parent="." index="5"]
+position = Vector2( 0, -30 )
+enabled = true
+cast_to = Vector2( 200, 0 )
+collision_mask = 7
+
+[node name="LookAhead2" type="RayCast2D" parent="." index="6"]
+position = Vector2( 0, 30 )
+enabled = true
+cast_to = Vector2( 200, 0 )
+collision_mask = 7
+[connection signal="body_entered" from="DetectRadius" to="." method="_on_DetectRadius_body_entered"]
+[connection signal="body_exited" from="DetectRadius" to="." method="_on_DetectRadius_body_exited"]

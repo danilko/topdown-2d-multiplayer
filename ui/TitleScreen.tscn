@@ -1,0 +1,301 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=2]
+[ext_resource path="res://tanks/Enemy.tscn" type="PackedScene" id=3]
+[ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
+
+[sub_resource type="Curve2D" id=1]
+_data = {
+"points": PoolVector2Array( 0, 0, 0, 0, 356.239, 164.872, 0, 0, 0, 0, 734.112, 159.157, 0, 0, 0, 0, 732.483, 468.668, 0, 0, 0, 0, 352.876, 479.677, 0, 0, 0, 0, 351.071, 754.939, 0, 0, 0, 0, -64.9797, 754.036, 0, 0, 0, 0, -109.202, 491.41, 0, 0, 0, 0, 354.681, 477.872, 0, 0, 0, 0, 354.966, -58.2774, 0, 0, 0, 0, -147.216, -48.992, 0, 0, 0, 0, -128.645, 160.702, 0, 0, 0, 0, 356.239, 164.872 )
+}
+
+[sub_resource type="DynamicFont" id=2]
+size = 86
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 50
+font_data = ExtResource( 1 )
+
+[sub_resource type="Animation" id=4]
+tracks/0/type = "value"
+tracks/0/path = NodePath("Title:rect_position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 145.317, -154.746 ), Vector2( 145.317, 255.317 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("PlayMessage:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ false, false, true ]
+}
+
+[node name="TitleScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 0.857361
+margin_top = -0.857376
+margin_right = 0.857422
+margin_bottom = -0.857361
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TileMap" type="TileMap" parent="."]
+modulate = Color( 0.494118, 0.494118, 0.494118, 1 )
+scale = Vector2( 0.5, 0.5 )
+tile_set = ExtResource( 2 )
+format = 1
+tile_data = PoolIntArray( 0, 0, 0, 2, 0, 0, 4, 0, 0, 6, 0, 0, 8, 0, 0, 10, 1, 0, 12, 0, 0, 14, 0, 0, 16, 0, 0, 18, 0, 0, 20, 0, 0, 22, 1, 0, 24, 0, 0, 26, 0, 0, 28, 0, 0, 30, 0, 0, 131072, 0, 0, 131074, 0, 0, 131076, 0, 0, 131078, 0, 0, 131080, 0, 0, 131082, 1, 0, 131084, 0, 0, 131086, 0, 0, 131088, 0, 0, 131090, 0, 0, 131092, 0, 0, 131094, 1, 0, 131096, 0, 0, 131098, 0, 0, 131100, 0, 0, 131102, 0, 0, 262144, 10, 0, 262146, 10, 0, 262148, 10, 0, 262150, 10, 0, 262152, 10, 0, 262154, 12, 0, 262156, 10, 0, 262158, 10, 0, 262160, 10, 0, 262162, 10, 0, 262164, 10, 0, 262166, 11, 0, 262168, 10, 0, 262170, 10, 0, 262172, 10, 0, 262174, 10, 0, 393216, 0, 0, 393218, 0, 0, 393220, 0, 0, 393222, 0, 0, 393224, 0, 0, 393226, 1, 0, 393228, 0, 0, 393230, 0, 0, 393232, 0, 0, 393234, 0, 0, 393236, 0, 0, 393238, 1, 0, 393240, 0, 0, 393242, 0, 0, 393244, 0, 0, 393246, 0, 0, 524288, 0, 0, 524290, 0, 0, 524292, 0, 0, 524294, 0, 0, 524296, 0, 0, 524298, 1, 0, 524300, 0, 0, 524302, 0, 0, 524304, 0, 0, 524306, 0, 0, 524308, 0, 0, 524310, 1, 0, 524312, 0, 0, 524314, 0, 0, 524316, 0, 0, 524318, 0, 0, 655360, 0, 0, 655362, 0, 0, 655364, 0, 0, 655366, 0, 0, 655368, 0, 0, 655370, 1, 0, 655372, 0, 0, 655374, 0, 0, 655376, 0, 0, 655378, 0, 0, 655380, 0, 0, 655382, 1, 0, 655384, 0, 0, 655386, 0, 0, 655388, 0, 0, 655390, 0, 0, 786432, 0, 0, 786434, 0, 0, 786436, 0, 0, 786438, 0, 0, 786440, 0, 0, 786442, 1, 0, 786444, 0, 0, 786446, 0, 0, 786448, 0, 0, 786450, 0, 0, 786452, 0, 0, 786454, 1, 0, 786456, 0, 0, 786458, 0, 0, 786460, 0, 0, 786461, 1, 0, 786462, 0, 0, 917504, 10, 0, 917506, 10, 0, 917508, 10, 0, 917510, 10, 0, 917512, 10, 0, 917514, 11, 0, 917516, 10, 0, 917518, 10, 0, 917520, 10, 0, 917522, 10, 0, 917524, 10, 0, 917526, 16, 0, 917528, 0, 0, 917530, 0, 0, 917532, 0, 0, 917534, 0, 0, 1048576, 0, 0, 1048578, 0, 0, 1048580, 0, 0, 1048582, 0, 0, 1048584, 0, 0, 1048586, 1, 0, 1048588, 0, 0, 1048590, 0, 0, 1048592, 0, 0, 1048594, 0, 0, 1048596, 0, 0, 1048598, 0, 0, 1048600, 0, 0, 1048602, 0, 0, 1048604, 0, 0, 1048606, 0, 0, 1179648, 0, 0, 1179650, 0, 0, 1179652, 0, 0, 1179654, 0, 0, 1179656, 0, 0, 1179658, 1, 0, 1179660, 0, 0, 1179662, 0, 0, 1179664, 0, 0, 1179666, 0, 0, 1179668, 0, 0, 1179670, 0, 0, 1179672, 0, 0, 1179674, 0, 0, 1179676, 0, 0, 1179678, 0, 0 )
+
+[node name="Path2D" type="Path2D" parent="."]
+curve = SubResource( 1 )
+
+[node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
+position = Vector2( 356.239, 164.872 )
+rotation = -0.015121
+
+[node name="Enemy" parent="Path2D/PathFollow2D" instance=ExtResource( 3 )]
+modulate = Color( 0.494118, 0.494118, 0.494118, 1 )
+scale = Vector2( 0.5, 0.5 )
+
+[node name="Title" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -366.683
+margin_top = -454.746
+margin_right = 375.317
+margin_bottom = -356.746
+custom_fonts/font = SubResource( 2 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 3
+custom_constants/shadow_offset_y = 3
+text = "Tank Battle"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PlayMessage" type="Label" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -355.0
+margin_top = 142.018
+margin_right = 355.0
+margin_bottom = 199.018
+custom_fonts/font = SubResource( 3 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 3
+custom_constants/shadow_offset_y = 3
+text = "Press Space to Play"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "start"
+anims/start = SubResource( 4 )
+
+[node name="PanelHost" type="Panel" parent="."]
+margin_left = 382.902
+margin_top = 237.098
+margin_right = 653.902
+margin_bottom = 405.098
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txtServerName" type="LineEdit" parent="PanelHost"]
+margin_left = 21.4525
+margin_top = 42.1902
+margin_right = 224.452
+margin_bottom = 66.1902
+text = "127.0.0.1"
+
+[node name="Label" type="Label" parent="PanelHost"]
+margin_left = 23.2133
+margin_top = 25.5347
+margin_right = 101.213
+margin_bottom = 39.5347
+text = "ServerName"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="PanelHost"]
+margin_left = 20.3933
+margin_top = 73.6324
+margin_right = 90.3933
+margin_bottom = 87.6324
+text = "Server Port"
+
+[node name="txtServerPort" type="LineEdit" parent="PanelHost"]
+margin_left = 26.3084
+margin_top = 93.6271
+margin_right = 84.3084
+margin_bottom = 117.627
+text = "31400"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txtMaxPlayers" type="SpinBox" parent="PanelHost"]
+margin_left = 117.614
+margin_top = 90.532
+margin_right = 191.614
+margin_bottom = 114.532
+value = 5.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label3" type="Label" parent="PanelHost"]
+margin_left = 117.722
+margin_top = 73.288
+margin_right = 226.722
+margin_bottom = 87.288
+text = "Max Connections"
+
+[node name="btCreate" type="Button" parent="PanelHost"]
+margin_left = 205.051
+margin_top = 129.221
+margin_right = 258.051
+margin_bottom = 149.221
+text = "Create"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblCreateSErver" type="Label" parent="PanelHost"]
+margin_left = 89.7582
+margin_top = 3.86887
+margin_right = 171.758
+margin_bottom = 17.8689
+text = "CreateServer"
+
+[node name="PanelJoin" type="Panel" parent="."]
+margin_left = 381.131
+margin_top = 421.226
+margin_right = 655.131
+margin_bottom = 588.226
+
+[node name="Label" type="Label" parent="PanelJoin"]
+margin_left = 93.6271
+margin_top = 7.73776
+margin_right = 163.627
+margin_bottom = 21.7378
+text = "Join Server"
+
+[node name="Label2" type="Label" parent="PanelJoin"]
+margin_left = 34.0463
+margin_top = 37.9151
+margin_right = 80.0463
+margin_bottom = 51.9151
+text = "IP"
+
+[node name="Label3" type="Label" parent="PanelJoin"]
+margin_left = 161.72
+margin_top = 32.4987
+margin_right = 199.72
+margin_bottom = 46.4987
+text = "Port"
+
+[node name="txtJoinIp" type="LineEdit" parent="PanelJoin"]
+margin_left = 25.0
+margin_top = 58.0
+margin_right = 95.0
+margin_bottom = 82.0
+text = "127.0.0.1"
+
+[node name="txtJoinPort" type="LineEdit" parent="PanelJoin"]
+margin_left = 157.077
+margin_top = 54.9382
+margin_right = 215.077
+margin_bottom = 78.9382
+text = "31400"
+
+[node name="btnJoin" type="Button" parent="PanelJoin"]
+margin_left = 33.2725
+margin_top = 109.876
+margin_right = 68.2725
+margin_bottom = 129.876
+text = "Join"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblJoinStatus" type="Label" parent="PanelJoin"]
+margin_left = 32.3404
+margin_top = 141.168
+margin_right = 72.3404
+margin_bottom = 155.168
+
+[node name="PanelPlayer" type="Panel" parent="."]
+margin_left = 13.0
+margin_top = 9.0
+margin_right = 376.0
+margin_bottom = 595.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="PanelPlayer"]
+margin_left = 9.43109
+margin_top = 2.57213
+margin_right = 90.4311
+margin_bottom = 16.5721
+text = "Player Name"
+
+[node name="txtPlayerName" type="LineEdit" parent="PanelPlayer"]
+margin_left = 5.0
+margin_top = 21.0
+margin_right = 115.0
+margin_bottom = 45.0
+text = "Player"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="PanelPlayer"]
+margin_left = 182.045
+margin_top = 3.56729
+margin_right = 296.045
+margin_bottom = 21.5673
+text = "Player Icon"
+
+[node name="spritePlayerIcon" type="Sprite" parent="PanelPlayer"]
+
+[node name="btDefaultColor" type="Button" parent="PanelPlayer"]
+margin_left = 5.47958
+margin_top = 534.626
+margin_right = 63.4796
+margin_bottom = 554.626
+text = "Default"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="PanelHost/btCreate" to="." method="onbtCreatePressed"]
+[connection signal="pressed" from="PanelJoin/btnJoin" to="." method="onbtJoinPressed"]

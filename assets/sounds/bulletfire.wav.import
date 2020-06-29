@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/bulletfire.wav-029d70499ffbf0bca52889fa426b31ec.sample"
+
+[deps]
+
+source_file="res://assets/sounds/bulletfire.wav"
+dest_files=[ "res://.import/bulletfire.wav-029d70499ffbf0bca52889fa426b31ec.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

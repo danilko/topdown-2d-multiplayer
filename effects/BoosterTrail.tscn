@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="Gradient" id=4]
+colors = PoolColorArray( 0, 31.43, 50.29, 1, 0.152344, 0.761597, 1, 0.247059 )
+
+[sub_resource type="GradientTexture" id=5]
+gradient = SubResource( 4 )
+
+[sub_resource type="ParticlesMaterial" id=3]
+emission_shape = 2
+emission_box_extents = Vector3( 10, 10, 1 )
+flag_disable_z = true
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 100.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+tangential_accel = 50.0
+scale = 10.0
+color_ramp = SubResource( 5 )
+
+[node name="BoosterTrail" type="Particles2D"]
+amount = 50
+local_coords = false
+process_material = SubResource( 3 )

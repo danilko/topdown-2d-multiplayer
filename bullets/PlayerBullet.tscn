@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://bullets/Bullet.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
+[ext_resource path="res://bullets/PlayerBullet.cs" type="Script" id=3]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 19.4892, 13.4633 )
+
+[node name="PlayerBullet" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+Speed = 2000
+Damage = 10
+Lifetime = 1.0
+
+[node name="Sprite" parent="." index="0"]
+rotation = 3.14159
+texture = ExtResource( 2 )
+region_enabled = true
+region_rect = Rect2( 1067, 36, 32, 24 )
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource( 1 )
