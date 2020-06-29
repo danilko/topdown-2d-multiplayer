@@ -115,6 +115,15 @@ public class Tank : KinematicBody2D
                 laserScale.x = laserLength;
                 laser.Scale = laserScale;
 
+                // TODO: FIX TO FIND THE CORRECT OBJECT
+                Node body = GetNode("/root/Map/" + hit["collider_id"]);
+
+                if (body != null && body.HasMethod("TakeDamage"))
+                {
+                    Tank tank = (Tank)(body);
+                    tank.TakeDamage(5, Position - hit_position);
+                }
+
             }
             else
             {
@@ -234,10 +243,9 @@ public class Tank : KinematicBody2D
         this.health = health;
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
 
-
         if (health <= 0)
         {
-         //   explode();
+            //   explode();
         }
     }
 
@@ -248,15 +256,16 @@ public class Tank : KinematicBody2D
 
     public void TakeDamage(int amount, Vector2 dir)
     {
-        //TODO: REMOVE
         health -= amount;
+
+        EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
 
         if (health < MaxHealth / 2)
         {
             Particles2D smoke = (Particles2D)GetNode("Smoke");
             smoke.Emitting = true;
         }
-        
+
         // knock back effect
         if (MaxSpeed != 0)
         {

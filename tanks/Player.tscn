@@ -42,6 +42,4 @@ texture = ExtResource( 2 )
 region_rect = Rect2( 55, 62, 49, 40 )
 
 [node name="Laser" parent="Turret" index="2"]
-modulate = Color( 50, 1, 1, 1 )
-position = Vector2( 103.226, 0 )
 scale = Vector2( 1e-05, 1 )

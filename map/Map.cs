@@ -312,36 +312,33 @@ public class Map : Node2D
                 continue;
             }
 
+
+            // Check if there is any input for this player. In that case, update the state
             if (gameStates.playerInputs.ContainsKey(networkPlayer.Key))
             {
 
                 bool primaryWeapon = false;
                 bool secondaryWeapon = false;
 
-                // Check if there is any input for this player. In that case, update the state
-                foreach (KeyValuePair<int, Dictionary<int, GameStates.PlayerInput>> playerInput in gameStates.playerInputs)
+                // Calculate the delta
+                float delta = gameStates.updateDelta / (float)(gameStates.playerInputs[networkPlayer.Key].Count);
+
+                foreach (KeyValuePair<int, GameStates.PlayerInput> input in gameStates.playerInputs[networkPlayer.Key])
                 {
-                    // Calculate the delta
-                    float delta = gameStates.updateDelta / (float)(playerInput.Value.Count);
 
-
-                    foreach (KeyValuePair<int, GameStates.PlayerInput> input in playerInput.Value)
-                    {
-                        Vector2 moveDir = new Vector2();
-                        if (input.Value.up) { moveDir.y = -1; }
-                        if (input.Value.down) { moveDir.y = 1; }
-                        if (input.Value.left) { moveDir.x = -1; }
-                        if (input.Value.right) { moveDir.x = 1; }
-                        primaryWeapon = input.Value.primaryWepaon;
-                        secondaryWeapon = input.Value.secondaryWepaon;
-                        playerNode.move(moveDir, input.Value.mousePosition, delta);
-                        playerNode._shoot(primaryWeapon, secondaryWeapon);
-
-                    }
-
-                    // Cleanup the input vector
-                    playerInput.Value.Clear();
+                    Vector2 moveDir = new Vector2();
+                    if (input.Value.up) { moveDir.y = -1; }
+                    if (input.Value.down) { moveDir.y = 1; }
+                    if (input.Value.left) { moveDir.x = -1; }
+                    if (input.Value.right) { moveDir.x = 1; }
+                    primaryWeapon = input.Value.primaryWepaon;
+                    secondaryWeapon = input.Value.secondaryWepaon;
+                    playerNode.move(moveDir, input.Value.mousePosition, delta);
+                    playerNode._shoot(primaryWeapon, secondaryWeapon);
                 }
+
+                // Cleanup the input vector
+                gameStates.playerInputs[networkPlayer.Key].Clear();
 
                 gameStates.playerInputs.Remove(networkPlayer.Key);
 
@@ -459,16 +456,6 @@ public class Map : Node2D
         client.Name = "client_" + pininfo.net_id;
         client.setUnitName(pininfo.name);
 
-        // If this actor is the current client controlled, add camera and attach HUD
-        if (pininfo.net_id == network.gamestateNetworkPlayer.net_id)
-        {
-            Camera2D camera2D = new Camera2D();
-            camera2D.Name = "Camera2D";
-            client.AddChild(camera2D);
-            client.Connect("AmmoChangedSignal", GetNode("HUD"), "_updateAmmoBar");
-            // client.Connect("DeadSignal", this, "_on_Player_Dead");
-            client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
-        }
 
         // If this actor does not belong to the server, change the network master accordingly
         if (pininfo.net_id != 1)
@@ -478,8 +465,15 @@ public class Map : Node2D
 
         AddChild(client);
 
-        if (pininfo.net_id == network.gamestateNetworkPlayer.net_id)
+        // If this actor is the current client controlled, add camera and attach HUD
+        if ((pininfo.net_id == network.gamestateNetworkPlayer.net_id) || (GetTree().IsNetworkServer() && pininfo.net_id == 1))
         {
+            Camera2D camera2D = new Camera2D();
+            camera2D.Name = "Camera2D";
+            client.AddChild(camera2D);
+            client.Connect("AmmoChangedSignal", GetNode("HUD"), "_updateAmmoBar");
+            // client.Connect("DeadSignal", this, "_on_Player_Dead");
+            client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
             _setCameraLimit();
         }
     }

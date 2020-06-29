@@ -6,7 +6,7 @@ public class Player : Tank
 
 
     public GameStates gameStates;
-        public Network network;
+    public Network network;
 
     public override void _Ready()
     {
@@ -26,7 +26,7 @@ public class Player : Tank
             GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
 
             playerInput.right = bool.Parse(inputData.Split(";")[0]);
-            playerInput.left =bool.Parse(inputData.Split(";")[1]);
+            playerInput.left = bool.Parse(inputData.Split(";")[1]);
             playerInput.up = bool.Parse(inputData.Split(";")[2]);
             playerInput.down = bool.Parse(inputData.Split(";")[3]);
             playerInput.primaryWepaon = bool.Parse(inputData.Split(";")[4]);
@@ -41,8 +41,12 @@ public class Player : Tank
     }
 
 
-    public override void _Control(float delta)
+    public void gatherInput(float delta)
     {
+
+
+
+
         GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
 
         playerInput.right = Input.IsActionPressed("turn_right");
@@ -97,7 +101,7 @@ public class Player : Tank
 
         if (IsNetworkMaster())
         {
-            _Control(delta);
+            gatherInput(delta);
         }
 
     }
