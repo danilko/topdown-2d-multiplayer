@@ -17,3 +17,8 @@ region_rect = Rect2( 1007, 40, 60, 24 )
 
 [node name="Flash" parent="Turret" index="1"]
 region_rect = Rect2( 212, 61, 58, 33 )
+
+[node name="Laser" parent="Turret" index="2"]
+modulate = Color( 1, 1, 1, 1 )
+position = Vector2( 0, 0 )
+offset = Vector2( 0, 0 )

@@ -25,7 +25,8 @@ margin_right = -187.044
 margin_bottom = -224.576
 grow_horizontal = 2
 rect_scale = Vector2( 5, 5 )
-text = "TEST TEST TEST TEST"
+align = 1
+valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }

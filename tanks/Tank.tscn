@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://tanks/Tank.cs" type="Script" id=1]
 [ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=2]
 [ext_resource path="res://effects/Smoke.tscn" type="PackedScene" id=3]
 [ext_resource path="res://effects/BoosterTrail.tscn" type="PackedScene" id=4]
 [ext_resource path="res://ui/UnitDisplay.tscn" type="PackedScene" id=5]
+[ext_resource path="res://assets/laser_head.png" type="Texture" id=6]
 
 [sub_resource type="Animation" id=1]
 resource_name = "init"
@@ -66,6 +67,12 @@ script = ExtResource( 1 )
 modulate = Color( 1, 1, 1, 0 )
 scale = Vector2( 0.5, 0.5 )
 region_enabled = true
+
+[node name="Laser" type="Sprite" parent="Turret"]
+modulate = Color( 50, 1, 1, 1 )
+position = Vector2( 103.226, 0 )
+texture = ExtResource( 6 )
+offset = Vector2( 0.5, 0 )
 
 [node name="GunTimer" type="Timer" parent="."]
 
