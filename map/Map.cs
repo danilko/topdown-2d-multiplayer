@@ -466,7 +466,7 @@ public class Map : Node2D
         AddChild(client);
 
         // If this actor is the current client controlled, add camera and attach HUD
-        if ((pininfo.net_id == network.gamestateNetworkPlayer.net_id) || (GetTree().IsNetworkServer() && pininfo.net_id == 1))
+        if (pininfo.net_id == network.gamestateNetworkPlayer.net_id)
         {
             Camera2D camera2D = new Camera2D();
             camera2D.Name = "Camera2D";

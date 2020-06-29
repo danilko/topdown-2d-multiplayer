@@ -10,6 +10,7 @@ extents = Vector2( 47.1943, 48.4166 )
 
 [node name="Enemy" instance=ExtResource( 1 )]
 collision_layer = 4
+collision_mask = 31
 script = ExtResource( 3 )
 Bullet = ExtResource( 4 )
 MaxSpeed = 250
