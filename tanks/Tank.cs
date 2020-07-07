@@ -61,11 +61,18 @@ public class Tank : KinematicBody2D
 
     private int health;
 
-    AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
-    AudioStream moveMusicClip = (AudioStream)GD.Load("res://assets/sounds/sci-fi_device_item_power_up_flash_01.wav");
+    protected AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
+    protected AudioStream moveMusicClip = (AudioStream)GD.Load("res://assets/sounds/sci-fi_device_item_power_up_flash_01.wav");
+
+    protected GameStates gameStates;
+    protected Network network;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        gameStates = (GameStates)GetNode("/root/GAMESTATES");
+        network = (Network)GetNode("/root/NETWORK");
+
         Timer timer = (Timer)GetNode("GunTimer");
         timer.WaitTime = GunCooldown;
         health = MaxHealth;
@@ -116,13 +123,13 @@ public class Tank : KinematicBody2D
                 laser.Scale = laserScale;
 
                 // TODO: FIX TO FIND THE CORRECT OBJECT
-                Node body = GetNode("/root/Map/" + hit["collider_id"]);
+            //    Node body = GetNode("/root/Map/" + hit["collider_id"]);
 
-                if (body != null && body.HasMethod("TakeDamage"))
-                {
-                    Tank tank = (Tank)(body);
-                    tank.TakeDamage(5, Position - hit_position);
-                }
+              //  if (body != null && body.HasMethod("TakeDamage"))
+             //   {
+             //       Tank tank = (Tank)(body);
+             //       tank.TakeDamage(5, Position - hit_position);
+             //   }
 
             }
             else
@@ -189,9 +196,9 @@ public class Tank : KinematicBody2D
 
     public void move(Vector2 moveDir, Vector2 pointPosition, float delta)
     {
-        Velocity = moveDir * MaxSpeed * delta;
+        // Need to times 100 to catch up with AI movement as there is delay in updating
+        Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
         LookAt(pointPosition);
-
         MoveAndSlide(Velocity);
     }
 
@@ -203,8 +210,8 @@ public class Tank : KinematicBody2D
         // Move effect
         if (playerMove)
         {
-            AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-            audioManager.playSoundEffect(moveMusicClip);
+           // AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+           //audioManager.playSoundEffect(moveMusicClip);
         }
         if (Velocity.x != 0 || Velocity.y != 0)
         {

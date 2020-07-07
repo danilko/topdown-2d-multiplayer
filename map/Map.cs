@@ -41,6 +41,22 @@ public class Map : Node2D
         public Dictionary<int, ClientData> botData = new Dictionary<int, ClientData>();
     }
 
+    public class ClientState
+    {
+        public Vector2 fromPosition;
+        public float fromRotation;
+        public Vector2 toPosition;
+        public float toRotation;
+        public bool primaryWepaon;
+        public bool secondaryWepaon;
+        public int health;
+        public float time;
+        public Node2D node;
+    }
+
+    Dictionary<String, ClientState> clientStates = new Dictionary<String, ClientState>();
+
+
     int spawned_bots = 0;
 
     Dictionary<int, SpawnBot> spawnBots = new Dictionary<int, SpawnBot>();
@@ -225,26 +241,99 @@ public class Map : Node2D
         foreach (KeyValuePair<int, ClientData> item in snapshot.playerData)
         {
             Player client = (Player)GetNode("client_" + item.Key);
-
+            // Depending on the synchronization mechanism, this may not be an error!
+            // For now assume the entities are spawned and kept in sync so just continue
+            // the loop
             if (client == null)
             {
                 continue;
             }
 
-            client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (client.Position != item.Value.position));
-            client.setHealth(item.Value.health);
+
+       client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
+       client.setHealth(item.Value.health);
+            //String client_key = "client_" + item.Key;
+
+            // if (clientStates.ContainsKey(client_key))
+            // {
+            //     // Currently iterated player already has previous data. Update the interpolation
+            //     // control variables
+
+            //     clientStates[client_key].fromPosition = clientStates[client_key].toPosition;
+            //     clientStates[client_key].fromRotation = clientStates[client_key].toRotation;
+            //     clientStates[client_key].toPosition = item.Value.position;
+            //     clientStates[client_key].toRotation = item.Value.rotation;
+            //     clientStates[client_key].time = 0.0f;
+            //     clientStates[client_key].primaryWepaon = item.Value.primaryWepaon;
+            //     clientStates[client_key].secondaryWepaon = item.Value.secondaryWepaon;
+            //     clientStates[client_key].health = item.Value.health;
+            //     clientStates[client_key].node = client;
+            // }
+            // else
+            // {
+            //     //There isn't any previous data for this player. Create the initial interpolation
+            //     // data. The next _process() iteration will take care of applying the state
+            //     ClientState clientState = new ClientState();
+            //     clientState.fromPosition = item.Value.position;
+            //     clientState.toRotation = item.Value.rotation;
+            //     clientState.toPosition = client.Position;
+            //     clientState.toRotation = client.Rotation;
+            //     clientState.time = gameStates.updateDelta;
+            //     clientState.primaryWepaon = item.Value.primaryWepaon;
+            //     clientState.secondaryWepaon = item.Value.secondaryWepaon;
+            //     clientState.health = item.Value.health;
+            //     clientState.node = client;
+
+            //     clientStates.Add(client_key, clientState);
+            // }
         }
 
         foreach (KeyValuePair<int, ClientData> item in snapshot.botData)
         {
-            Enemy client = (Enemy)GetNode("bot_" + item.Key);
-            if (client == null)
+            // Only need to do on client, as logic already perform on server through calculation
+            if (!GetTree().IsNetworkServer())
             {
-                continue;
-            }
+                Enemy client = (Enemy)GetNode("bot_" + item.Key);
+                if (client == null)
+                {
+                    continue;
+                }
+                       client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
+       client.setHealth(item.Value.health);
 
-            client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (client.Position != item.Value.position));
-            client.setHealth(item.Value.health);
+                // String client_key = "bot_" + item.Key;
+                // if (clientStates.ContainsKey(client_key))
+                // {
+                //     // Currently iterated player already has previous data. Update the interpolation
+                //     // control variables
+
+                //     clientStates[client_key].fromPosition = clientStates[client_key].toPosition;
+                //     clientStates[client_key].fromRotation = clientStates[client_key].toRotation;
+                //     clientStates[client_key].toPosition = item.Value.position;
+                //     clientStates[client_key].toRotation = item.Value.rotation;
+                //     clientStates[client_key].time = 0f;
+                //     clientStates[client_key].primaryWepaon = item.Value.primaryWepaon;
+                //     clientStates[client_key].secondaryWepaon = item.Value.secondaryWepaon;
+                //     clientStates[client_key].health = item.Value.health;
+                //     clientStates[client_key].node = client;
+                // }
+                // else
+                // {
+                //     //There isn't any previous data for this player. Create the initial interpolation
+                //     // data. The next _process() iteration will take care of applying the state
+                //     ClientState clientState = new ClientState();
+                //     clientState.fromPosition = client.Position;
+                //     clientState.toRotation = client.Rotation;
+                //     clientState.toPosition = client.Position;
+                //     clientState.toRotation = client.Rotation;
+                //     clientState.time = gameStates.updateDelta;
+                //     clientState.node = client;
+                //     clientState.primaryWepaon = item.Value.primaryWepaon;
+                //     clientState.secondaryWepaon = item.Value.secondaryWepaon;
+                //     clientState.health = item.Value.health;
+                //     clientStates.Add(client_key, clientState);
+                // }
+            }
         }
     }
 
@@ -312,9 +401,12 @@ public class Map : Node2D
                 continue;
             }
 
+            Vector2 pPosition = playerNode.Position;
+            float pRotation = playerNode.Rotation;
+            
 
             // Check if there is any input for this player. In that case, update the state
-            if (gameStates.playerInputs.ContainsKey(networkPlayer.Key))
+            if (gameStates.playerInputs.ContainsKey(networkPlayer.Key) && gameStates.playerInputs[networkPlayer.Key].Count > 0)
             {
 
                 bool primaryWeapon = false;
@@ -333,8 +425,8 @@ public class Map : Node2D
                     if (input.Value.right) { moveDir.x = 1; }
                     primaryWeapon = input.Value.primaryWepaon;
                     secondaryWeapon = input.Value.secondaryWepaon;
-                    playerNode.move(moveDir, input.Value.mousePosition, delta);
                     playerNode._shoot(primaryWeapon, secondaryWeapon);
+                    playerNode.move(moveDir, input.Value.mousePosition, delta);
                 }
 
                 // Cleanup the input vector
@@ -361,7 +453,7 @@ public class Map : Node2D
         foreach (KeyValuePair<int, SpawnBot> spawnBot in spawnBots)
         {
             // Locate the bot node
-            Enemy enemyNode = (Enemy)GetNode("bot_" + spawnBot.Key);
+            Enemy enemyNode = (Enemy)GetNode("Paths/Path2D/PathFollow2D/bot_" + spawnBot.Key);
 
             if (enemyNode == null)
             {
@@ -369,15 +461,17 @@ public class Map : Node2D
                 continue;
             }
 
+            enemyNode._shoot(enemyNode.isPrimaryWeapon, enemyNode.isSecondaryWeapon);
+
             // Build bot_data entry
             ClientData clientData = new ClientData();
             clientData.id = spawnBot.Key;
-            clientData.position = enemyNode.Position;
-            clientData.rotation = enemyNode.Rotation;
+            clientData.position = enemyNode.GlobalPosition;
+            clientData.rotation = enemyNode.GlobalRotation;
             clientData.health = enemyNode.getHealth();
 
-            //clientData.primaryWepaon = primaryWeapon;
-            //clientData.secondaryWepaon = secondaryWeapon;
+            clientData.primaryWepaon = enemyNode.isPrimaryWeapon;
+            clientData.secondaryWepaon = enemyNode.isSecondaryWeapon;
             // Append into the snapshot
             snapshot.botData.Add(spawnBot.Key, clientData);
         }
@@ -492,7 +586,19 @@ public class Map : Node2D
         {
             while (spawnBots.Count > bot_count)
             {
-                Node node = GetNode(spawnBots[spawnBots.Count - 1].name);
+                Node node = null;
+
+                // If on server, remove from path2d nodes
+                // If on client, directly remove from map
+                if (GetTree().IsNetworkServer())
+                {
+                    node = GetNode("Paths/Path2D/PathFollow2D/" + spawnBots[spawnBots.Count - 1].name);
+                }
+                else
+                {
+                    node = GetNode(spawnBots[spawnBots.Count - 1].name);
+                }
+
                 if (node == null)
                 {
                     GD.Print("Must remove bots from game but cannot find its node");
@@ -516,27 +622,59 @@ public class Map : Node2D
                 spawnBots.Add(spawnBots.Count, new SpawnBot("bot_" + spawnBots.Count, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
 
                 Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
-                bot.Position = new Vector2(100, 100 + (100 * (spawnBots.Count - 1)));
+
                 bot.Connect("ShootSingal", this, "_onTankShoot");
                 bot.Name = spawnBots[spawnBots.Count - 1].name;
                 bot.setUnitName(spawnBots[spawnBots.Count - 1].name);
 
                 bot.SetNetworkMaster(1);
 
-                AddChild(bot);
+                // If not on network server, add to map, otherwise add to map directly
+                if (GetTree().IsNetworkServer())
+                {
+
+                    this.GetNode("Paths/Path2D/PathFollow2D").AddChild(bot);
+                }
+                else
+                {
+
+                    AddChild(bot);
+                }
             }
         }
     }
 
     public override void _Process(float delta)
     {
+
+
+        // foreach (KeyValuePair<string, ClientState> item in clientStates)
+        // {
+        //     // Interpolate the state
+        //     float countTime = gameStates.updateDelta;
+        //     // If it is current, no need to update
+        //     if (item.Value.time >= countTime)
+        //     {
+        //         continue;
+        //     }
+
+        //     item.Value.time += delta;
+
+        //     float intAlpha = item.Value.time / countTime;
+        //     Vector2 targetPosition = item.Value.fromPosition.LinearInterpolate(item.Value.toPosition, intAlpha);
+        //     float targetRotation = Mathf.Lerp(item.Value.fromRotation, item.Value.toRotation, intAlpha);
+        //     ((Tank)(item.Value.node)).set(targetPosition, targetRotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.node.Position != targetPosition));
+        //     ((Tank)(item.Value.node)).setHealth(item.Value.health);
+        // }
+
+
+
         // Update the timeout counter
         currentTime += delta;
         if (currentTime < gameStates.updateDelta)
         {
             return;
         }
-
 
         // "Reset" the time counting
         currentTime -= gameStates.updateDelta;

@@ -5,18 +5,6 @@ public class Player : Tank
 {
 
 
-    public GameStates gameStates;
-    public Network network;
-
-    public override void _Ready()
-    {
-        gameStates = (GameStates)GetNode("/root/GAMESTATES");
-        network = (Network)GetNode("/root/NETWORK");
-
-        base._Ready();
-    }
-
-
     [Remote]
     public void serverGetPlayerInput(String inputData)
     {

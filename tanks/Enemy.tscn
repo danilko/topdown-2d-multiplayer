@@ -18,6 +18,7 @@ RotationSpeed = 5.0
 GunCooldown = 0.5
 MaxHealth = 30
 TurretSpeed = 10
+DetectRadius = 20.0
 
 [node name="Body" parent="." index="0"]
 texture = ExtResource( 2 )

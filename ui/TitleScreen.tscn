@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=2]
-[ext_resource path="res://tanks/Enemy.tscn" type="PackedScene" id=3]
 [ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
 
 [sub_resource type="Curve2D" id=1]
@@ -68,11 +67,7 @@ curve = SubResource( 1 )
 
 [node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
 position = Vector2( 356.239, 164.872 )
-rotation = -0.015121
-
-[node name="Enemy" parent="Path2D/PathFollow2D" instance=ExtResource( 3 )]
-modulate = Color( 0.494118, 0.494118, 0.494118, 1 )
-scale = Vector2( 0.5, 0.5 )
+rotation = -0.015125
 
 [node name="Title" type="Label" parent="."]
 anchor_left = 0.5
