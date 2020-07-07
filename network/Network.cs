@@ -30,18 +30,6 @@ public class Network : Node
     [Signal]
     public delegate void PingUpdatedSignal();
 
-    const float PINGINTERVAL = 1.0f;          // Wait one second between ping requests
-    const float PINGTIMEOUT = 5.0f;           // Wait 5 seconds before considering a ping request as lost
-
-    public class PingEntry
-    {
-        public Timer timer = new Timer();  // Timer object to control the ping/pong loop
-        public float signature = 0;          // Used to match ping/pong packets
-        public float packetLost = 0;         // Count number of lost packets
-        public float lastPing = 0;          // Last measured time taken to get an answer from the peer
-    }
-    public Dictionary<int, PingEntry> pingEntries = new Dictionary<int, PingEntry>();
-
     public NetworkPlayer gamestateNetworkPlayer = new NetworkPlayer();
 
     private String hostType;
@@ -128,107 +116,10 @@ public class Network : Node
         {
             // Send the server info to the player
             RpcId(id, nameof(getServerInfo), serverinfo.name + ";" + serverinfo.max_players);
-            PingEntry pingEntry = new PingEntry();
-
-            // Setup the timer
-            pingEntry.timer.OneShot = true;
-            pingEntry.timer.WaitTime = PINGINTERVAL;
-            pingEntry.timer.ProcessMode = Timer.TimerProcessMode.Idle;
-            pingEntry.timer.Connect("timeout", this, nameof(onPingInterval));
-            pingEntry.timer.Name = "ping_timer_" + id;
-
-            // Timers need to be part of the tree otherwise they are not updated and never fire up the timeout event
-            AddChild(pingEntry.timer);
-
-            // Add the entry to the dictionary
-            pingEntries.Add(id, pingEntry);
-            // Just to ensure, start the timer (in theory is should run but...)
-            pingEntry.timer.Start();
         }
 
     }
 
-    public void requestPing(int destId)
-    {
-        Godot.Collections.Array array = new Godot.Collections.Array();
-        array.Add(destId);
-
-        // Configure the timer
-        pingEntries[destId].timer.Connect("timeout", this, nameof(onPingTimeout), array, (uint)ConnectFlags.Oneshot);
-        //  Start the timer
-        pingEntries[destId].timer.Start(PINGTIMEOUT);
-
-        // Call the remote machine
-        RpcUnreliableId(destId, nameof(onPing), pingEntries[destId].signature + ";" + pingEntries[destId].lastPing);
-    }
-
-    public void onPingTimeout(int peerId)
-    {
-
-        GD.Print("Ping timeout, destionation peer " + peerId);
-        //  The last ping request has timedout. No answer received, so assume the packet has been lost
-        pingEntries[peerId].packetLost += 1;
-        // Update the ping signature that will be sent in the next request
-        pingEntries[peerId].signature += 1;
-        // And request a new ping - no need to wait since we have already waited 5 seconds!
-        CallDeferred(nameof(requestPing), peerId);
-    }
-
-    [Remote]
-    public void onPing(String info)
-    {
-        float signature = float.Parse(info.Split(";")[0]);
-        float lsastPing = float.Parse(info.Split(";")[1]);
-
-        RpcUnreliableId(1, nameof(onPong), signature);
-    }
-
-    [Remote]
-    public void onPong(float signature)
-    {
-        //  Bail if not the server
-        if (!GetTree().IsNetworkServer())
-        {
-            return;
-        }
-
-        // Obtain the unique ID of the caller
-        int peerId = GetTree().GetRpcSenderId();
-
-        // Check if the answer matches the expected one
-        if (pingEntries[peerId] != null && pingEntries[peerId].signature == signature)
-        {
-            // It does. Calculate the elapsed time, in milliseconds
-            pingEntries[peerId].lastPing = (PINGTIMEOUT - pingEntries[peerId].timer.TimeLeft) * 1000;
-            // If here, the ping timeout timer is running but must be configured now for the ping interval
-            pingEntries[peerId].timer.Stop();
-            pingEntries[peerId].timer.Disconnect("timeout", this, nameof(onPingTimeout));
-            Godot.Collections.Array array = new Godot.Collections.Array();
-            array.Add(peerId);
-            pingEntries[peerId].timer.Connect("timeout", this, nameof(onPingInterval), array, (uint)ConnectFlags.Oneshot);
-            pingEntries[peerId].timer.Start(PINGINTERVAL);
-            // Broadcast the new value to everyone
-            RpcUnreliable(nameof(pingValueChagned), peerId + ";" + pingEntries[peerId].lastPing);
-            // And allow the server to do something with this value
-            EmitSignal(nameof(PingUpdatedSignal), peerId, pingEntries[peerId].lastPing);
-        }
-    }
-
-    [Remote]
-    public void pingValueChagned(String info)
-    {
-        int peerId = int.Parse(info.Split(";")[0]);
-        float lastPing = float.Parse(info.Split(";")[1]);
-
-        EmitSignal(nameof(PingUpdatedSignal), peerId, lastPing);
-    }
-
-    public void onPingInterval(int peerId)
-    {
-        // Update the ping signature then request it
-        pingEntries[peerId].signature += 1;
-        requestPing(peerId);
-    }
 
     // Everyone gets notified whenever someone disconnects from the server
     private void _on_player_disconnected(int id)
@@ -238,13 +129,6 @@ public class Network : Node
         // Update the player tables
         if (GetTree().IsNetworkServer())
         {
-            // Make sure the timer is stoped
-            pingEntries[id].timer.Stop();
-            // Remove the timer from the tree
-            pingEntries[id].timer.QueueFree();
-            // And from the ping_data dictionary
-            pingEntries.Remove(id);
-
             // Unregister the player from the server's list
             unregisterPlayer(id);
             //  Then on all remaining peers
@@ -267,6 +151,7 @@ public class Network : Node
             serverinfo.max_players = int.Parse(info.Split(";")[1]);
         }
     }
+
 
     // Peer is notified when disconnected from server
     private void _on_disconnected_from_server()

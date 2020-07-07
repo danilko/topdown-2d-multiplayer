@@ -24,38 +24,6 @@ public class Map : Node2D
         public PackedScene packedScene;
     }
 
-    public class ClientData
-    {
-        public int id;
-        public Vector2 position;
-        public float rotation;
-        public bool primaryWepaon;
-        public bool secondaryWepaon;
-        public int health;
-    }
-
-    public class Snapshot : Godot.Object
-    {
-        public int signature;
-        public Dictionary<int, ClientData> playerData = new Dictionary<int, ClientData>();
-        public Dictionary<int, ClientData> botData = new Dictionary<int, ClientData>();
-    }
-
-    public class ClientState
-    {
-        public Vector2 fromPosition;
-        public float fromRotation;
-        public Vector2 toPosition;
-        public float toRotation;
-        public bool primaryWepaon;
-        public bool secondaryWepaon;
-        public int health;
-        public float time;
-        public Node2D node;
-    }
-
-    Dictionary<String, ClientState> clientStates = new Dictionary<String, ClientState>();
-
 
     int spawned_bots = 0;
 
@@ -64,12 +32,6 @@ public class Map : Node2D
     Network network;
 
     float currentTime;
-
-    // The "signature" (timestamp) added into each generated state snapshot
-    int snapshotSignature = 1;
-
-    // The signature of the last snapshot received
-    int lastSnapshotSignature = 0;
 
     [Signal]
     public delegate void SnapshotReceivedSignal();
@@ -82,9 +44,6 @@ public class Map : Node2D
         Input.SetCustomMouseCursor(GD.Load("res://assets/ui/blue_cross.png"), Input.CursorShape.Arrow, new Vector2(16, 16));
         //  AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         //  audioManager.playMusic(musicClip);
-
-        // After receiving and fully decoding a new snapshot, apply it to the game world
-        this.Connect(nameof(SnapshotReceivedSignal), this, nameof(applySnapshot));
 
         network = (Network)GetNode("/root/NETWORK");
         network.Connect("DisconnectedSignal", this, nameof(onDisconnected));
@@ -107,234 +66,6 @@ public class Map : Node2D
             RpcId(1, nameof(syncBots), -1);
         }
 
-    }
-    // Based on the "High level" snapshot data, encodes into a byte array
-    // ready to be sent across the network. This function does not return
-    // the data, just broadcasts it to the connected players. To that end,
-    // it is meant to be run only on the server
-    private void encodeSnapshot(Snapshot snapshot)
-    {
-        if (!GetTree().IsNetworkServer())
-        {
-            return;
-        }
-        String encodedData = "";
-
-        // First add the snapshot signature (timestamp)
-        encodedData = encodedData + snapshot.signature + ";";
-
-        // Player data count
-        encodedData = encodedData + snapshot.playerData.Count + ";";
-        // snapshot_data should contain a "players" field which must be an array
-        // of player data. Each entry in this array should be a dictionary, containing
-        // the following fields: network_id, position, rotation, col
-        foreach (KeyValuePair<int, ClientData> item in snapshot.playerData)
-        {
-            encodedData = encodedData + item.Value.id + ";";
-            encodedData = encodedData + item.Value.position.x + ";";
-            encodedData = encodedData + item.Value.position.y + ";";
-            encodedData = encodedData + item.Value.rotation + ";";
-            encodedData = encodedData + item.Value.primaryWepaon + ";";
-            encodedData = encodedData + item.Value.secondaryWepaon + ";";
-            encodedData = encodedData + item.Value.health + ";";
-        }
-        // Bot data count
-        encodedData = encodedData + snapshot.botData.Count + ";";
-        // The bot_data field should be an array, each entry containing the following
-        // fields: bot_id, position, rotation
-        foreach (KeyValuePair<int, ClientData> item in snapshot.botData)
-        {
-            encodedData = encodedData + item.Value.id + ";";
-            encodedData = encodedData + item.Value.position.x + ";";
-            encodedData = encodedData + item.Value.position.y + ";";
-            encodedData = encodedData + item.Value.rotation + ";";
-            encodedData = encodedData + item.Value.primaryWepaon.ToString() + ";";
-            encodedData = encodedData + item.Value.secondaryWepaon.ToString() + ";";
-            encodedData = encodedData + item.Value.health + ";";
-        }
-        // First add the snapshot signature (timestamp)
-        RpcUnreliable(nameof(clientGetSnapshot), encodedData);
-    }
-
-    [Remote]
-    private void clientGetSnapshot(String encodedData)
-    {
-        int parseIndex = 0;
-
-        // Extract the signature
-        int signature = int.Parse(encodedData.Split(";")[parseIndex]);
-        parseIndex++;
-
-        // If the received snapshot is older (or even equal) to the last received one, ignore the rest
-        if (signature <= lastSnapshotSignature)
-        {
-            return;
-        }
-
-        Snapshot snapshot = new Snapshot();
-        snapshot.signature = signature;
-
-        // Initialize the player data and bot data arrays
-
-        // Extract player data count
-        int clientCount = int.Parse(encodedData.Split(";")[parseIndex]);
-        parseIndex++;
-
-        // Then the player data itself
-        for (int index = 0; index < clientCount; index++)
-        {
-            ClientData clientData = new ClientData();
-            clientData.id = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.position.x = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.position.y = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.rotation = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.primaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.secondaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.health = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-
-            snapshot.playerData.Add(clientData.id, clientData);
-        }
-
-        // Extract bot data count
-        clientCount = int.Parse(encodedData.Split(";")[parseIndex]);
-        parseIndex++;
-
-        // Then the bot data
-        for (int index = 0; index < clientCount; index++)
-        {
-            ClientData clientData = new ClientData();
-            clientData.id = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.position.x = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.position.y = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.rotation = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.primaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.secondaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.health = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-
-            snapshot.botData.Add(clientData.id, clientData);
-        }
-
-        //  Update the "last_snapshot"
-        lastSnapshotSignature = signature;
-
-        // Emit the signal indicating that there is a new snapshot do be applied
-        EmitSignal(nameof(SnapshotReceivedSignal), snapshot);
-    }
-    private void applySnapshot(Snapshot snapshot)
-    {
-        // In here we assume the obtained snapshot is newer than the last one
-        // Iterate through player data 
-        foreach (KeyValuePair<int, ClientData> item in snapshot.playerData)
-        {
-            Player client = (Player)GetNode("client_" + item.Key);
-            // Depending on the synchronization mechanism, this may not be an error!
-            // For now assume the entities are spawned and kept in sync so just continue
-            // the loop
-            if (client == null)
-            {
-                continue;
-            }
-
-
-       client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
-       client.setHealth(item.Value.health);
-            //String client_key = "client_" + item.Key;
-
-            // if (clientStates.ContainsKey(client_key))
-            // {
-            //     // Currently iterated player already has previous data. Update the interpolation
-            //     // control variables
-
-            //     clientStates[client_key].fromPosition = clientStates[client_key].toPosition;
-            //     clientStates[client_key].fromRotation = clientStates[client_key].toRotation;
-            //     clientStates[client_key].toPosition = item.Value.position;
-            //     clientStates[client_key].toRotation = item.Value.rotation;
-            //     clientStates[client_key].time = 0.0f;
-            //     clientStates[client_key].primaryWepaon = item.Value.primaryWepaon;
-            //     clientStates[client_key].secondaryWepaon = item.Value.secondaryWepaon;
-            //     clientStates[client_key].health = item.Value.health;
-            //     clientStates[client_key].node = client;
-            // }
-            // else
-            // {
-            //     //There isn't any previous data for this player. Create the initial interpolation
-            //     // data. The next _process() iteration will take care of applying the state
-            //     ClientState clientState = new ClientState();
-            //     clientState.fromPosition = item.Value.position;
-            //     clientState.toRotation = item.Value.rotation;
-            //     clientState.toPosition = client.Position;
-            //     clientState.toRotation = client.Rotation;
-            //     clientState.time = gameStates.updateDelta;
-            //     clientState.primaryWepaon = item.Value.primaryWepaon;
-            //     clientState.secondaryWepaon = item.Value.secondaryWepaon;
-            //     clientState.health = item.Value.health;
-            //     clientState.node = client;
-
-            //     clientStates.Add(client_key, clientState);
-            // }
-        }
-
-        foreach (KeyValuePair<int, ClientData> item in snapshot.botData)
-        {
-            // Only need to do on client, as logic already perform on server through calculation
-            if (!GetTree().IsNetworkServer())
-            {
-                Enemy client = (Enemy)GetNode("bot_" + item.Key);
-                if (client == null)
-                {
-                    continue;
-                }
-                       client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
-       client.setHealth(item.Value.health);
-
-                // String client_key = "bot_" + item.Key;
-                // if (clientStates.ContainsKey(client_key))
-                // {
-                //     // Currently iterated player already has previous data. Update the interpolation
-                //     // control variables
-
-                //     clientStates[client_key].fromPosition = clientStates[client_key].toPosition;
-                //     clientStates[client_key].fromRotation = clientStates[client_key].toRotation;
-                //     clientStates[client_key].toPosition = item.Value.position;
-                //     clientStates[client_key].toRotation = item.Value.rotation;
-                //     clientStates[client_key].time = 0f;
-                //     clientStates[client_key].primaryWepaon = item.Value.primaryWepaon;
-                //     clientStates[client_key].secondaryWepaon = item.Value.secondaryWepaon;
-                //     clientStates[client_key].health = item.Value.health;
-                //     clientStates[client_key].node = client;
-                // }
-                // else
-                // {
-                //     //There isn't any previous data for this player. Create the initial interpolation
-                //     // data. The next _process() iteration will take care of applying the state
-                //     ClientState clientState = new ClientState();
-                //     clientState.fromPosition = client.Position;
-                //     clientState.toRotation = client.Rotation;
-                //     clientState.toPosition = client.Position;
-                //     clientState.toRotation = client.Rotation;
-                //     clientState.time = gameStates.updateDelta;
-                //     clientState.node = client;
-                //     clientState.primaryWepaon = item.Value.primaryWepaon;
-                //     clientState.secondaryWepaon = item.Value.secondaryWepaon;
-                //     clientState.health = item.Value.health;
-                //     clientStates.Add(client_key, clientState);
-                // }
-            }
-        }
     }
 
     private void onPlayerRemoved(int id)
@@ -375,115 +106,6 @@ public class Map : Node2D
 
         // Mark the node for deletion
         playerNode.QueueFree();
-    }
-
-    // Update and generate a game state snapshot
-    private void updateState()
-    {
-        // If not on the server, bail
-        if (!GetTree().IsNetworkServer())
-        {
-            return;
-        }
-        // Initialize the "high level" snapshot
-        Snapshot snapshot = new Snapshot();
-        snapshot.signature = snapshotSignature;
-
-        foreach (KeyValuePair<int, NetworkPlayer> networkPlayer in network.networkPlayers)
-        {
-            // Locate the player's node. Even if there is no input/update, it's state will be dumped
-            // into the snapshot anyway
-            Player playerNode = (Player)GetNode("client_" + networkPlayer.Value.net_id);
-
-            if (playerNode == null)
-            {
-                // Ideally should give a warning that a player node wasn't found
-                continue;
-            }
-
-            Vector2 pPosition = playerNode.Position;
-            float pRotation = playerNode.Rotation;
-            
-
-            // Check if there is any input for this player. In that case, update the state
-            if (gameStates.playerInputs.ContainsKey(networkPlayer.Key) && gameStates.playerInputs[networkPlayer.Key].Count > 0)
-            {
-
-                bool primaryWeapon = false;
-                bool secondaryWeapon = false;
-
-                // Calculate the delta
-                float delta = gameStates.updateDelta / (float)(gameStates.playerInputs[networkPlayer.Key].Count);
-
-                foreach (KeyValuePair<int, GameStates.PlayerInput> input in gameStates.playerInputs[networkPlayer.Key])
-                {
-
-                    Vector2 moveDir = new Vector2();
-                    if (input.Value.up) { moveDir.y = -1; }
-                    if (input.Value.down) { moveDir.y = 1; }
-                    if (input.Value.left) { moveDir.x = -1; }
-                    if (input.Value.right) { moveDir.x = 1; }
-                    primaryWeapon = input.Value.primaryWepaon;
-                    secondaryWeapon = input.Value.secondaryWepaon;
-                    playerNode._shoot(primaryWeapon, secondaryWeapon);
-                    playerNode.move(moveDir, input.Value.mousePosition, delta);
-                }
-
-                // Cleanup the input vector
-                gameStates.playerInputs[networkPlayer.Key].Clear();
-
-                gameStates.playerInputs.Remove(networkPlayer.Key);
-
-                ClientData clientData = new ClientData();
-                clientData.id = networkPlayer.Key;
-                clientData.position = playerNode.Position;
-                clientData.rotation = playerNode.Rotation;
-                clientData.primaryWepaon = primaryWeapon;
-                clientData.secondaryWepaon = secondaryWeapon;
-                clientData.health = playerNode.getHealth();
-
-                snapshot.playerData.Add(networkPlayer.Key, clientData);
-            }
-
-        }
-
-        // Clean the input
-        gameStates.playerInputs.Clear();
-
-        foreach (KeyValuePair<int, SpawnBot> spawnBot in spawnBots)
-        {
-            // Locate the bot node
-            Enemy enemyNode = (Enemy)GetNode("Paths/Path2D/PathFollow2D/bot_" + spawnBot.Key);
-
-            if (enemyNode == null)
-            {
-                // Ideally should give a warning that a bot node wasn't found
-                continue;
-            }
-
-            enemyNode._shoot(enemyNode.isPrimaryWeapon, enemyNode.isSecondaryWeapon);
-
-            // Build bot_data entry
-            ClientData clientData = new ClientData();
-            clientData.id = spawnBot.Key;
-            clientData.position = enemyNode.GlobalPosition;
-            clientData.rotation = enemyNode.GlobalRotation;
-            clientData.health = enemyNode.getHealth();
-
-            clientData.primaryWepaon = enemyNode.isPrimaryWeapon;
-            clientData.secondaryWepaon = enemyNode.isSecondaryWeapon;
-            // Append into the snapshot
-            snapshot.botData.Add(spawnBot.Key, clientData);
-        }
-
-
-        // Encode and broadcast the snapshot - if there is at least one connected client
-        if (network.networkPlayers.Count > 1)
-        {
-            encodeSnapshot(snapshot);
-        }
-        // Make sure the next update will have the correct snapshot signature
-        snapshotSignature += 1;
     }
 
 
@@ -586,18 +208,8 @@ public class Map : Node2D
         {
             while (spawnBots.Count > bot_count)
             {
-                Node node = null;
+                Node node = GetNode("Paths/Path2D/PathFollow2D/" + spawnBots[spawnBots.Count - 1].name);
 
-                // If on server, remove from path2d nodes
-                // If on client, directly remove from map
-                if (GetTree().IsNetworkServer())
-                {
-                    node = GetNode("Paths/Path2D/PathFollow2D/" + spawnBots[spawnBots.Count - 1].name);
-                }
-                else
-                {
-                    node = GetNode(spawnBots[spawnBots.Count - 1].name);
-                }
 
                 if (node == null)
                 {
@@ -629,58 +241,9 @@ public class Map : Node2D
 
                 bot.SetNetworkMaster(1);
 
-                // If not on network server, add to map, otherwise add to map directly
-                if (GetTree().IsNetworkServer())
-                {
-
-                    this.GetNode("Paths/Path2D/PathFollow2D").AddChild(bot);
-                }
-                else
-                {
-
-                    AddChild(bot);
-                }
+                this.GetNode("Paths/Path2D/PathFollow2D").AddChild(bot);
             }
         }
-    }
-
-    public override void _Process(float delta)
-    {
-
-
-        // foreach (KeyValuePair<string, ClientState> item in clientStates)
-        // {
-        //     // Interpolate the state
-        //     float countTime = gameStates.updateDelta;
-        //     // If it is current, no need to update
-        //     if (item.Value.time >= countTime)
-        //     {
-        //         continue;
-        //     }
-
-        //     item.Value.time += delta;
-
-        //     float intAlpha = item.Value.time / countTime;
-        //     Vector2 targetPosition = item.Value.fromPosition.LinearInterpolate(item.Value.toPosition, intAlpha);
-        //     float targetRotation = Mathf.Lerp(item.Value.fromRotation, item.Value.toRotation, intAlpha);
-        //     ((Tank)(item.Value.node)).set(targetPosition, targetRotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.node.Position != targetPosition));
-        //     ((Tank)(item.Value.node)).setHealth(item.Value.health);
-        // }
-
-
-
-        // Update the timeout counter
-        currentTime += delta;
-        if (currentTime < gameStates.updateDelta)
-        {
-            return;
-        }
-
-        // "Reset" the time counting
-        currentTime -= gameStates.updateDelta;
-
-        // And update the game state
-        updateState();
     }
 
     private void _setCameraLimit()

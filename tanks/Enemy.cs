@@ -14,9 +14,23 @@ public class Enemy : Tank
 
     private int speed;
 
-    public bool isPrimaryWeapon;
-    public bool isSecondaryWeapon;
+    [Puppet]
+    public bool remotePrimaryWeapon;
 
+    [Puppet]
+    public bool remoteSecondaryWeapon;
+
+    [Puppet]
+    Vector2 remotePosition = new Vector2();
+
+    [Puppet]
+    float remoteRotation = 0.0f;
+
+    [Puppet]
+    int remoteHealth = 0;
+
+    [Puppet]
+    float remoteOffset = 0;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -29,13 +43,12 @@ public class Enemy : Tank
 
         base._Ready();
 
-        isPrimaryWeapon = false;
-        isSecondaryWeapon = false;
+        remotePrimaryWeapon = false;
+        remoteSecondaryWeapon = false;
     }
 
     public override void _Control(float delta)
     {
-
         if (target != null)
         {
             Vector2 targetDir = (target.GlobalPosition - GlobalPosition).Normalized();
@@ -47,12 +60,14 @@ public class Enemy : Tank
             GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
             if (targetDir.Dot(currentDir) > 0.9)
             {
-                isPrimaryWeapon = true;
+                remotePrimaryWeapon = true;
+                remotePrimaryWeapon = false;
+                _shoot(remotePrimaryWeapon, remotePrimaryWeapon);
             }
             else
             {
-                isPrimaryWeapon = false;
-                isSecondaryWeapon = false;
+                remotePrimaryWeapon = false;
+                remoteSecondaryWeapon = false;
             }
         }
 
@@ -71,6 +86,8 @@ public class Enemy : Tank
         {
             PathFollow2D pathFollow2D = (PathFollow2D)GetParent();
             pathFollow2D.Offset = pathFollow2D.Offset + speed * delta;
+
+            remoteOffset = pathFollow2D.Offset;
         }
     }
 
@@ -84,6 +101,27 @@ public class Enemy : Tank
         if (GetTree().IsNetworkServer())
         {
             _Control(delta);
+
+            RsetUnreliable(nameof(remotePosition), GlobalPosition);
+            RsetUnreliable(nameof(remoteRotation), GlobalRotation);
+            RsetUnreliable(nameof(remoteHealth), getHealth());
+            RsetUnreliable(nameof(remotePrimaryWeapon), remotePrimaryWeapon);
+            RsetUnreliable(nameof(remoteSecondaryWeapon), remoteSecondaryWeapon);
+            RsetUnreliable(nameof(remoteOffset), remoteOffset);
+        }
+        else
+        {
+            _shoot(remotePrimaryWeapon, remoteSecondaryWeapon);
+
+            //Position = remotePosition;
+            Rotation = remoteRotation;
+            setHealth(remoteHealth);
+
+            if (typeof(PathFollow2D).IsInstanceOfType(GetParent()))
+            {
+                PathFollow2D pathFollow2D = (PathFollow2D)GetParent();
+                pathFollow2D.Offset = remoteOffset;
+            }
         }
     }
 
