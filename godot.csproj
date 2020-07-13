@@ -53,12 +53,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ai\RaycastAStar.cs" />
     <Compile Include="bullets\Bullet.cs" />
     <Compile Include="bullets\PlayerBullet.cs" />
     <Compile Include="environments\Obstacle.cs" />
     <Compile Include="GameStates.cs" />
     <Compile Include="items\Pickup.cs" />
-    <Compile Include="map\Map.cs" />
+    <Compile Include="map\GameWorld.cs" />
     <Compile Include="network\Network.cs" />
     <Compile Include="network\NetworkPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

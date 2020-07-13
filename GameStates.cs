@@ -8,10 +8,10 @@ public class GameStates : Node
     public int current_level = 0;
 
     // How many game updates per second
-    public float updateRate = 30;
+    public float updateRate = 120;
     public float updateDelta = 0;
 
-    public String[] levels = { "res://ui/TitleScreen.tscn", "res://map/Map.tscn" };
+    public String[] levels = { "res://ui/TitleScreen.tscn", "res://map/GameWorld.tscn" };
 
 
     public float currentTime = 0;

@@ -56,7 +56,6 @@ public class Tank : KinematicBody2D
     [Export]
     private String unitName = "Default";
 
-
     int max_dist = 2000;
 
     private int health;
@@ -66,6 +65,8 @@ public class Tank : KinematicBody2D
 
     protected GameStates gameStates;
     protected Network network;
+
+    private String teamIdentifier = "UNKOWN";
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -85,6 +86,16 @@ public class Tank : KinematicBody2D
 
         Label label = (Label)(GetNode("UnitDisplay/Name"));
         label.Text = this.unitName;
+    }
+
+    public void setTeamIdentifier(String inputTeamIdentifier)
+    {
+        teamIdentifier = inputTeamIdentifier;
+    }
+
+    public String getTeamIdentifier()
+    {
+        return teamIdentifier;
     }
 
     public void setUnitName(String unitName)
