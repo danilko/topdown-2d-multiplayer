@@ -13,9 +13,10 @@ public class RaycastAStar
     private Godot.Collections.Dictionary fScore = null;
     private Godot.Collections.Array excludes;
     private World2D space;
-    private Godot.Collections.Dictionary neigborsMap = null;
+    private Godot.Collections.Dictionary neighborsMap = new Godot.Collections.Dictionary();
     private int max_iterations = 1000;
 
+    private GameWorld gameWorld;
 
     // Simple vector seralization
     private String vector2ToId(Vector2 vector)
@@ -55,9 +56,9 @@ public class RaycastAStar
     {
         String vectorId = vector2ToId(vector);
 
-        if (neigborsMap.Contains(vectorId))
+        if (neighborsMap.Contains(vectorId))
         {
-            return (Godot.Collections.Array)neigborsMap[vectorId];
+            return (Godot.Collections.Array)neighborsMap[vectorId];
         }
 
         Godot.Collections.Array targets = new Godot.Collections.Array();
@@ -65,6 +66,11 @@ public class RaycastAStar
         targets.Add(vector + new Vector2(-GRID_SIZE, 0));
         targets.Add(vector + new Vector2(0, GRID_SIZE));
         targets.Add(vector + new Vector2(0, -GRID_SIZE));
+
+        targets.Add(vector + new Vector2(GRID_SIZE, -GRID_SIZE));
+        targets.Add(vector + new Vector2(GRID_SIZE, GRID_SIZE));
+        targets.Add(vector + new Vector2(-GRID_SIZE, GRID_SIZE));
+        targets.Add(vector + new Vector2(-GRID_SIZE, -GRID_SIZE));
 
         Godot.Collections.Array valid = new Godot.Collections.Array();
 
@@ -75,15 +81,48 @@ public class RaycastAStar
             Godot.Collections.Dictionary result = ray.IntersectRay(vector, target, excludes);
 
             // There's nothing there, so we can visit the neighbor
-            if (!(result.Count > 1))
+            if (result.Count == 0)
             {
+                debugDraw(target);
                 valid.Add(target);
             }
         }
 
-        neigborsMap.Add(vectorId, valid);
+
+        neighborsMap.Add(vectorId, valid);
 
         return valid;
+    }
+
+    public void debugDraw(Vector2 target)
+    {
+
+        Node2D path = (Node2D)gameWorld.GetNode("path_raycast");
+
+        if (path == null)
+        {
+            path = (Node2D)gameWorld.GetNode("pathchart").Duplicate();
+            path.Name = "path_raycast";
+            gameWorld.AddChild(path);
+        }
+
+        Node2D pointNode = (Node2D)gameWorld.GetNode("dot").Duplicate();
+        pointNode.Name = "path_raycast_" + target.x + "_" + target.y;
+        pointNode.Position = target;
+        path.AddChild(pointNode);
+    }
+
+    public void debugDrawClear()
+    {
+        Node2D path = (Node2D)gameWorld.GetNode("path_raycast");
+
+        if (path != null)
+        {
+            foreach (Node2D node in path.GetChildren())
+            {
+                node.QueueFree();
+            }
+        }
     }
 
     // Works backward, looking up ideal steps in cameFrom, to reproduce the full path
@@ -110,9 +149,10 @@ public class RaycastAStar
     }
 
     // Entrypoint to the pathfinding algorithm. Will return either null or an array of Vector2s
-    public Godot.Collections.Array path(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array exclude_bodies, Enemy enemy)
+    public Godot.Collections.Array path(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array exclude_bodies, GameWorld gameWorld)
     {
-        enemy.cleanDrawing();
+
+        this.gameWorld = gameWorld;
 
         int iteration = 0;
 
@@ -125,12 +165,11 @@ public class RaycastAStar
         String startId = vector2ToId(start);
         String endId = vector2ToId(end);
 
-        neigborsMap = new Godot.Collections.Dictionary();
         cameFrom = new Godot.Collections.Dictionary();
         openSet = new Godot.Collections.Dictionary();
         openSet.Add(startId, start);
-        gScore  = new Godot.Collections.Dictionary();
-        fScore  = new Godot.Collections.Dictionary();
+        gScore = new Godot.Collections.Dictionary();
+        fScore = new Godot.Collections.Dictionary();
 
         gScore.Add(startId, 0.0f);
         fScore.Add(startId, hDistance(end, start));
@@ -178,7 +217,7 @@ public class RaycastAStar
 
                     // gScore is the actual distance it took to get here from the start
                     gScore.Add(neighborId, tentativeGscore);
-                    
+
                     // fScore is the actual distance from the start plus the estimated distance to the end
                     // Whoever has the best fScore in the openSet gets our attention next
                     // Therefore we are always inspecting the current best-guess-path
@@ -197,7 +236,6 @@ public class RaycastAStar
             iteration++;
         }
 
-        GD.Print("Not Found");
         // No path found
         return null;
     }

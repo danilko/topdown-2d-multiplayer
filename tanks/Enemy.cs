@@ -25,7 +25,6 @@ public class Enemy : Tank
 
     private float PATHRADIUS = 5.0f;
 
-    private RaycastAStar aStarSolver = null;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -41,40 +40,46 @@ public class Enemy : Tank
         isPrimaryWeapon = false;
         isSecondaryWeapon = false;
 
-        gameworld = (GameWorld)GetParent();
+        speed = MaxSpeed;
 
-        if (GetTree().IsNetworkServer())
-        {
-            aStarSolver = new RaycastAStar();
-        }
+        gameworld = (GameWorld)GetParent();
     }
 
-    public void setCurrentSpawnPoint(int currentSpawnPointIndex)
+    public void setCurrentSpawnIndex(int currentSpawnPointIndex)
     {
         this.currentSpawnPointIndex = currentSpawnPointIndex;
+    }
+
+    public int getCurrentSpawnIndex()
+    {
+        return currentSpawnPointIndex;
+    }
+
+    private void calculatePath()
+    {
+        currentSpawnPointIndex = gameworld.getNextSpawnIndex(currentSpawnPointIndex);
+        // targetPaths = gameworld.getPaths(GlobalPosition, gameworld.getSpawnPointPosition(currentSpawnPointIndex));
+
+        Godot.Collections.Array excludes = new Godot.Collections.Array() { this };
+
+        targetPaths = gameworld.getPaths(GlobalPosition, gameworld.getSpawnPointPosition(currentSpawnPointIndex + 1), GetWorld2d(), excludes);
+        if (targetPaths != null && targetPaths.Count < 2)
+        {
+            targetPaths = null;
+        }
+
+
+        if (targetPaths != null)
+        {
+            targetPaths.RemoveAt(0);
+        }
     }
 
     public override void _Control(float delta)
     {
         if (targetPaths == null && target == null)
         {
-            currentSpawnPointIndex = gameworld.getNextSpawnIndex(currentSpawnPointIndex);
-            // targetPaths = gameworld.getPaths(GlobalPosition, gameworld.getSpawnPointPosition(currentSpawnPointIndex));
-
-            Godot.Collections.Array excludes = new Godot.Collections.Array() { this };
-
-            targetPaths = aStarSolver.path(GlobalPosition, gameworld.getSpawnPointPosition(currentSpawnPointIndex + 1), GetWorld2d(), excludes, this);
-            if (targetPaths != null && targetPaths.Count < 2)
-            {
-                targetPaths = null;
-            }
-
-
-            if (targetPaths != null)
-            {
-                targetPaths.RemoveAt(0);
-            }
-
+            calculatePath();
         }
 
         if (targetPaths != null)
@@ -123,17 +128,6 @@ public class Enemy : Tank
         {
             isPrimaryWeapon = false;
             isSecondaryWeapon = false;
-        }
-
-        RayCast2D lookAhead1 = (RayCast2D)GetNode("LookAhead1");
-        RayCast2D lookAhead2 = (RayCast2D)GetNode("LookAhead2");
-        if (lookAhead1.IsColliding() || lookAhead2.IsColliding())
-        {
-            //speed = (int)Mathf.Lerp(speed, 0.0f, 0.1f);
-        }
-        else
-        {
-            speed = (int)Mathf.Lerp(speed, MaxSpeed, 0.05f);
         }
     }
 
@@ -192,12 +186,26 @@ public class Enemy : Tank
             // If not same team identifier, identify as target
             if (((Tank)body).getTeamIdentifier() != getTeamIdentifier())
             {
-                target = body;
-                targetPaths = null;
+                // target = body;
+                //  targetPaths = null;
             }
         }
     }
 
+    private void _on_FrontDetection_body_entered(Node2D body)
+    {
+        // Perform a follow behavior during agent collision
+        if (body.HasMethod("getCurrentSpawnIndex"))
+        {
+            int spawnIndex = ((Enemy)body).getCurrentSpawnIndex();
+            // Set the smaller target index as the domainat
+            if (spawnIndex < currentSpawnPointIndex)
+            {
+                currentSpawnPointIndex = spawnIndex;
+                calculatePath();
+            }
+        }
+    }
 
     private void _on_DetectRadius_body_exited(Node2D body)
     {

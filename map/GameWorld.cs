@@ -15,6 +15,7 @@ public class GameWorld : Node2D
         public NetworkPlayer networkPlayer { get; set; }
     }
 
+
     private class SpawnBot
     {
         public SpawnBot(String name, PackedScene packedScene)
@@ -80,6 +81,9 @@ public class GameWorld : Node2D
 
     private AStar aStar;
 
+
+    private RaycastAStar aStarSolver;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -106,7 +110,7 @@ public class GameWorld : Node2D
         if (GetTree().IsNetworkServer())
         {
             aStar = new AStar();
-
+aStarSolver = new RaycastAStar();
             spwanPlayer(convertToString(network.gamestateNetworkPlayer, 1));
             // The amount doesn't matter because it will be calculated in the function body
             syncBots(-1);
@@ -116,6 +120,7 @@ public class GameWorld : Node2D
             RpcId(1, nameof(spwanPlayer), convertToString(network.gamestateNetworkPlayer, -1));
             RpcId(1, nameof(syncBots), -1);
         }
+
 
     }
 
@@ -141,7 +146,14 @@ public class GameWorld : Node2D
         return nextSpawnIndex;
     }
 
-    public Godot.Collections.Array getPaths(Vector2 startPosition, Vector2 endPosition)
+
+    public Godot.Collections.Array getPaths(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array excludes)
+    {
+        return aStarSolver.path(start, end, space_state, excludes, this);
+    }
+
+
+    public Godot.Collections.Array getPaths2(Vector2 startPosition, Vector2 endPosition)
     {
 
         Godot.Collections.Array pathArray = new Godot.Collections.Array();
@@ -575,7 +587,7 @@ public class GameWorld : Node2D
                 Node node = null;
 
 
-                node = GetNode("bot_" + spawnBots[spawnBots.Count - 1].name);
+                node = GetNode(spawnBots[spawnBots.Count - 1].name);
 
 
                 if (node == null)
@@ -615,7 +627,7 @@ public class GameWorld : Node2D
                 bot.Position = nodeSpawnPoint.GlobalPosition;
 
                 bot.SetNetworkMaster(1);
-                bot.setCurrentSpawnPoint(currentSpawnPoint);
+                bot.setCurrentSpawnIndex(currentSpawnPoint);
 
 
                 AddChild(bot);

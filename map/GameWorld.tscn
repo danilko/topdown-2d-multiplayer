@@ -28,7 +28,7 @@ tile_data = PoolIntArray( -2, 0, 0, -65536, 0, 0, -65534, 0, 0, -65532, 0, 0, -6
 [node name="Obstacles" type="Node2D" parent="."]
 
 [node name="Obstacle" parent="Obstacles" instance=ExtResource( 9 )]
-position = Vector2( 3093.51, 1419.63 )
+position = Vector2( 688.727, 1286.28 )
 type = 16
 
 [node name="Pickups" type="Node2D" parent="."]
