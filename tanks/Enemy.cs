@@ -17,7 +17,7 @@ public class Enemy : Tank
     public bool isPrimaryWeapon;
     public bool isSecondaryWeapon;
 
-    Godot.Collections.Array targetPaths = null;
+    private Godot.Collections.Array targetPaths = null;
 
     GameWorld gameworld;
 
@@ -25,6 +25,7 @@ public class Enemy : Tank
 
     private float PATHRADIUS = 5.0f;
 
+    Godot.Collections.Array detourPaths = null;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -77,14 +78,14 @@ public class Enemy : Tank
 
     public override void _Control(float delta)
     {
-        if (targetPaths == null && target == null)
+        if (detourPaths == null && targetPaths == null && target == null)
         {
             calculatePath();
         }
 
-        if (targetPaths != null)
+        if (detourPaths != null)
         {
-            Vector2 targetPoint = (Vector2)targetPaths[0];
+            Vector2 targetPoint = (Vector2)detourPaths[0];
 
             Vector2 targetDir = (targetPoint - GlobalPosition).Normalized();
             Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
@@ -93,11 +94,11 @@ public class Enemy : Tank
 
             if (GlobalPosition.DistanceTo(targetPoint) < PATHRADIUS)
             {
-                targetPaths.RemoveAt(0);
+                detourPaths.RemoveAt(0);
 
-                if (targetPaths.Count == 0)
+                if (detourPaths.Count == 0)
                 {
-                    targetPaths = null;
+                    detourPaths = null;
                 }
             }
             else
@@ -105,7 +106,33 @@ public class Enemy : Tank
                 MoveAndSlide(targetDir * speed);
             }
 
+        }
+        else
+        {
+            // Only execute the next detourPaths once detour is empty
+            if (targetPaths != null)
+            {
+                Vector2 targetPoint = (Vector2)targetPaths[0];
 
+                Vector2 targetDir = (targetPoint - GlobalPosition).Normalized();
+                Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+
+                GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
+
+                if (GlobalPosition.DistanceTo(targetPoint) < PATHRADIUS)
+                {
+                    targetPaths.RemoveAt(0);
+
+                    if (targetPaths.Count == 0)
+                    {
+                        targetPaths = null;
+                    }
+                }
+                else
+                {
+                    MoveAndSlide(targetDir * speed);
+                }
+            }
         }
 
         if (target != null)
@@ -186,8 +213,8 @@ public class Enemy : Tank
             // If not same team identifier, identify as target
             if (((Tank)body).getTeamIdentifier() != getTeamIdentifier())
             {
-                // target = body;
-                //  targetPaths = null;
+                target = body;
+                targetPaths = null;
             }
         }
     }
@@ -195,17 +222,38 @@ public class Enemy : Tank
     private void _on_FrontDetection_body_entered(Node2D body)
     {
         // Perform a follow behavior during agent collision
-        if (body.HasMethod("getCurrentSpawnIndex"))
+        if (body.HasMethod("getCurrentSpawnIndex") && targetPaths != null)
         {
-            int spawnIndex = ((Enemy)body).getCurrentSpawnIndex();
-            // Set the smaller target index as the domainat
-            if (spawnIndex < currentSpawnPointIndex)
+            Vector2 nextPosition = (body.GlobalPosition - GlobalPosition).Rotated(Mathf.Pi / 2);
+
+            if (detourPaths == null)
             {
-                currentSpawnPointIndex = spawnIndex;
-                calculatePath();
+                detourPaths = new Godot.Collections.Array();
+            }
+
+            detourPaths.Insert(0, GlobalPosition + nextPosition);
+
+            int spawnIndex = ((Enemy)body).getCurrentSpawnIndex();
+
+            if(spawnIndex > currentSpawnPointIndex)
+            {
+                currentSpawnPointIndex = spawnIndex - 1;
+                targetPaths.Clear();
+                targetPaths = null;
+            }
+            else
+            {
+                targetPaths.Clear();
+                targetPaths = null;
             }
         }
     }
+
+    private void _on_FrontDetection_body_exit(Node2D body)
+    {
+
+    }
+
 
     private void _on_DetectRadius_body_exited(Node2D body)
     {
