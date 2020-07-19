@@ -130,8 +130,7 @@ public class Tank : KinematicBody2D
             // Update to use this weapon as primary
             currentPrimaryWeaponIndex = primaryWeapons.Count - 1;
             weaponHolder.AddChild(curretnWeapon);
-            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primary            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);Weapons[currentPrimaryWeaponIndex]).weaponType);
-
+            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
             return true;
         }
 
