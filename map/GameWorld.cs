@@ -36,6 +36,8 @@ public class GameWorld : Node2D
         public bool primaryWepaon;
         public bool secondaryWepaon;
         public int health;
+        public int primaryWeaponIndex;
+        public int secondaryWeaponIndex;
     }
 
     public class Snapshot : Godot.Object
@@ -109,8 +111,7 @@ public class GameWorld : Node2D
         // Spawn the players
         if (GetTree().IsNetworkServer())
         {
-            aStar = new AStar();
-aStarSolver = new RaycastAStar();
+            aStarSolver = new RaycastAStar();
             spwanPlayer(convertToString(network.gamestateNetworkPlayer, 1));
             // The amount doesn't matter because it will be calculated in the function body
             syncBots(-1);
@@ -128,7 +129,7 @@ aStarSolver = new RaycastAStar();
     {
         if (spawnPointIndex >= GetNode("SpawnPoints").GetChildCount())
         {
-            spawnPointIndex = GetNode("SpawnPoints").GetChildCount() - 1;;
+            spawnPointIndex = GetNode("SpawnPoints").GetChildCount() - 1; ;
         }
 
         return ((Node2D)GetNode("SpawnPoints/SpawnPoint_" + spawnPointIndex)).GlobalPosition;
@@ -201,6 +202,8 @@ aStarSolver = new RaycastAStar();
             encodedData = encodedData + item.Value.primaryWepaon + ";";
             encodedData = encodedData + item.Value.secondaryWepaon + ";";
             encodedData = encodedData + item.Value.health + ";";
+            encodedData = encodedData + item.Value.primaryWeaponIndex + ";";
+            encodedData = encodedData + item.Value.secondaryWeaponIndex + ";";
         }
         // Bot data count
         encodedData = encodedData + snapshot.botData.Count + ";";
@@ -215,6 +218,8 @@ aStarSolver = new RaycastAStar();
             encodedData = encodedData + item.Value.primaryWepaon + ";";
             encodedData = encodedData + item.Value.secondaryWepaon + ";";
             encodedData = encodedData + item.Value.health + ";";
+            encodedData = encodedData + item.Value.primaryWeaponIndex + ";";
+            encodedData = encodedData + item.Value.secondaryWeaponIndex + ";";
         }
         // First add the snapshot signature (timestamp)
         RpcUnreliable(nameof(clientGetSnapshot), encodedData);
@@ -262,6 +267,10 @@ aStarSolver = new RaycastAStar();
             parseIndex++;
             clientData.health = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
+            clientData.primaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            parseIndex++;
+            clientData.secondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            parseIndex++;
 
             snapshot.playerData.Add(clientData.id, clientData);
         }
@@ -288,6 +297,10 @@ aStarSolver = new RaycastAStar();
             parseIndex++;
             clientData.health = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
+            clientData.primaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            parseIndex++;
+            clientData.secondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            parseIndex++;
 
             snapshot.botData.Add(clientData.id, clientData);
         }
@@ -313,7 +326,8 @@ aStarSolver = new RaycastAStar();
                 continue;
             }
 
-
+            client.currentPrimaryWeaponIndex = item.Value.primaryWeaponIndex;
+            client.currentSecondaryWeaponIndex = item.Value.primaryWeaponIndex;
             client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
             client.setHealth(item.Value.health);
         }
@@ -328,6 +342,9 @@ aStarSolver = new RaycastAStar();
                 {
                     continue;
                 }
+
+                client.currentPrimaryWeaponIndex = item.Value.primaryWeaponIndex;
+                client.currentSecondaryWeaponIndex = item.Value.primaryWeaponIndex;
                 client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
                 client.setHealth(item.Value.health);
             }
@@ -422,6 +439,8 @@ aStarSolver = new RaycastAStar();
                     if (input.Value.right) { moveDir.x = 1; }
                     primaryWeapon = input.Value.primaryWepaon;
                     secondaryWeapon = input.Value.secondaryWepaon;
+                    if(input.Value.changePrimaryWeapon){playerNode.changePrimaryWeapon();}
+                    if(input.Value.changeSecondaryWeapon){playerNode.changeSecondaryWeapon();}
                     playerNode._shoot(primaryWeapon, secondaryWeapon);
                     playerNode.move(moveDir, input.Value.mousePosition, delta);
                 }
@@ -437,6 +456,8 @@ aStarSolver = new RaycastAStar();
                 clientData.rotation = playerNode.Rotation;
                 clientData.primaryWepaon = primaryWeapon;
                 clientData.secondaryWepaon = secondaryWeapon;
+                clientData.primaryWeaponIndex = playerNode.currentPrimaryWeaponIndex;
+                clientData.secondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
                 clientData.health = playerNode.getHealth();
 
                 snapshot.playerData.Add(networkPlayer.Key, clientData);
@@ -487,13 +508,13 @@ aStarSolver = new RaycastAStar();
     private SpwanInfo convertToObject(String info)
     {
         SpwanInfo spwanInfo = new SpwanInfo();
-        spwanInfo.networkPlayer = network.convertToObject(info);
-        spwanInfo.spawn_index = Int32.Parse(info.Split(";")[2]);
+        spwanInfo.networkPlayer = new NetworkPlayer(info);
+        spwanInfo.spawn_index = Int32.Parse(info.Split(";")[3]);
         return spwanInfo;
     }
     private String convertToString(NetworkPlayer networkPlayer, int spawn_index)
     {
-        return network.convertToString(networkPlayer) + ";" + spawn_index;
+        return networkPlayer.ToString() + ";" + spawn_index;
     }
 
 
@@ -501,7 +522,7 @@ aStarSolver = new RaycastAStar();
     private void spwanPlayer(String info)
     {
         SpwanInfo spwanInfo = convertToObject(info);
-        NetworkPlayer pininfo = network.convertToObject(info);
+        NetworkPlayer pininfo = new NetworkPlayer(info);
         int spawnIndex = spwanInfo.spawn_index;
 
         // If the spawn_index is -1 then we define it based on the size of the player list
@@ -544,10 +565,9 @@ aStarSolver = new RaycastAStar();
         Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + getNextSpawnIndex(spawnIndex - 1));
         client.Position = nodeSpawnPoint.GlobalPosition;
 
-        client.Connect("ShootSingal", this, "_onTankShoot");
         client.Name = "client_" + pininfo.net_id;
         client.setUnitName(pininfo.name);
-        client.setTeamIdentifier("TEAM_CLIENT_" + pininfo.net_id);
+        client.setTeamIdentifier(pininfo.team);
 
         // If this actor does not belong to the server, change the network master accordingly
         if (pininfo.net_id != 1)
@@ -563,8 +583,10 @@ aStarSolver = new RaycastAStar();
             Camera2D camera2D = new Camera2D();
             camera2D.Name = "Camera2D";
             client.AddChild(camera2D);
-            client.Connect("AmmoChangedSignal", GetNode("HUD"), "_updateAmmoBar");
+            // client.Connect("AmmoChangedSignal", GetNode("HUD"), "_updateAmmoBar");
             // client.Connect("DeadSignal", this, "_on_Player_Dead");
+            client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updatePrimaryWeapon");
+            client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updateSecondaryWeapon");
             client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
             _setCameraLimit();
         }
@@ -616,19 +638,17 @@ aStarSolver = new RaycastAStar();
 
 
                 // Get spawn position, -1 as to utilize 0 spawn point
-                int currentSpawnPoint = getNextSpawnIndex(spawnBots.Count - 2);
+                int currentSpawnPoint = spawnBots.Count % GetNode("SpawnPoints").GetChildCount();
                 Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
 
-                bot.Connect("ShootSingal", this, "_onTankShoot");
                 bot.Name = spawnBots[spawnBots.Count - 1].name;
                 bot.setUnitName(spawnBots[spawnBots.Count - 1].name);
-                bot.setTeamIdentifier("TEAM");
+                bot.setTeamIdentifier("TEAM_BOT");
 
                 bot.Position = nodeSpawnPoint.GlobalPosition;
 
                 bot.SetNetworkMaster(1);
                 bot.setCurrentSpawnIndex(currentSpawnPoint);
-
 
                 AddChild(bot);
             }

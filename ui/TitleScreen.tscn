@@ -20,10 +20,10 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.5 ),
-"transitions": PoolRealArray( 1, 1 ),
+"times": PoolRealArray( 0, 0.5, 0.501 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
-"values": [ Vector2( 145.317, -154.746 ), Vector2( 145.317, 255.317 ) ]
+"values": [ Vector2( 145.317, -154.746 ), Vector2( 145.317, 170.902 ), Vector2( 145.317, 170.902 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("PlayMessage:visible")
@@ -34,7 +34,7 @@ tracks/1/enabled = true
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.5, 0.6 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
-"update": 1,
+"update": 0,
 "values": [ false, false, true ]
 }
 
@@ -62,38 +62,37 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -366.683
-margin_top = -454.746
-margin_right = 375.317
-margin_bottom = -356.746
+margin_left = -381.5
+margin_top = -119.758
+margin_right = 381.5
+margin_bottom = -21.7574
 custom_fonts/font = SubResource( 1 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 3
 custom_constants/shadow_offset_y = 3
-text = "Tank Battle"
+text = "Mach Battle"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="PlayMessage" type="Label" parent="."]
-visible = false
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -355.0
-margin_top = 142.018
-margin_right = 355.0
-margin_bottom = 199.018
+margin_left = -354.22
+margin_top = -7.28265
+margin_right = 355.78
+margin_bottom = 49.7173
 custom_fonts/font = SubResource( 2 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 3
 custom_constants/shadow_offset_y = 3
-text = "Press Space to Play"
+text = "create/join server"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -103,10 +102,10 @@ autoplay = "start"
 anims/start = SubResource( 3 )
 
 [node name="PanelHost" type="Panel" parent="."]
-margin_left = 382.902
-margin_top = 237.098
-margin_right = 653.902
-margin_bottom = 405.098
+margin_left = 406.414
+margin_top = 432.25
+margin_right = 676.414
+margin_bottom = 595.25
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -163,10 +162,10 @@ margin_bottom = 87.288
 text = "Max Connections"
 
 [node name="btCreate" type="Button" parent="PanelHost"]
-margin_left = 205.051
-margin_top = 129.221
-margin_right = 258.051
-margin_bottom = 149.221
+margin_left = 123.3
+margin_top = 130.808
+margin_right = 176.3
+margin_bottom = 150.808
 text = "Create"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -180,10 +179,13 @@ margin_bottom = 17.8689
 text = "CreateServer"
 
 [node name="PanelJoin" type="Panel" parent="."]
-margin_left = 381.131
-margin_top = 421.226
-margin_right = 655.131
-margin_bottom = 588.226
+margin_left = 702.183
+margin_top = 429.957
+margin_right = 976.183
+margin_bottom = 596.957
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Label" type="Label" parent="PanelJoin"]
 margin_left = 93.6271
@@ -237,10 +239,10 @@ margin_right = 72.3404
 margin_bottom = 155.168
 
 [node name="PanelPlayer" type="Panel" parent="."]
-margin_left = 13.0
-margin_top = 9.0
-margin_right = 376.0
-margin_bottom = 595.0
+margin_left = 406.0
+margin_top = 357.0
+margin_right = 966.0
+margin_bottom = 419.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -262,21 +264,42 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label2" type="Label" parent="PanelPlayer"]
+[node name="lblPlayerTeam" type="Label" parent="PanelPlayer"]
 margin_left = 182.045
 margin_top = 3.56729
 margin_right = 296.045
 margin_bottom = 21.5673
-text = "Player Icon"
+text = "Player Team"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="spritePlayerIcon" type="Sprite" parent="PanelPlayer"]
 
-[node name="btDefaultColor" type="Button" parent="PanelPlayer"]
-margin_left = 5.47958
-margin_top = 534.626
-margin_right = 63.4796
-margin_bottom = 554.626
-text = "Default"
+[node name="txtPlayerTeam" type="LineEdit" parent="PanelPlayer"]
+margin_left = 182.0
+margin_top = 20.0
+margin_right = 342.0
+margin_bottom = 44.0
+text = "Team1"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+margin_left = 49.4097
+margin_top = 357.41
+margin_right = 344.41
+margin_bottom = 600.41
+text = "Control Instruction
+
+W - UP
+A - RIGHT
+S - DOWN
+D - LEFT
+Q - PRIMARY WEAPON CHANGE
+
+MOUSE - AIM
+MOUSE LEFT CLICK - PRIMARY WEAPON
+MOUSE RIGHT CLICK - SECONDARY WEAPON
+"
 __meta__ = {
 "_edit_use_anchors_": false
 }

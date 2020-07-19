@@ -12,15 +12,28 @@ public class Player : Tank
         {
             // Decode the input data
             GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
+            int parseIndex = 0;
 
-            playerInput.right = bool.Parse(inputData.Split(";")[0]);
-            playerInput.left = bool.Parse(inputData.Split(";")[1]);
-            playerInput.up = bool.Parse(inputData.Split(";")[2]);
-            playerInput.down = bool.Parse(inputData.Split(";")[3]);
-            playerInput.primaryWepaon = bool.Parse(inputData.Split(";")[4]);
-            playerInput.secondaryWepaon = bool.Parse(inputData.Split(";")[5]);
-            playerInput.mousePosition.x = float.Parse(inputData.Split(";")[6]);
-            playerInput.mousePosition.y = float.Parse(inputData.Split(";")[7]);
+            playerInput.right = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.left = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.up = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.down = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.primaryWepaon = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.secondaryWepaon = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.mousePosition.x = float.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.mousePosition.y = float.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.changePrimaryWeapon = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.changeSecondaryWeapon = bool.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
 
             // Then cache the decoded data
             gameStates.cacheInput(GetTree().GetRpcSenderId(), playerInput);
@@ -31,10 +44,6 @@ public class Player : Tank
 
     public void gatherInput(float delta)
     {
-
-
-
-
         GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
 
         playerInput.right = Input.IsActionPressed("turn_right");
@@ -44,6 +53,8 @@ public class Player : Tank
         playerInput.primaryWepaon = Input.IsActionPressed("left_click");
         playerInput.secondaryWepaon = Input.IsActionPressed("right_click");
         playerInput.mousePosition = GetGlobalMousePosition();
+        playerInput.changePrimaryWeapon = Input.IsActionJustPressed("change_primary_weapon");
+        playerInput.changeSecondaryWeapon = Input.IsActionJustPressed("change_secondary_weapon");
 
         if (GetTree().IsNetworkServer())
         {
@@ -60,6 +71,8 @@ public class Player : Tank
             inputData = inputData + playerInput.secondaryWepaon + ";";
             inputData = inputData + playerInput.mousePosition.x + ";";
             inputData = inputData + playerInput.mousePosition.y + ";";
+            inputData = inputData + playerInput.changePrimaryWeapon + ";";
+            inputData = inputData + playerInput.changeSecondaryWeapon + ";";
 
             RpcUnreliableId(1, nameof(serverGetPlayerInput), inputData);
         }

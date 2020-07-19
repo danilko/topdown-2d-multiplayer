@@ -12,15 +12,10 @@ public class Tank : KinematicBody2D
     public delegate void DeadSignal();
 
     [Signal]
-    public delegate void ShootSingal();
-
+    public delegate void PrimaryWeaponChangeSignal();
 
     [Signal]
-    public delegate void AmmoChangedSignal();
-
-
-    [Export]
-    protected PackedScene Bullet;
+    public delegate void SecondaryWeaponChangeSignal();
 
     [Export]
     protected int MaxSpeed;
@@ -29,36 +24,35 @@ public class Tank : KinematicBody2D
     protected float RotationSpeed;
 
     [Export]
-    protected float GunCooldown;
-
-    [Export]
     protected int MaxHealth;
 
     [Export]
-    protected int MaxAmmo = 20;
-
-    [Export]
-    protected int Ammo = -1;
-
-    [Export]
-    protected int GunShot = 1;
-
-    [Export]
-    protected float GunSpread;
+    protected int MaxEnergy;
 
     protected Vector2 Velocity;
-    protected Boolean CanShoot = true;
     protected Boolean Alive = true;
 
     public float currentTime = 0;
+
+    public int currentPrimaryWeaponIndex { get; set; }
+    public int currentSecondaryWeaponIndex { get; set; }
+
+    protected Godot.Collections.Array primaryWeapons = new Godot.Collections.Array();
+    protected Godot.Collections.Array secondaryWeapons = new Godot.Collections.Array();
+
+    [Export]
+    private int MaxPrimaryWeaponCount = 2;
+
+    [Export]
+    private int MaxSecondaryWeaponCount = 1;
 
 
     [Export]
     private String unitName = "Default";
 
-    int max_dist = 2000;
-
     private int health;
+
+    private int energy;
 
     protected AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
     protected AudioStream moveMusicClip = (AudioStream)GD.Load("res://assets/sounds/sci-fi_device_item_power_up_flash_01.wav");
@@ -66,31 +60,112 @@ public class Tank : KinematicBody2D
     protected GameStates gameStates;
     protected Network network;
 
+    protected Node2D target = null;
+
     private String teamIdentifier = "UNKOWN";
+
+    protected GameWorld gameworld;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        gameworld = (GameWorld)GetParent();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
         network = (Network)GetNode("/root/NETWORK");
 
-        Timer timer = (Timer)GetNode("GunTimer");
-        timer.WaitTime = GunCooldown;
         health = MaxHealth;
+        energy = MaxEnergy;
 
         Particles2D smoke = (Particles2D)GetNode("Smoke");
         smoke.Emitting = false;
 
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
-        EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
 
-        Label label = (Label)(GetNode("UnitDisplay/Name"));
-        label.Text = this.unitName;
+        currentPrimaryWeaponIndex = -1;
+        currentSecondaryWeaponIndex = -1;
+
+        // Temporary script to automatic load weapon
+        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
+        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
+
+        EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
+    }
+
+    public void changePrimaryWeapon()
+    {
+        if (currentPrimaryWeaponIndex != -1)
+        {
+            ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Hide();
+            currentPrimaryWeaponIndex = (currentPrimaryWeaponIndex + 1) % primaryWeapons.Count;
+            ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Show();
+            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
+        }
+    }
+
+    public void changeSecondaryWeapon()
+    {
+        if (currentSecondaryWeaponIndex != -1)
+        {
+            ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Hide();
+            currentSecondaryWeaponIndex = (currentSecondaryWeaponIndex + 1) % secondaryWeapons.Count;
+            ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Show();
+            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
+        }
+
+    }
+    public bool updatePrimaryWeapon(PackedScene weapon)
+    {
+        if (primaryWeapons.Count < MaxPrimaryWeaponCount)
+        {
+            // Hide existing weapon if exist
+            if (currentPrimaryWeaponIndex != -1)
+            {
+                ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Hide();
+            }
+
+            Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
+            Weapon curretnWeapon = (Weapon)(weapon.Instance());
+            curretnWeapon.gameWorld = (GameWorld)GetParent();
+            primaryWeapons.Add(curretnWeapon);
+            // Update to use this weapon as primary
+            currentPrimaryWeaponIndex = primaryWeapons.Count - 1;
+            weaponHolder.AddChild(curretnWeapon);
+            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primary            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);Weapons[currentPrimaryWeaponIndex]).weaponType);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool updateSecondaryWeapon(PackedScene weapon)
+    {
+        if (secondaryWeapons.Count < MaxSecondaryWeaponCount)
+        {
+            // Hide existing weapon if exist
+            if (currentSecondaryWeaponIndex != -1)
+            {
+                ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Hide();
+            }
+
+            Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
+            Weapon curretnWeapon = (Weapon)(weapon.Instance());
+            secondaryWeapons.Add(curretnWeapon);
+            // Update to use this weapon as primary
+            currentSecondaryWeaponIndex = secondaryWeapons.Count - 1;
+            weaponHolder.AddChild(curretnWeapon);
+            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
+
+            return true;
+        }
+
+        return false;
     }
 
     public void setTeamIdentifier(String inputTeamIdentifier)
     {
         teamIdentifier = inputTeamIdentifier;
+        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + teamIdentifier + ")";
     }
 
     public String getTeamIdentifier()
@@ -101,8 +176,7 @@ public class Tank : KinematicBody2D
     public void setUnitName(String unitName)
     {
         this.unitName = unitName;
-        Label label = (Label)(GetNode("UnitDisplay/Name"));
-        label.Text = this.unitName;
+        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + teamIdentifier + ")";
     }
 
     public String getUnitName()
@@ -113,96 +187,6 @@ public class Tank : KinematicBody2D
     public virtual void _Control(float delta) { }
 
     public virtual void _shootSecondary() { }
-
-
-    public void handleBeam()
-    {
-        Node2D laser = (Node2D)GetNode("Turret/Laser");
-        if (laser != null)
-        {
-            Physics2DDirectSpaceState ray = GetWorld2d().DirectSpaceState;
-            Node2D muzzle = (Node2D)GetNode("Turret/Muzzle");
-            Godot.Collections.Dictionary hit = ray.IntersectRay(muzzle.GlobalPosition, muzzle.GlobalPosition + Transform.x * max_dist, new Godot.Collections.Array() { this }, 1, true, true);
-
-            if (hit.Count > 0)
-            {
-                Vector2 hit_position = (Vector2)hit["position"];
-
-                float laserLength = laser.GlobalPosition.DistanceTo(hit_position);
-                Vector2 laserScale = laser.Scale;
-                laserScale.x = laserLength;
-                laser.Scale = laserScale;
-
-                // TODO: FIX TO FIND THE CORRECT OBJECT
-            //    Node body = GetNode("/root/Map/" + hit["collider_id"]);
-
-              //  if (body != null && body.HasMethod("TakeDamage"))
-             //   {
-             //       Tank tank = (Tank)(body);
-             //       tank.TakeDamage(5, Position - hit_position);
-             //   }
-
-            }
-            else
-            {
-                Vector2 laserScale = laser.Scale;
-                laserScale.x = max_dist;
-                laser.Scale = laserScale;
-            }
-        }
-    }
-
-    public void cleanBeam()
-    {
-        Node2D laser = (Node2D)GetNode("Turret/Laser");
-        if (laser != null)
-        {
-            Vector2 laserScale = laser.Scale;
-            laserScale.x = 0;
-            laser.Scale = laserScale;
-        }
-    }
-
-
-    public virtual void _shoot(int num, float spread, Node2D target = null)
-    {
-        if (CanShoot && Ammo != 0)
-        {
-            CanShoot = false;
-            Ammo -= 1;
-            EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
-
-            Timer timer = (Timer)GetNode("GunTimer");
-            timer.Start();
-            Sprite turret = (Sprite)GetNode("Turret");
-
-            Vector2 dir = (new Vector2(1, 0)).Rotated(turret.GlobalRotation);
-
-            Position2D muzzle = (Position2D)GetNode("Turret/Muzzle");
-            if (num > 1)
-            {
-                for (int i = 0; i < num; i++)
-                {
-                    float a = -spread + i * (2 * spread) / (num - 1);
-                    EmitSignal(nameof(ShootSingal), Bullet, muzzle.GlobalPosition, dir.Rotated(a), target);
-                }
-            }
-            else
-            {
-                EmitSignal(nameof(ShootSingal), Bullet, muzzle.GlobalPosition, dir, target);
-            }
-
-            AnimationPlayer animationPlayer = (AnimationPlayer)GetNode("AnimationPlayer");
-            animationPlayer.Play("muzzle_flash");
-
-            // knock back effect
-            if (MaxSpeed != 0)
-            {
-                MoveAndSlide(dir * -500);
-            }
-
-        }
-    }
 
 
     public void move(Vector2 moveDir, Vector2 pointPosition, float delta)
@@ -221,8 +205,8 @@ public class Tank : KinematicBody2D
         // Move effect
         if (playerMove)
         {
-           // AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-           //audioManager.playSoundEffect(moveMusicClip);
+            AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+            audioManager.playSoundEffect(moveMusicClip);
         }
         if (Velocity.x != 0 || Velocity.y != 0)
         {
@@ -241,18 +225,24 @@ public class Tank : KinematicBody2D
 
     public void _shoot(bool primaryWeapon, bool secondaryWeapon)
     {
-        if (primaryWeapon)
+        if (primaryWeapon && currentPrimaryWeaponIndex != -1)
         {
-            _shoot(GunShot, GunSpread, null);
+            // knock back effect
+            if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).fire(target) && MaxSpeed != 0)
+            {
+                Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+                MoveAndSlide(dir * -1 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
+            }
         }
 
-        if (secondaryWeapon)
+        if (secondaryWeapon && currentSecondaryWeaponIndex != -1)
         {
-            handleBeam();
-        }
-        else
-        {
-            cleanBeam();
+            // knock back effect
+            if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).fire(target) && MaxSpeed != 0)
+            {
+                Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+                MoveAndSlide(dir * -1 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
+            }
         }
     }
 
@@ -309,20 +299,33 @@ public class Tank : KinematicBody2D
         }
     }
 
-    public void ammoIncrease(int amount)
+    public bool ammoIncrease(Weapon.WeaponAmmoType weaponAmmoType, int amount)
     {
+        bool consume = false;
 
-        Ammo = +amount;
-
-        if (Ammo > MaxAmmo)
+        if (weaponAmmoType != Weapon.WeaponAmmoType.machine_energy)
         {
-            Ammo = MaxAmmo;
+            foreach (Weapon currentWeapon in primaryWeapons)
+            {
+                if (weaponAmmoType == currentWeapon.weaponAmmoType)
+                {
+                    consume = true;
+                    ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).ammoIncrease(amount);
+                }
+            }
+        }
+        else
+        {
+            energy = +amount;
+
+            if (energy > MaxEnergy)
+            {
+                energy = MaxEnergy;
+            }
         }
 
-        EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
+        return consume;
     }
-
-
 
     private void explode()
     {
@@ -338,16 +341,8 @@ public class Tank : KinematicBody2D
         animatedSprite.Show();
         animatedSprite.Play("fire");
 
-
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(musicClip);
-
-    }
-
-    public void _on_GunTimerTimeout()
-    {
-        CanShoot = true;
-        Timer timer = (Timer)GetNode("GunTimer");
     }
 
     private void _OnExplosionAnimationFinished()

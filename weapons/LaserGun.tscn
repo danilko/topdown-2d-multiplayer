@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/laser_head.png" type="Texture" id=2]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
+[ext_resource path="res://weapons/LaserGun.cs" type="Script" id=4]
+
+[node name="Weapon" instance=ExtResource( 1 )]
+script = ExtResource( 4 )
+weaponType = 1
+KnockbackForce = 100.0
+GunCooldown = 0.1
+WeaponName = "LaserGun"
+
+[node name="TriggerPoint" parent="." index="1"]
+position = Vector2( 100, 0 )
+
+[node name="Body" type="Sprite" parent="." index="2"]
+position = Vector2( 36.8704, 0 )
+texture = ExtResource( 3 )
+region_enabled = true
+region_rect = Rect2( 420, 36, 120, 32 )
+
+[node name="Laser" type="Sprite" parent="." index="3"]
+modulate = Color( 50, 1, 1, 1 )
+position = Vector2( 103.226, 0 )
+texture = ExtResource( 2 )
+offset = Vector2( 0.5, 0 )

@@ -8,7 +8,7 @@ public class GameStates : Node
     public int current_level = 0;
 
     // How many game updates per second
-    public float updateRate = 120;
+    public float updateRate = 60;
     public float updateDelta = 0;
 
     public String[] levels = { "res://ui/TitleScreen.tscn", "res://map/GameWorld.tscn" };
@@ -30,7 +30,8 @@ public class GameStates : Node
 
         public bool primaryWepaon;
         public bool secondaryWepaon;
-
+        public bool changePrimaryWeapon;
+        public bool changeSecondaryWeapon;
     }
 
     // Holds player input data (including the local one) which will be used to update the game state

@@ -32,7 +32,7 @@ public class HUD : CanvasLayer
     private void onPlayerListChanged()
     {
         // Update the server name
-        ((Label)GetNode("PanelServerInfo/lblServerName")).Text = "Server: " + network.serverinfo.name;
+        ((Label)GetNode("lblServerName")).Text = "Server: " + network.serverinfo.name;
 
         Node boxList = GetNode("boxList");
         foreach (Node node in boxList.GetChildren())
@@ -56,7 +56,7 @@ public class HUD : CanvasLayer
                 boxList.AddChild(playerEntryRoot);
             }
 
-            
+
 
         }
     }
@@ -80,6 +80,26 @@ public class HUD : CanvasLayer
     {
         TextureProgress ammoBar = (TextureProgress)GetNode("Margin/Container/AmmoBar");
         ammoBar.Value = value;
+
+    }
+
+    public void _updatePrimaryWeapon(Weapon.WeaponType weaponType)
+    {
+        ((Label)GetNode("lblPrimaryWeaponLabel")).Text = "" + weaponType.ToString();
+        Sprite symbol = ((Sprite)GetNode("spPrimaryWeaponSymbol"));
+
+        if (weaponType == Weapon.WeaponType.lasergun)
+        {
+            symbol.RegionRect = new Rect2(new Vector2(419, 36), new Vector2(121, 32));
+        }
+        else if (weaponType == Weapon.WeaponType.rifile)
+        {
+            symbol.RegionRect = new Rect2(new Vector2(763, 39), new Vector2(71, 28));
+        }
+
+    }
+    public void _updateSecondaryWeapon(Weapon.WeaponType weaponType)
+    {
 
     }
 

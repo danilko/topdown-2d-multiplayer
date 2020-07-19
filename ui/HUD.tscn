@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
 [ext_resource path="res://assets/ui/green_circle.png" type="Texture" id=3]
 [ext_resource path="res://assets/ui/yellow_boxTick.png" type="Texture" id=4]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=5]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource( 1 )
@@ -49,6 +50,16 @@ fill_mode = 4
 radial_initial_angle = 270.0
 radial_fill_degrees = 180.0
 
+[node name="lblPrimaryWeaponLabel" type="Label" parent="."]
+margin_left = 320.378
+margin_top = 10.1396
+margin_right = 423.378
+margin_bottom = 24.1396
+text = "PrimaryWeapon"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="lblLocalPlayer" type="Label" parent="."]
 margin_left = 27.3425
 margin_top = 83.4875
@@ -67,16 +78,29 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="lblServerName" type="Label" parent="."]
+margin_left = 605.0
+margin_top = 563.0
+margin_right = 1010.0
+margin_bottom = 580.0
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="PanelServerInfo" type="Panel" parent="."]
-margin_left = 800.0
-margin_top = 200.0
-margin_right = 840.0
-margin_bottom = 240.0
+margin_left = 605.0
+margin_top = 563.0
+margin_right = 709.0
+margin_bottom = 579.0
 rect_scale = Vector2( 3.88731, 2.12269 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblServerName" type="Label" parent="PanelServerInfo"]
-margin_right = 40.0
-margin_bottom = 14.0
+[node name="spPrimaryWeaponSymbol" type="Sprite" parent="."]
+position = Vector2( 383.145, 45.0868 )
+scale = Vector2( 1.18019, 1.18019 )
+texture = ExtResource( 5 )
+region_enabled = true

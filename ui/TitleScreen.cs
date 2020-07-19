@@ -3,12 +3,6 @@ using System;
 
 public class TitleScreen : Control
 {
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
-
-    // Called when the node enters the scene tree for the first time.
-
     Network network;
 
     public override void _Ready()
@@ -24,8 +18,8 @@ public class TitleScreen : Control
 
     private void setPlayerInfo()
     {
-        LineEdit lineEdit = (LineEdit)GetNode("PanelPlayer/txtPlayerName");
-        network.gamestateNetworkPlayer.name = lineEdit.Text;
+        network.gamestateNetworkPlayer.name = ((LineEdit)GetNode("PanelPlayer/txtPlayerName")).Text;
+        network.gamestateNetworkPlayer.team = ((LineEdit)GetNode("PanelPlayer/txtPlayerTeam")).Text;
     }
 
     private void readyToPlay()

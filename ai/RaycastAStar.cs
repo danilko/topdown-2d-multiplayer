@@ -212,16 +212,17 @@ public class RaycastAStar
                 // If this path is better than the previous path through this neighbor, record it
                 if (tentativeGscore < neighborGScore)
                 {
+
                     // This lets us work backwards through best-points later
-                    cameFrom.Add(neighborId, current);
+                    if (!cameFrom.Contains(neighborId)) { cameFrom.Add(neighborId, current); }
 
                     // gScore is the actual distance it took to get here from the start
-                    gScore.Add(neighborId, tentativeGscore);
+                    if (!gScore.Contains(neighborId)) { gScore.Add(neighborId, tentativeGscore); }
 
                     // fScore is the actual distance from the start plus the estimated distance to the end
                     // Whoever has the best fScore in the openSet gets our attention next
                     // Therefore we are always inspecting the current best-guess-path
-                    fScore.Add(neighborId, tentativeGscore + hDistance(end, neighbor));
+                    if (!fScore.Contains(neighborId)) { fScore.Add(neighborId, tentativeGscore + hDistance(end, neighbor));}
 
                     // This would allow revisiting if the heuristic were not consistent
                     // But in our use case we should not end up revisiting nodes

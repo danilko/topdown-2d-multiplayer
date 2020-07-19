@@ -89,7 +89,7 @@ public class Network : Node
         // Tell the server has been created successfully
         EmitSignal(nameof(ServerCreatedSignal));
 
-        registerPlayer(convertToString(gamestateNetworkPlayer));
+        registerPlayer(gamestateNetworkPlayer.ToString());
     }
 
     public void joinServer(String ip, int port)
@@ -115,10 +115,10 @@ public class Network : Node
         gamestateNetworkPlayer.net_id = GetTree().GetNetworkUniqueId();
         GD.Print(hostType + ": Player " + gamestateNetworkPlayer.net_id + "connected _on_connected_to_server");
 
-        RpcId(1, nameof(registerPlayer), convertToString(gamestateNetworkPlayer));
+        RpcId(1, nameof(registerPlayer), gamestateNetworkPlayer.ToString());
 
         // And register itself on the local list
-        registerPlayer(convertToString(gamestateNetworkPlayer));
+        registerPlayer(gamestateNetworkPlayer.ToString());
     }
 
     // Everyone gets notified whenever a new client joins the server
@@ -294,7 +294,7 @@ public class Network : Node
     [Remote]
     private void registerPlayer(String info)
     {
-        NetworkPlayer pininfo = convertToObject(info);
+        NetworkPlayer pininfo = new NetworkPlayer(info);
 
         GD.Print(hostType + ": Register player preapre for " + pininfo.net_id);
 
@@ -305,13 +305,13 @@ public class Network : Node
             {
                 GD.Print(hostType + ": Register player info send to " + pininfo.net_id + " with" + item.Value.net_id);
                 // Send currently iterated player info to the new player
-                RpcId(pininfo.net_id, nameof(registerPlayer), convertToString(item.Value));
+                RpcId(pininfo.net_id, nameof(registerPlayer), item.Value.ToString());
 
                 // Send new player info to currently iterated player, skipping the server (which will get the info shortly)
                 if (item.Key != 1)
                 {
                     GD.Print(hostType + ": Register player info send to " + item.Key + " with" + pininfo.net_id);
-                    RpcId(item.Key, nameof(registerPlayer), convertToString(pininfo));
+                    RpcId(item.Key, nameof(registerPlayer), pininfo.ToString());
                 }
             }
         }
@@ -326,20 +326,6 @@ public class Network : Node
 
         EmitSignal(nameof(PlayerListChangedSignal));    // And notify that the player list has been changed
     }
-
-
-    public String convertToString(NetworkPlayer networkPlayer)
-    {
-        return networkPlayer.net_id + ";" + networkPlayer.name;
-    }
-    public NetworkPlayer convertToObject(String info)
-    {
-        NetworkPlayer networkPlayer = new NetworkPlayer();
-        networkPlayer.net_id = Int32.Parse(info.Split(";")[0]);
-        networkPlayer.name = info.Split(";")[1];
-        return networkPlayer;
-    }
-
 
     [Remote]
     private void unregisterPlayer(int id)

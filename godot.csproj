@@ -73,6 +73,9 @@
     <Compile Include="ui\TitleScreen.cs" />
     <Compile Include="ui\UIPlayerListEntry.cs" />
     <Compile Include="ui\UnitDisplay.cs" />
+    <Compile Include="weapons\LaserGun.cs" />
+    <Compile Include="weapons\Rifile.cs" />
+    <Compile Include="weapons\Weapon.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies">
