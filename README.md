@@ -3,7 +3,7 @@ top - down 2D multiplayer base on godot
 
 Video Sample
 
-https://www.youtube.com/watch?v=2MOOPJU05Zk
+https://www.youtube.com/playlist?list=PLlwvRbWsWmGUtEd47nyo0MUZJVJqvd4Iv
 
 Code Reference
 ======
@@ -31,11 +31,11 @@ https://gamesounds.xyz/?dir=Sonniss.com%20-%20GDC%202016%20-%20Game%20Audio%20Bu
 
 What is working
 ======
-Basic top down 2D player effect with project tile shooting
+Basic top down 2D player effect with project tile shooting with networking support
 
 TODO
 ======
-The bot is equip with basic AI, but still not good with collision avoidance with each other
+The bot is equip with basic AI, but still not good with collision avoidance with each other (workaround now with no collision to save AI resource (there is basic code avoidance also in there can be enabled if need))
 Secondary weapson laser effect damages
 Better Game Play
 Character end of life behavior
