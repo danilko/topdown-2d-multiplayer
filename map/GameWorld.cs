@@ -326,8 +326,8 @@ public class GameWorld : Node2D
                 continue;
             }
 
-            client.currentPrimaryWeaponIndex = item.Value.primaryWeaponIndex;
-            client.currentSecondaryWeaponIndex = item.Value.primaryWeaponIndex;
+            client.changePrimaryWeapon(item.Value.primaryWeaponIndex);
+            client.changeSecondaryWeapon(item.Value.secondaryWeaponIndex);
             client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
             client.setHealth(item.Value.health);
         }
@@ -343,8 +343,9 @@ public class GameWorld : Node2D
                     continue;
                 }
 
-                client.currentPrimaryWeaponIndex = item.Value.primaryWeaponIndex;
-                client.currentSecondaryWeaponIndex = item.Value.primaryWeaponIndex;
+                GD.Print("pw " + item.Value.primaryWeaponIndex);
+                client.changePrimaryWeapon(item.Value.primaryWeaponIndex);
+                client.changeSecondaryWeapon(item.Value.secondaryWeaponIndex);
                 client.set(item.Value.position, item.Value.rotation, item.Value.primaryWepaon, item.Value.secondaryWepaon, (item.Value.position != client.Position));
                 client.setHealth(item.Value.health);
             }
@@ -439,8 +440,8 @@ public class GameWorld : Node2D
                     if (input.Value.right) { moveDir.x = 1; }
                     primaryWeapon = input.Value.primaryWepaon;
                     secondaryWeapon = input.Value.secondaryWepaon;
-                    if(input.Value.changePrimaryWeapon){playerNode.changePrimaryWeapon();}
-                    if(input.Value.changeSecondaryWeapon){playerNode.changeSecondaryWeapon();}
+                    if (input.Value.changePrimaryWeapon) { playerNode.changePrimaryWeapon(playerNode.currentPrimaryWeaponIndex + 1); }
+                    if (input.Value.changeSecondaryWeapon) { playerNode.changeSecondaryWeapon(playerNode.currentSecondaryWeaponIndex + 1); }
                     playerNode._shoot(primaryWeapon, secondaryWeapon);
                     playerNode.move(moveDir, input.Value.mousePosition, delta);
                 }
@@ -487,9 +488,11 @@ public class GameWorld : Node2D
             clientData.position = enemyNode.GlobalPosition;
             clientData.rotation = enemyNode.GlobalRotation;
             clientData.health = enemyNode.getHealth();
-
             clientData.primaryWepaon = enemyNode.isPrimaryWeapon;
             clientData.secondaryWepaon = enemyNode.isSecondaryWeapon;
+            clientData.primaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
+            clientData.secondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex; 
+
             // Append into the snapshot
             snapshot.botData.Add(spawnBot.Key, clientData);
         }

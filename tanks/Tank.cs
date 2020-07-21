@@ -64,13 +64,13 @@ public class Tank : KinematicBody2D
 
     private String teamIdentifier = "UNKOWN";
 
-    protected GameWorld gameworld;
+    protected GameWorld gameworld { get; set; }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        gameworld = (GameWorld)GetParent();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
+        gameworld = (GameWorld)GetParent();
         network = (Network)GetNode("/root/NETWORK");
 
         health = MaxHealth;
@@ -91,23 +91,25 @@ public class Tank : KinematicBody2D
         EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
     }
 
-    public void changePrimaryWeapon()
+    public void changePrimaryWeapon(int weaponIndex)
     {
         if (currentPrimaryWeaponIndex != -1)
         {
             ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Hide();
-            currentPrimaryWeaponIndex = (currentPrimaryWeaponIndex + 1) % primaryWeapons.Count;
+            currentPrimaryWeaponIndex = weaponIndex % primaryWeapons.Count;
+            if (currentPrimaryWeaponIndex < 0) { currentPrimaryWeaponIndex = currentPrimaryWeaponIndex * -1; }
             ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Show();
             EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
         }
     }
 
-    public void changeSecondaryWeapon()
+    public void changeSecondaryWeapon(int weaponIndex)
     {
         if (currentSecondaryWeaponIndex != -1)
         {
             ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Hide();
-            currentSecondaryWeaponIndex = (currentSecondaryWeaponIndex + 1) % secondaryWeapons.Count;
+            currentSecondaryWeaponIndex = weaponIndex % secondaryWeapons.Count;
+            if (currentSecondaryWeaponIndex < 0) { currentSecondaryWeaponIndex = currentSecondaryWeaponIndex * -1; }
             ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Show();
             EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
         }
@@ -125,7 +127,7 @@ public class Tank : KinematicBody2D
 
             Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
             Weapon curretnWeapon = (Weapon)(weapon.Instance());
-            curretnWeapon.gameWorld = (GameWorld)GetParent();
+            curretnWeapon.gameWorld = gameworld;
             primaryWeapons.Add(curretnWeapon);
             // Update to use this weapon as primary
             currentPrimaryWeaponIndex = primaryWeapons.Count - 1;
@@ -149,8 +151,9 @@ public class Tank : KinematicBody2D
 
             Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
             Weapon curretnWeapon = (Weapon)(weapon.Instance());
+            curretnWeapon.gameWorld = gameworld;
             secondaryWeapons.Add(curretnWeapon);
-            // Update to use this weapon as primary
+            // Update to use this weapon as secondary
             currentSecondaryWeaponIndex = secondaryWeapons.Count - 1;
             weaponHolder.AddChild(curretnWeapon);
             EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
@@ -184,9 +187,6 @@ public class Tank : KinematicBody2D
     }
 
     public virtual void _Control(float delta) { }
-
-    public virtual void _shootSecondary() { }
-
 
     public void move(Vector2 moveDir, Vector2 pointPosition, float delta)
     {
@@ -227,6 +227,7 @@ public class Tank : KinematicBody2D
         if (primaryWeapon && currentPrimaryWeaponIndex != -1)
         {
             // knock back effect
+            GD.Print("shoot " + ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
             if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
