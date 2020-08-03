@@ -29,7 +29,7 @@ public class Tank : KinematicBody2D
     [Export]
     protected int MaxEnergy;
 
-    protected Vector2 Velocity;
+    public Vector2 Velocity;
     protected Boolean Alive = true;
 
     public float currentTime = 0;
@@ -227,7 +227,6 @@ public class Tank : KinematicBody2D
         if (primaryWeapon && currentPrimaryWeaponIndex != -1)
         {
             // knock back effect
-            GD.Print("shoot " + ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
             if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);

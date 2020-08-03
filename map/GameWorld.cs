@@ -83,12 +83,14 @@ public class GameWorld : Node2D
 
     private AStar aStar;
 
+private Godot.RandomNumberGenerator random;
 
     private RaycastAStar aStarSolver;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
 
         Navigation2D navigation2D = (Navigation2D)GetNode("Navigation2D");
@@ -648,7 +650,7 @@ public class GameWorld : Node2D
                 bot.setUnitName(spawnBots[spawnBots.Count - 1].name);
                 bot.setTeamIdentifier("TEAM_BOT");
 
-                bot.Position = nodeSpawnPoint.GlobalPosition;
+                bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
 
                 bot.SetNetworkMaster(1);
                 bot.setCurrentSpawnIndex(currentSpawnPoint);

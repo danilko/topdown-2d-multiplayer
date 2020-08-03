@@ -28,7 +28,7 @@ tile_data = PoolIntArray( -2, 0, 0, -65536, 0, 0, -65534, 0, 0, -65532, 0, 0, -6
 [node name="Obstacles" type="Node2D" parent="."]
 
 [node name="Obstacle" parent="Obstacles" instance=ExtResource( 9 )]
-position = Vector2( 688.727, 1286.28 )
+position = Vector2( 692.502, 1286.28 )
 type = 16
 
 [node name="Pickups" type="Node2D" parent="."]
@@ -46,16 +46,37 @@ environment = SubResource( 1 )
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="SpawnPoint_0" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 243.232, 176.41 )
+position = Vector2( 111.09, 180.185 )
 
 [node name="SpawnPoint_1" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 317.321, 1994.36 )
+position = Vector2( 1363.13, 231.203 )
 
 [node name="SpawnPoint_2" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 1525.71, 1745.3 )
+position = Vector2( 2550.76, 236.989 )
 
 [node name="SpawnPoint_3" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 2627.6, 611.999 )
+position = Vector2( 2604.95, 1251.95 )
+
+[node name="SpawnPoint_4" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 2489.79, 2263.78 )
+
+[node name="SpawnPoint_5" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 1432.66, 2288.32 )
+
+[node name="SpawnPoint_6" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 1887.6, 1586.08 )
+
+[node name="SpawnPoint_7" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 1951.79, 908.375 )
+
+[node name="SpawnPoint_8" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 1087.2, 919.702 )
+
+[node name="SpawnPoint_9" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 434.036, 2246.79 )
+
+[node name="SpawnPoint_10" type="Node2D" parent="SpawnPoints"]
+position = Vector2( 445.363, 898.937 )
 
 [node name="dot" type="Sprite" parent="."]
 texture = ExtResource( 2 )

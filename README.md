@@ -17,6 +17,10 @@ Kidcancode Youtube Channel
 
 https://www.youtube.com/watch?v=sQ1FpD0DYF8&list=PLsk-HSGFjnaFC8kEv6MaLXnnDcevGpSWf
 
+autonomousagents_behaviour_flock
+
+https://bitbucket.org/gresille_siffle/godot2d_autonomousagents_behaviour_flock/src/master/
+
 Artifact Reference
 ======
 Graphic Asset by Kenny (please consider donate to Kenny on the website if like them, the attached one are all free ones, the paid version is not included as should purchase them through Kenney's site)

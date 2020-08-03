@@ -22,11 +22,22 @@ public class Enemy : Tank
     private float PATHRADIUS = 5.0f;
 
     Godot.Collections.Array detourPaths = null;
+    Godot.Collections.Array members = new Godot.Collections.Array();
+    // 10 px / s
+    float maxForces = 100;
+    float mass = 4.0f;
 
+    float cohesionDistance = 64;
+    float alignmentDistance = 20;
+    float separationDistance = 10;
+
+    int slowingDistance = 128;
+
+    private Vector2 acceleration;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
-    {       
+    {
         base._Ready();
 
         CollisionShape2D detectRadius = (CollisionShape2D)(GetNode("DetectRadius").GetNode("CollisionShape2D"));
@@ -71,11 +82,156 @@ public class Enemy : Tank
         }
     }
 
+    public Vector2 seek(Vector2 targetPosition)
+    {
+        // Return the force that needs to be added to the current velocity to seek the target position
+        // Use the max force to attribute to clamp the force magnitude
+
+        return ((targetPosition - Position).Normalized() * MaxSpeed - Velocity).Clamped(maxForces);
+    }
+
+    public Vector2 seekWithMass(Vector2 targetPosition)
+    {
+        // Return the force that needs to be added to the current velocity to seek the target position
+        // Use the mass attribute to divded the force mangnitude
+
+        return ((targetPosition - Position).Normalized() * MaxSpeed - Velocity) / mass;
+    }
+    public Vector2 seekAndArrive(Vector2 targetPosition)
+    {
+        // Return the force that needs to be added to the current velocity to seek and slowly approch the target position
+        Vector2 desiredVelocity = (targetPosition - Position);
+        float targetDistance = desiredVelocity.Length();
+
+        return (approachTarget(slowingDistance, targetDistance, desiredVelocity.Normalized() * MaxSpeed) - Velocity).Clamped(maxForces);
+    }
+
+    public Vector2 approachTarget(int slowingDistance, float distanceToTarget, Vector2 desiredVelocity)
+    {
+        if (distanceToTarget < slowingDistance)
+        {
+            desiredVelocity *= distanceToTarget / slowingDistance;
+        }
+        return desiredVelocity;
+    }
+
+    public Vector2 cohesion(Godot.Collections.Array members)
+    {
+        int membersCount = 0;
+        Vector2 sumOfPosition = new Vector2();
+
+        foreach (Tank member in members)
+        {
+            float distance = Position.DistanceTo(member.Position);
+
+            if (distance > 0 && distance <= cohesionDistance)
+            {
+                sumOfPosition += member.Position;
+                membersCount++;
+            }
+        }
+        if (membersCount != 0)
+        {
+            return seek(sumOfPosition / (float)membersCount);
+        }
+
+        return sumOfPosition;
+    }
+
+    public Vector2 alignment(Godot.Collections.Array members)
+    {
+        int membersCount = 0;
+        Vector2 sumOfVelocity = new Vector2();
+
+        foreach (Tank member in members)
+        {
+            float distance = Position.DistanceTo(member.Position);
+
+            if (distance > 0 && distance <= alignmentDistance)
+            {
+                sumOfVelocity += member.Velocity;
+                membersCount++;
+            }
+        }
+        if (membersCount != 0)
+        {
+            return ((sumOfVelocity / (float)membersCount).Normalized() * MaxSpeed - Velocity).Clamped(maxForces);
+        }
+
+        return sumOfVelocity;
+    }
+
+    public Vector2 separation(Godot.Collections.Array members)
+    {
+        int membersCount = 0;
+        Vector2 separationForce = new Vector2();
+
+        foreach (Tank member in members)
+        {
+            float distance = Position.DistanceTo(member.Position);
+
+            if (distance > 0 && distance <= separationDistance)
+            {
+                separationForce += (Position - member.Position).Normalized() / distance;
+                membersCount++;
+            }
+        }
+        if (membersCount != 0)
+        {
+            return ((separationForce / (float)membersCount).Normalized() * MaxSpeed - Velocity).Clamped(maxForces);
+        }
+
+        return separationForce;
+    }
+
+    public void flock(Godot.Collections.Array members)
+    {
+        applyForce(cohesion(members) * 1.0f);
+        applyForce(alignment(members) * 0.8f);
+        applyForce(separation(members) * 1.4f);
+    }
+
+    public void applyForce(Vector2 force)
+    {
+        acceleration = acceleration + force;
+    }
+
     public override void _Control(float delta)
     {
+        Godot.Collections.Array removeIndices = new Godot.Collections.Array();
 
-        // Only execute the next detourPaths once detour is empty
-        if (targetPaths != null)
+        int index = 0;
+        // Check vaild members
+        foreach (Tank member in members)
+        {
+            if (!IsInstanceValid(member))
+            {
+                removeIndices.Add(index);
+            }
+            index++;
+        }
+
+        foreach (int removeIndex in removeIndices)
+        {
+            members.Remove(removeIndex);
+        }
+
+        // Set the accel
+        acceleration = new Vector2();
+
+        // Validate if target is available or is freed up (maybe no longer in scene)
+        if (target != null && ! IsInstanceValid(target))
+        {
+            target = null;
+        }
+
+        if (targetPaths != null && targetPaths.Count == 0)
+        {
+            targetPaths = null;
+        }
+
+        // Execute next path when target is not empty
+        if (targetPaths != null && target == null)
         {
             Vector2 targetPoint = (Vector2)targetPaths[0];
 
@@ -95,62 +251,14 @@ public class Enemy : Tank
             }
             else
             {
-                MoveAndSlide(targetDir * speed);
+
+                Velocity = targetDir * MaxSpeed;
+
+                flock(members);
+                Velocity += acceleration;
+                MoveAndSlide(Velocity);
             }
         }
-
-
-        // if (detourPaths != null)
-        // {
-        //     Vector2 targetPoint = (Vector2)detourPaths[0];
-
-        //     Vector2 targetDir = (targetPoint - GlobalPosition).Normalized();
-        //     Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-
-        //     GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
-
-        //     if (GlobalPosition.DistanceTo(targetPoint) < PATHRADIUS)
-        //     {
-        //         detourPaths.RemoveAt(0);
-
-        //         if (detourPaths.Count == 0)
-        //         {
-        //             detourPaths = null;
-        //         }
-        //     }
-        //     else
-        //     {
-        //         MoveAndSlide(targetDir * speed);
-        //     }
-
-        // }
-        // else
-        // {
-        //     // Only execute the next detourPaths once detour is empty
-        //     if (targetPaths != null)
-        //     {
-        //         Vector2 targetPoint = (Vector2)targetPaths[0];
-
-        //         Vector2 targetDir = (targetPoint - GlobalPosition).Normalized();
-        //         Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-
-        //         GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
-
-        //         if (GlobalPosition.DistanceTo(targetPoint) < PATHRADIUS)
-        //         {
-        //             targetPaths.RemoveAt(0);
-
-        //             if (targetPaths.Count == 0)
-        //             {
-        //                 targetPaths = null;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             MoveAndSlide(targetDir * speed);
-        //         }
-        //     }
-        // }
 
         if (target != null)
         {
@@ -178,6 +286,7 @@ public class Enemy : Tank
         {
             calculatePath();
         }
+
     }
 
     public void debugDrawing(Vector2 point)
@@ -236,52 +345,39 @@ public class Enemy : Tank
             if (((Tank)body).getTeamIdentifier() != getTeamIdentifier())
             {
                 target = body;
-                targetPaths = null;
+            }
+            else
+            {
+                // Join as member
+                members.Add((Tank)body);
             }
         }
     }
-
-    private void _on_FrontDetection_body_entered(Node2D body)
-    {
-        // Perform a follow behavior during agent collision
-        // if (body.HasMethod("getCurrentSpawnIndex") && targetPaths != null)
-        // {
-        //     Vector2 nextPosition = (body.GlobalPosition - GlobalPosition).Rotated(Mathf.Pi / 2);
-
-        //     if (detourPaths == null)
-        //     {
-        //         detourPaths = new Godot.Collections.Array();
-        //     }
-
-        //     detourPaths.Insert(0, GlobalPosition + nextPosition);
-
-        //     int spawnIndex = ((Enemy)body).getCurrentSpawnIndex();
-
-        //     if(spawnIndex > currentSpawnPointIndex)
-        //     {
-        //         currentSpawnPointIndex = spawnIndex - 1;
-        //         targetPaths.Clear();
-        //         targetPaths = null;
-        //     }
-        //     else
-        //     {
-        //         targetPaths.Clear();
-        //         targetPaths = null;
-        //     }
-        // }
-    }
-
-    private void _on_FrontDetection_body_exit(Node2D body)
-    {
-
-    }
-
 
     private void _on_DetectRadius_body_exited(Node2D body)
     {
         if (body == target)
         {
             target = null;
+        }
+        else
+        {
+            // Remove from members
+            int removeIndex = 0;
+            foreach (Tank member in members)
+            {
+                if (IsInstanceValid(member) && member == body)
+                {
+                    break;
+                }
+
+                removeIndex++;
+            }
+
+            if (removeIndex != -1 && removeIndex < members.Count)
+            {
+                members.Remove(removeIndex);
+            }
         }
     }
 }
