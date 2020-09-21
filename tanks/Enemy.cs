@@ -22,7 +22,7 @@ public class Enemy : Tank
     private float PATHRADIUS = 5.0f;
 
     Godot.Collections.Array detourPaths = null;
-    Godot.Collections.Array members = new Godot.Collections.Array();
+    Godot.Collections.Array members = null;
     // 10 px / s
     float maxForces = 100;
     float mass = 4.0f;
@@ -50,6 +50,8 @@ public class Enemy : Tank
         isSecondaryWeapon = false;
 
         speed = MaxSpeed;
+
+        members = new Godot.Collections.Array();
     }
 
     public void setCurrentSpawnIndex(int currentSpawnPointIndex)
@@ -115,13 +117,19 @@ public class Enemy : Tank
         return desiredVelocity;
     }
 
-    public Vector2 cohesion(Godot.Collections.Array members)
+    public Vector2 cohesion()
     {
         int membersCount = 0;
         Vector2 sumOfPosition = new Vector2();
 
         foreach (Tank member in members)
         {
+            // It is possible that member got destroy before this API request
+            if (!IsInstanceValid(member))
+            {
+                continue;
+            }
+
             float distance = Position.DistanceTo(member.Position);
 
             if (distance > 0 && distance <= cohesionDistance)
@@ -138,13 +146,19 @@ public class Enemy : Tank
         return sumOfPosition;
     }
 
-    public Vector2 alignment(Godot.Collections.Array members)
+    public Vector2 alignment()
     {
         int membersCount = 0;
         Vector2 sumOfVelocity = new Vector2();
 
         foreach (Tank member in members)
         {
+            // It is possible that member got destroy before this API request
+            if (!IsInstanceValid(member))
+            {
+                continue;
+            }
+
             float distance = Position.DistanceTo(member.Position);
 
             if (distance > 0 && distance <= alignmentDistance)
@@ -161,13 +175,19 @@ public class Enemy : Tank
         return sumOfVelocity;
     }
 
-    public Vector2 separation(Godot.Collections.Array members)
+    public Vector2 separation()
     {
         int membersCount = 0;
         Vector2 separationForce = new Vector2();
 
         foreach (Tank member in members)
         {
+            // It is possible that member got destroy before this API request
+            if (!IsInstanceValid(member))
+            {
+                continue;
+            }
+
             float distance = Position.DistanceTo(member.Position);
 
             if (distance > 0 && distance <= separationDistance)
@@ -184,11 +204,11 @@ public class Enemy : Tank
         return separationForce;
     }
 
-    public void flock(Godot.Collections.Array members)
+    public void flock()
     {
-        applyForce(cohesion(members) * 1.0f);
-        applyForce(alignment(members) * 0.8f);
-        applyForce(separation(members) * 1.4f);
+        applyForce(cohesion() * 1.0f);
+        applyForce(alignment() * 0.8f);
+        applyForce(separation() * 1.4f);
     }
 
     public void applyForce(Vector2 force)
@@ -254,7 +274,7 @@ public class Enemy : Tank
 
                 Velocity = targetDir * MaxSpeed;
 
-                flock(members);
+                flock();
                 Velocity += acceleration;
                 MoveAndSlide(Velocity);
             }

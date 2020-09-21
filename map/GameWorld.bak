@@ -16,7 +16,7 @@ public class GameWorld : Node2D
     }
 
 
-    private class SpawnBot
+    private class SpawnBot : Godot.Object
     {
         public SpawnBot(String name, PackedScene packedScene)
         {
@@ -62,17 +62,14 @@ public class GameWorld : Node2D
         public Node2D node;
     }
 
-    Dictionary<String, ClientState> clientStates = new Dictionary<String, ClientState>();
+    Godot.Collections.Dictionary clientStates = new Godot.Collections.Dictionary();
 
 
     int spawned_bots = 0;
 
-    Dictionary<String, SpawnBot> spawnBots = new Dictionary<String, SpawnBot>();
+    private Godot.Collections.Dictionary spawnBots = new Godot.Collections.Dictionary();
 
     Network network;
-
-    long botCounter = 0;
-    private long MAX_BOT_COUNT = 1000;
 
     float currentTime;
 
@@ -86,7 +83,7 @@ public class GameWorld : Node2D
 
     private AStar aStar;
 
-    private Godot.RandomNumberGenerator random;
+private Godot.RandomNumberGenerator random;
 
     private RaycastAStar aStarSolver;
 
@@ -198,35 +195,34 @@ public class GameWorld : Node2D
         // snapshot_data should contain a "players" field which must be an array
         // of player data. Each entry in this array should be a dictionary, containing
         // the following fields: network_id, position, rotation, col
-        foreach (ClientData item in snapshot.playerData.Values)
+        foreach (ClientData clientData  in snapshot.playerData.Values)
         {
-            encodedData = encodedData + item.id + ";";
-            encodedData = encodedData + item.position.x + ";";
-            encodedData = encodedData + item.position.y + ";";
-            encodedData = encodedData + item.rotation + ";";
-            encodedData = encodedData + item.primaryWepaon + ";";
-            encodedData = encodedData + item.secondaryWepaon + ";";
-            encodedData = encodedData + item.health + ";";
-            encodedData = encodedData + item.primaryWeaponIndex + ";";
-            encodedData = encodedData + item.secondaryWeaponIndex + ";";
+            encodedData = encodedData + clientData.id + ";";
+            encodedData = encodedData + clientData.position.x + ";";
+            encodedData = encodedData + clientData.position.y + ";";
+            encodedData = encodedData + clientData.rotation + ";";
+            encodedData = encodedData + clientData.primaryWepaon + ";";
+            encodedData = encodedData + clientData.secondaryWepaon + ";";
+            encodedData = encodedData + clientData.health + ";";
+            encodedData = encodedData + clientData.primaryWeaponIndex + ";";
+            encodedData = encodedData + clientData.secondaryWeaponIndex + ";";
         }
         // Bot data count
         encodedData = encodedData + snapshot.botData.Count + ";";
         // The bot_data field should be an array, each entry containing the following
         // fields: bot_id, position, rotation
-        foreach (ClientData item in snapshot.botData.Values)
+        foreach (ClientData clientData in snapshot.botData.Values)
         {
-            encodedData = encodedData + item.id + ";";
-            encodedData = encodedData + item.position.x + ";";
-            encodedData = encodedData + item.position.y + ";";
-            encodedData = encodedData + item.rotation + ";";
-            encodedData = encodedData + item.primaryWepaon + ";";
-            encodedData = encodedData + item.secondaryWepaon + ";";
-            encodedData = encodedData + item.health + ";";
-            encodedData = encodedData + item.primaryWeaponIndex + ";";
-            encodedData = encodedData + item.secondaryWeaponIndex + ";";
+            encodedData = encodedData + clientData.id + ";";
+            encodedData = encodedData + clientData.position.x + ";";
+            encodedData = encodedData + clientData.position.y + ";";
+            encodedData = encodedData + clientData.rotation + ";";
+            encodedData = encodedData + clientData.primaryWepaon + ";";
+            encodedData = encodedData + clientData.secondaryWepaon + ";";
+            encodedData = encodedData + clientData.health + ";";
+            encodedData = encodedData + clientData.primaryWeaponIndex + ";";
+            encodedData = encodedData + clientData.secondaryWeaponIndex + ";";
         }
-
         // First add the snapshot signature (timestamp)
         RpcUnreliable(nameof(clientGetSnapshot), encodedData);
     }
@@ -321,9 +317,9 @@ public class GameWorld : Node2D
     {
         // In here we assume the obtained snapshot is newer than the last one
         // Iterate through player data 
-        foreach (ClientData item in snapshot.playerData.Values)
+        foreach (ClientData clientData in snapshot.playerData.Values)
         {
-            Player client = (Player)GetNode("client_" + item.id);
+            Player client = (Player)GetNode(clientData.id);
             // Depending on the synchronization mechanism, this may not be an error!
             // For now assume the entities are spawned and kept in sync so just continue
             // the loop
@@ -332,27 +328,27 @@ public class GameWorld : Node2D
                 continue;
             }
 
-            client.changePrimaryWeapon(item.primaryWeaponIndex);
-            client.changeSecondaryWeapon(item.secondaryWeaponIndex);
-            client.set(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
-            client.setHealth(item.health);
+            client.changePrimaryWeapon(clientData.primaryWeaponIndex);
+            client.changeSecondaryWeapon(clientData.secondaryWeaponIndex);
+            client.set(clientData.position, clientData.rotation, clientData.primaryWepaon, clientData.secondaryWepaon, (clientData.position != client.Position));
+            client.setHealth(clientData.health);
         }
 
-        foreach (ClientData item in snapshot.botData.Values)
+        foreach (ClientData clientData in snapshot.botData.Values)
         {
             // Only need to do on client, as logic already perform on server through calculation
             if (!GetTree().IsNetworkServer())
             {
-                Enemy client = (Enemy)GetNode("bot_" + item.id);
+                Enemy client = (Enemy)GetNode(clientData.id);
                 if (client == null)
                 {
                     continue;
                 }
 
-                client.changePrimaryWeapon(item.primaryWeaponIndex);
-                client.changeSecondaryWeapon(item.secondaryWeaponIndex);
-                client.set(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
-                client.setHealth(item.health);
+                client.changePrimaryWeapon(clientData.primaryWeaponIndex);
+                client.changeSecondaryWeapon(clientData.secondaryWeaponIndex);
+                client.set(clientData.position, clientData.rotation, clientData.primaryWepaon, clientData.secondaryWepaon, (clientData.position != client.Position));
+                client.setHealth(clientData.health);
             }
         }
     }
@@ -385,7 +381,7 @@ public class GameWorld : Node2D
             }
         }
         // Try to locate the player actor
-        Tank playerNode = (Tank)GetNode("client_" + id);
+        Node playerNode = GetNode("client_" + id);
 
         if (playerNode == null)
         {
@@ -394,7 +390,7 @@ public class GameWorld : Node2D
         }
 
         // Mark the node for deletion
-        playerNode.explode();
+        playerNode.QueueFree();
     }
 
     // Update and generate a game state snapshot
@@ -457,7 +453,7 @@ public class GameWorld : Node2D
                 gameStates.playerInputs.Remove(networkPlayer.Key);
 
                 ClientData clientData = new ClientData();
-                clientData.id = networkPlayer.Key + "";
+                clientData.id = "client_" + networkPlayer.Key;
                 clientData.position = playerNode.Position;
                 clientData.rotation = playerNode.Rotation;
                 clientData.primaryWepaon = primaryWeapon;
@@ -466,7 +462,7 @@ public class GameWorld : Node2D
                 clientData.secondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
                 clientData.health = playerNode.getHealth();
 
-                snapshot.playerData.Add(networkPlayer.Key, clientData);
+                snapshot.playerData.Add(clientData.id, clientData);
             }
 
         }
@@ -474,12 +470,10 @@ public class GameWorld : Node2D
         // Clean the input
         gameStates.playerInputs.Clear();
 
-        Godot.Collections.Array<String> removeSpawnBots = new Godot.Collections.Array<String>();
-
-        foreach (KeyValuePair<String, SpawnBot> spawnBot in spawnBots)
+        foreach (SpawnBot spawnBot in spawnBots.Values)
         {
             // Locate the bot node
-            Enemy enemyNode = (Enemy)GetNode(spawnBot.Key);
+            Enemy enemyNode = (Enemy)GetNode(spawnBot.name);
 
             if (enemyNode == null)
             {
@@ -489,32 +483,21 @@ public class GameWorld : Node2D
 
             enemyNode._shoot(enemyNode.isPrimaryWeapon, enemyNode.isSecondaryWeapon);
 
-            if (enemyNode.getHealth() > 0)
-            {
-                // Build bot_data entry
-                ClientData clientData = new ClientData();
-                clientData.id = spawnBot.Key;
-                clientData.position = enemyNode.GlobalPosition;
-                clientData.rotation = enemyNode.GlobalRotation;
-                clientData.health = enemyNode.getHealth();
-                clientData.primaryWepaon = enemyNode.isPrimaryWeapon;
-                clientData.secondaryWepaon = enemyNode.isSecondaryWeapon;
-                clientData.primaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
-                clientData.secondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
+            // Build bot_data entry
+            ClientData clientData = new ClientData();
+            clientData.id = spawnBot.name;
+            clientData.position = enemyNode.GlobalPosition;
+            clientData.rotation = enemyNode.GlobalRotation;
+            clientData.health = enemyNode.getHealth();
+            clientData.primaryWepaon = enemyNode.isPrimaryWeapon;
+            clientData.secondaryWepaon = enemyNode.isSecondaryWeapon;
+            clientData.primaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
+            clientData.secondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex; 
 
-                // Append into the snapshot
-                snapshot.botData.Add(spawnBot.Key, clientData);
-            }
-            else
-            {
-                removeSpawnBots.Insert(0, spawnBot.Key);
-            }
+            // Append into the snapshot
+            snapshot.botData.Add(spawnBot.name, clientData);
         }
 
-        foreach (String spawnBotId in removeSpawnBots)
-        {
-            removeClient("bot", spawnBotId);
-        }
 
         // Encode and broadcast the snapshot - if there is at least one connected client
         if (network.networkPlayers.Count > 1)
@@ -585,7 +568,7 @@ public class GameWorld : Node2D
         // Get spawn position, -1 as to utilize 0 spawn point
         Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + getNextSpawnIndex(spawnIndex - 1));
         client.Position = nodeSpawnPoint.GlobalPosition;
-
+        
         client.Name = "client_" + pininfo.net_id;
         client.setUnitName(pininfo.name);
         client.setTeamIdentifier(pininfo.team);
@@ -595,7 +578,7 @@ public class GameWorld : Node2D
         {
             client.SetNetworkMaster(pininfo.net_id);
         }
-
+       GD.Print("spawn player" + client.Name );
         AddChild(client);
 
         // If this actor is the current client controlled, add camera and attach HUD
@@ -614,29 +597,6 @@ public class GameWorld : Node2D
     }
 
     [Remote]
-    private void removeClient(String type, String id)
-    {
-        if (GetTree().IsNetworkServer())
-        {
-            Rpc(nameof(removeClient), type, id);
-        }
-
-        if (type == "bot" && spawnBots[id] != null)
-        {
-            removeBot(id);
-        }
-
-        // Only generated if bot have not created excess MAX_BOT_COUNT
-        if (botCounter < MAX_BOT_COUNT)
-        {
-            String botId = "bot_" + botCounter;
-            botCounter++;
-
-            addBot(botId);
-        }
-    }
-
-    [Remote]
     private void syncBots(int bot_count)
     {
         if (GetTree().IsNetworkServer())
@@ -650,11 +610,21 @@ public class GameWorld : Node2D
         {
             while (spawnBots.Count > bot_count)
             {
-                foreach (SpawnBot spawnBot  in spawnBots.Values)
+                Node node = null;
+
+
+                node = GetNode(((SpawnBot)(spawnBots["bot_" + (spawnBots.Count - 1)])).name);
+
+
+                if (node == null)
                 {
-                    removeBot(spawnBot.name);
-                    break;
+                    GD.Print("Must remove bots from game but cannot find its node");
+                    spawnBots.Remove(spawnBots.Count - 1);
+                    continue;
                 }
+
+                node.QueueFree();
+                spawnBots.Remove(spawnBots.Count - 1);
             }
         }
         else if (spawnBots.Count < bot_count)
@@ -666,56 +636,27 @@ public class GameWorld : Node2D
 
             while (spawnBots.Count < bot_count)
             {
-                // Only generated if bot have not created excess MAX_BOT_COUNT
-                if (botCounter < MAX_BOT_COUNT)
-                {
-                    String botId = "bot_" + botCounter;
-                    botCounter++;
+                spawnBots.Add("bot_" + spawnBots.Count, new SpawnBot("bot_" + spawnBots.Count, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
 
-                    addBot(botId);
-                }
+                Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
+
+
+                // Get spawn position, -1 as to utilize 0 spawn point
+                int currentSpawnPoint = spawnBots.Count % GetNode("SpawnPoints").GetChildCount();
+                Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
+
+                bot.Name = ((SpawnBot)(spawnBots["bot_" + (spawnBots.Count - 1)])).name;
+                bot.setUnitName(((SpawnBot)(spawnBots["bot_" + (spawnBots.Count - 1)])).name);
+                bot.setTeamIdentifier("TEAM_BOT");
+
+                bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
+
+                bot.SetNetworkMaster(1);
+                bot.setCurrentSpawnIndex(currentSpawnPoint);
+
+                AddChild(bot);
             }
         }
-    }
-
-    private void removeBot(String botId)
-    {
-        Tank node = null;
-        node = (Tank)GetNode(spawnBots[botId].name);
-
-        if (node == null)
-        {
-            GD.Print("Must remove bots from game but cannot find its node");
-        }
-        else
-        {
-            node.explode();
-        }
-
-        spawnBots.Remove(botId);
-    }
-
-    [Remote]
-    private void addBot(String botId)
-    {
-        spawnBots.Add(botId, new SpawnBot(botId, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
-
-        Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
-
-        // Get spawn position, -1 as to utilize 0 spawn point
-        int currentSpawnPoint = (int)botCounter % GetNode("SpawnPoints").GetChildCount();
-        Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
-
-        bot.Name = botId;
-        bot.setUnitName(botId);
-        bot.setTeamIdentifier("TEAM_BOT");
-
-        bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
-
-        bot.SetNetworkMaster(1);
-        bot.setCurrentSpawnIndex(currentSpawnPoint);
-
-        AddChild(bot);
     }
 
     public override void _Process(float delta)

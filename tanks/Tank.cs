@@ -326,15 +326,13 @@ public class Tank : KinematicBody2D
         return consume;
     }
 
-    private void explode()
+    public void explode()
     {
         CollisionShape2D collisionShape2D = (CollisionShape2D)GetNode("CollisionShape2D");
         collisionShape2D.Disabled = true;
         Alive = false;
         Sprite body = (Sprite)GetNode("Body");
         body.Hide();
-        Sprite turret = (Sprite)GetNode("Turret");
-        turret.Hide();
 
         AnimatedSprite animatedSprite = (AnimatedSprite)GetNode("Explosion");
         animatedSprite.Show();
