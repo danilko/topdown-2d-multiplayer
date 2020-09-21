@@ -124,7 +124,6 @@ public class GameWorld : Node2D
         else
         {
             RpcId(1, nameof(spwanPlayer), convertToString(network.gamestateNetworkPlayer, -1));
-            RpcId(1, nameof(syncBots), -1);
         }
 
 
@@ -323,14 +322,16 @@ public class GameWorld : Node2D
         // Iterate through player data 
         foreach (ClientData item in snapshot.playerData.Values)
         {
-            Player client = (Player)GetNode("client_" + item.id);
+
             // Depending on the synchronization mechanism, this may not be an error!
             // For now assume the entities are spawned and kept in sync so just continue
             // the loop
-            if (client == null)
+            if (!HasNode("client_" + item.id))
             {
                 continue;
             }
+
+            Player client = (Player)GetNode("client_" + item.id);
 
             client.changePrimaryWeapon(item.primaryWeaponIndex);
             client.changeSecondaryWeapon(item.secondaryWeaponIndex);
@@ -343,11 +344,12 @@ public class GameWorld : Node2D
             // Only need to do on client, as logic already perform on server through calculation
             if (!GetTree().IsNetworkServer())
             {
-                Enemy client = (Enemy)GetNode("bot_" + item.id);
-                if (client == null)
+                if (!HasNode(item.id))
                 {
                     continue;
                 }
+
+                Enemy client = (Enemy)GetNode(item.id);
 
                 client.changePrimaryWeapon(item.primaryWeaponIndex);
                 client.changeSecondaryWeapon(item.secondaryWeaponIndex);
@@ -476,10 +478,10 @@ public class GameWorld : Node2D
 
         Godot.Collections.Array<String> removeSpawnBots = new Godot.Collections.Array<String>();
 
-        foreach (KeyValuePair<String, SpawnBot> spawnBot in spawnBots)
+        foreach (SpawnBot spawnBot in spawnBots.Values)
         {
             // Locate the bot node
-            Enemy enemyNode = (Enemy)GetNode(spawnBot.Key);
+            Enemy enemyNode = (Enemy)GetNode(spawnBot.name);
 
             if (enemyNode == null)
             {
@@ -493,7 +495,7 @@ public class GameWorld : Node2D
             {
                 // Build bot_data entry
                 ClientData clientData = new ClientData();
-                clientData.id = spawnBot.Key;
+                clientData.id = spawnBot.name;
                 clientData.position = enemyNode.GlobalPosition;
                 clientData.rotation = enemyNode.GlobalRotation;
                 clientData.health = enemyNode.getHealth();
@@ -503,17 +505,22 @@ public class GameWorld : Node2D
                 clientData.secondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
 
                 // Append into the snapshot
-                snapshot.botData.Add(spawnBot.Key, clientData);
+                snapshot.botData.Add(spawnBot.name, clientData);
             }
             else
             {
-                removeSpawnBots.Insert(0, spawnBot.Key);
+                removeSpawnBots.Insert(0, spawnBot.name);
             }
         }
 
         foreach (String spawnBotId in removeSpawnBots)
         {
-            removeClient("bot", spawnBotId);
+            removeClient(spawnBotId);
+        }
+
+        if (removeSpawnBots.Count > 0)
+        {
+            syncBots(-1);
         }
 
         // Encode and broadcast the snapshot - if there is at least one connected client
@@ -575,6 +582,12 @@ public class GameWorld : Node2D
 
                 s_index++;
             }
+
+            // Add current bot info to new player
+            foreach (SpawnBot spawnBot in spawnBots.Values)
+            {
+                RpcId(pininfo.net_id, nameof(addBot), spawnBot.name);
+            }
         }
 
         // Load the scene and create an instance
@@ -611,28 +624,25 @@ public class GameWorld : Node2D
             client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
             _setCameraLimit();
         }
+
+
     }
 
     [Remote]
-    private void removeClient(String type, String id)
+    private void removeClient(String id)
     {
         if (GetTree().IsNetworkServer())
         {
-            Rpc(nameof(removeClient), type, id);
+            Rpc(nameof(removeClient), id);
+        }
+        else
+        {
+            GD.Print("Removed bot " + id);
         }
 
-        if (type == "bot" && spawnBots[id] != null)
+        if (spawnBots.ContainsKey(id))
         {
             removeBot(id);
-        }
-
-        // Only generated if bot have not created excess MAX_BOT_COUNT
-        if (botCounter < MAX_BOT_COUNT)
-        {
-            String botId = "bot_" + botCounter;
-            botCounter++;
-
-            addBot(botId);
         }
     }
 
@@ -643,79 +653,91 @@ public class GameWorld : Node2D
         {
             // Calculate the target amount of spawned bots
             bot_count = network.serverinfo.max_players - network.networkPlayers.Count;
-            Rpc(nameof(syncBots), bot_count);
-        }
 
-        if (spawnBots.Count > bot_count)
-        {
-            while (spawnBots.Count > bot_count)
+            if (spawnBots.Count > bot_count)
             {
-                foreach (SpawnBot spawnBot  in spawnBots.Values)
+                while (spawnBots.Count > bot_count)
                 {
-                    removeBot(spawnBot.name);
-                    break;
+                    foreach (SpawnBot spawnBot in spawnBots.Values)
+                    {
+                        removeClient(spawnBot.name);
+
+                        break;
+                    }
+                }
+            }
+            else if (spawnBots.Count < bot_count)
+            {
+                // We have less bots than the target count - must add some
+                //  Since every single bot uses the exact same scene path we can cahce it's loaded scene here
+                // otherwise, we would have to move the following code into the while loop and change the dictionary
+                // key ID to point into the correct bot info. In this case we are pointing to the 1
+
+                while (spawnBots.Count < bot_count)
+                {
+                    // Only generated if bot have not created excess MAX_BOT_COUNT
+                    if (botCounter < MAX_BOT_COUNT)
+                    {
+                        String botId = "bot_" + botCounter;
+                        botCounter++;
+
+                        Rpc(nameof(addBot), botId);
+
+                        addBot(botId);
+                    }
                 }
             }
         }
-        else if (spawnBots.Count < bot_count)
-        {
-            // We have less bots than the target count - must add some
-            //  Since every single bot uses the exact same scene path we can cahce it's loaded scene here
-            // otherwise, we would have to move the following code into the while loop and change the dictionary
-            // key ID to point into the correct bot info. In this case we are pointing to the 1
 
-            while (spawnBots.Count < bot_count)
-            {
-                // Only generated if bot have not created excess MAX_BOT_COUNT
-                if (botCounter < MAX_BOT_COUNT)
-                {
-                    String botId = "bot_" + botCounter;
-                    botCounter++;
-
-                    addBot(botId);
-                }
-            }
-        }
     }
 
     private void removeBot(String botId)
     {
-        Tank node = null;
-        node = (Tank)GetNode(spawnBots[botId].name);
-
-        if (node == null)
+        if (HasNode(spawnBots[botId].name))
         {
-            GD.Print("Must remove bots from game but cannot find its node");
-        }
-        else
-        {
-            node.explode();
+            Tank node = null;
+            node = (Tank)GetNode(botId);
+
+            if (!IsInstanceValid(node))
+            {
+                GD.Print("Must remove bots from game but cannot find its node");
+            }
+            else
+            {
+                node.explode();
+            }
         }
 
-        spawnBots.Remove(botId);
+        if (spawnBots.ContainsKey(botId))
+        {
+            spawnBots.Remove(botId);
+        }
     }
 
     [Remote]
     private void addBot(String botId)
     {
-        spawnBots.Add(botId, new SpawnBot(botId, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
+        if (!spawnBots.ContainsKey(botId))
+        {
+            spawnBots.Add(botId, new SpawnBot(botId, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
 
-        Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
+            Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
 
-        // Get spawn position, -1 as to utilize 0 spawn point
-        int currentSpawnPoint = (int)botCounter % GetNode("SpawnPoints").GetChildCount();
-        Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
+            // Get spawn position, -1 as to utilize 0 spawn point
+            int currentSpawnPoint = (int)botCounter % GetNode("SpawnPoints").GetChildCount();
+            Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
 
-        bot.Name = botId;
-        bot.setUnitName(botId);
-        bot.setTeamIdentifier("TEAM_BOT");
+            bot.Name = botId;
+            bot.setUnitName(botId);
+            bot.setTeamIdentifier("TEAM_BOT");
 
-        bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
+            bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
 
-        bot.SetNetworkMaster(1);
-        bot.setCurrentSpawnIndex(currentSpawnPoint);
+            bot.SetNetworkMaster(1);
+            bot.setCurrentSpawnIndex(currentSpawnPoint);
 
-        AddChild(bot);
+            AddChild(bot);
+        }
     }
 
     public override void _Process(float delta)

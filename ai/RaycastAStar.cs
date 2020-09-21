@@ -97,13 +97,17 @@ public class RaycastAStar
     public void debugDraw(Vector2 target)
     {
 
-        Node2D path = (Node2D)gameWorld.GetNode("path_raycast");
+        Node2D path = null;
 
-        if (path == null)
+        if (! gameWorld.HasNode("path_raycast"))
         {
             path = (Node2D)gameWorld.GetNode("pathchart").Duplicate();
             path.Name = "path_raycast";
             gameWorld.AddChild(path);
+        }
+        else
+        {
+            path = (Node2D)gameWorld.GetNode("path_raycast");
         }
 
         Node2D pointNode = (Node2D)gameWorld.GetNode("dot").Duplicate();
