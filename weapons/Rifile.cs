@@ -9,7 +9,7 @@ public class Rifile : Weapon
         base._Ready();
     }
 
-    public override bool fire(Node2D target) {
+    public override bool fire(Node2D source, Node2D target) {
         if (CanShoot && Ammo != 0)
         {
             CanShoot = false;
@@ -27,12 +27,12 @@ public class Rifile : Weapon
                 for (int i = 0; i < GunShot; i++)
                 {
                     float a = -GunSpread + i * (2 * GunSpread) / (GunShot - 1);
-                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), target);
+                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), (Tank)source, target);
                 }
             }
             else
             {
-                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, target);
+                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, (Tank)source, target);
             }
 
             AnimationPlayer animationPlayer = (AnimationPlayer)GetNode("AnimationPlayer");

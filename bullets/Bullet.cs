@@ -17,6 +17,8 @@ public class Bullet : Area2D
 
     Node2D target = null;
 
+    Node2D source = null;
+
     Vector2 velocity;
     Vector2 acceleration;
 
@@ -24,7 +26,7 @@ public class Bullet : Area2D
     AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
     AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
 
-    public void start(Vector2 position, Vector2 direction, Node2D inTarget)
+    public void start(Vector2 position, Vector2 direction, Node2D inSource, Node2D inTarget)
     {
         Position = position;
         Rotation = direction.Angle();
@@ -33,6 +35,7 @@ public class Bullet : Area2D
         acceleration = new Vector2();
 
         target = inTarget;
+        source = inSource;
 
         Timer timer = (Timer)GetNode("Lifetime");
         timer.WaitTime = Lifetime;
@@ -97,7 +100,7 @@ public class Bullet : Area2D
         if (body.HasMethod("TakeDamage"))
         {
             Tank tank = (Tank)(body);
-            tank.TakeDamage(Damage, hitDir);
+            tank.TakeDamage(Damage, hitDir, (Tank)source);
         }
 
     }

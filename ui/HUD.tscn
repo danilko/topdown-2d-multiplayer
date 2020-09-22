@@ -60,6 +60,25 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="lblDefeatedAgentCountLabel" type="Label" parent="."]
+margin_left = 766.595
+margin_top = 470.405
+margin_right = 875.595
+margin_bottom = 486.405
+text = "Defeated Agent"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblDefeatedAgentCount" type="Label" parent="."]
+margin_left = 875.407
+margin_top = 470.405
+margin_right = 984.407
+margin_bottom = 486.405
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="lblLocalPlayer" type="Label" parent="."]
 margin_left = 27.3425
 margin_top = 83.4875
@@ -90,10 +109,10 @@ __meta__ = {
 }
 
 [node name="PanelServerInfo" type="Panel" parent="."]
-margin_left = 605.0
-margin_top = 563.0
-margin_right = 709.0
-margin_bottom = 579.0
+margin_left = 606.189
+margin_top = 501.161
+margin_right = 710.189
+margin_bottom = 517.161
 rect_scale = Vector2( 3.88731, 2.12269 )
 __meta__ = {
 "_edit_use_anchors_": false

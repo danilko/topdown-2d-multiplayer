@@ -116,8 +116,6 @@ public class HUD : CanvasLayer
             barTexture = barYellow;
         }
 
-
-
         TextureProgress healthBar = (TextureProgress)GetNode("Margin/Container/HealthBar");
         healthBar.TextureProgress_ = barTexture;
 
@@ -126,5 +124,10 @@ public class HUD : CanvasLayer
         value, 0.2f,
         Tween.TransitionType.Linear, Tween.EaseType.InOut);
         tween.Start();
+    }
+
+    public void _updateDefeatedAgentBar(int value)
+    {
+        ((Label)GetNode("lblDefeatedAgentCount")).Text = "" + value;
     }
 }

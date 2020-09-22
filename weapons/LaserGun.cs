@@ -68,7 +68,7 @@ public class LaserGun : Weapon
         clearBeam();
     }
 
-    public override bool fire(Node2D target)
+    public override bool fire(Node2D source, Node2D target)
     {
         Timer timer = (Timer)GetNode("WeaponTimer");
 

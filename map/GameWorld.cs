@@ -622,6 +622,7 @@ public class GameWorld : Node2D
             client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updatePrimaryWeapon");
             client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updateSecondaryWeapon");
             client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
+            client.Connect("DefeatedAgentChangedSignal", GetNode("HUD"), "_updateDefeatedAgentBar");
             _setCameraLimit();
         }
 
@@ -634,10 +635,6 @@ public class GameWorld : Node2D
         if (GetTree().IsNetworkServer())
         {
             Rpc(nameof(removeClient), id);
-        }
-        else
-        {
-            GD.Print("Removed bot " + id);
         }
 
         if (spawnBots.ContainsKey(id))
@@ -771,11 +768,11 @@ public class GameWorld : Node2D
         playerCamera.LimitBottom = (int)(mapLimit.End.y * mapCellSize.y);
     }
 
-    private void _onTankShoot(PackedScene bullet, Vector2 _position, Vector2 _direction, Node2D target = null)
+    private void _onTankShoot(PackedScene bullet, Vector2 _position, Vector2 _direction, Node2D source = null, Node2D target = null)
     {
         Bullet newBullet = (Bullet)bullet.Instance();
         AddChild(newBullet);
-        newBullet.start(_position, _direction, target);
+        newBullet.start(_position, _direction, source, target);
     }
 
     private void _onPlayerDead()

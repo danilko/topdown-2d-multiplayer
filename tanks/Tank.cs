@@ -9,6 +9,9 @@ public class Tank : KinematicBody2D
     public delegate void HealthChangedSignal();
 
     [Signal]
+    public delegate void DefeatedAgentChangedSignal();
+
+    [Signal]
     public delegate void DeadSignal();
 
     [Signal]
@@ -65,6 +68,8 @@ public class Tank : KinematicBody2D
     private String teamIdentifier = "UNKOWN";
 
     protected GameWorld gameworld { get; set; }
+
+    private int defeatedAgentCount = 0;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -227,7 +232,7 @@ public class Tank : KinematicBody2D
         if (primaryWeapon && currentPrimaryWeaponIndex != -1)
         {
             // knock back effect
-            if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).fire(target) && MaxSpeed != 0)
+            if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).fire(this, target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                 MoveAndSlide(dir * -1 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
@@ -237,7 +242,7 @@ public class Tank : KinematicBody2D
         if (secondaryWeapon && currentSecondaryWeaponIndex != -1)
         {
             // knock back effect
-            if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).fire(target) && MaxSpeed != 0)
+            if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).fire(this, target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                 MoveAndSlide(dir * -1 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
@@ -249,11 +254,6 @@ public class Tank : KinematicBody2D
     {
         this.health = health;
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
-
-        if (health <= 0)
-        {
-            //   explode();
-        }
     }
 
     public int getHealth()
@@ -261,8 +261,20 @@ public class Tank : KinematicBody2D
         return health;
     }
 
-    public void TakeDamage(int amount, Vector2 dir)
+    public void incrementDefeatedAgentCount()
+    { 
+        defeatedAgentCount++;
+        EmitSignal(nameof(DefeatedAgentChangedSignal), defeatedAgentCount);
+    }
+
+    public int getDefeatedAgentCount()
+    { 
+        return defeatedAgentCount;
+    }
+
+    public void TakeDamage(int amount, Vector2 dir, Tank source)
     {
+        int originalHealth = health;
         health -= amount;
 
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
@@ -272,6 +284,17 @@ public class Tank : KinematicBody2D
             Particles2D smoke = (Particles2D)GetNode("Smoke");
             smoke.Emitting = true;
         }
+
+        // Only the one that actually damange agent to 0 will be count as the one defeated
+        if (originalHealth > 0 && health <= 0)
+        {
+            if (source != null && IsInstanceValid(source))
+            {
+                source.incrementDefeatedAgentCount();
+            }
+        }
+
+
 
         // knock back effect
         if (MaxSpeed != 0)

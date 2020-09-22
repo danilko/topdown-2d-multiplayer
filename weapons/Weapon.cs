@@ -61,7 +61,7 @@ public class Weapon : Node2D
         EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
     }
 
-    public virtual bool fire(Node2D target)
+    public virtual bool fire(Node2D source, Node2D target)
     {
         return false;
     }
