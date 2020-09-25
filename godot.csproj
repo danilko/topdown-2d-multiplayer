@@ -55,7 +55,8 @@
   <ItemGroup>
     <Compile Include="ai\RaycastAStar.cs" />
     <Compile Include="bullets\Bullet.cs" />
-    <Compile Include="bullets\PlayerBullet.cs" />
+    <Compile Include="bullets\LaserRay.cs" />
+    <Compile Include="bullets\RifileBullet.cs" />
     <Compile Include="environments\Obstacle.cs" />
     <Compile Include="GameStates.cs" />
     <Compile Include="items\Pickup.cs" />

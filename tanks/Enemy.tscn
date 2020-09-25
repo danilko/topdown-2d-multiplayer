@@ -30,7 +30,7 @@ shape = SubResource( 1 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectRadius" index="0"]
 scale = Vector2( 22.44, 22.44 )
 
-[node name="Weapon" parent="." index="7"]
+[node name="Weapon" parent="." index="6"]
 position = Vector2( 70, 0 )
 [connection signal="body_entered" from="DetectRadius" to="." method="_on_DetectRadius_body_entered"]
 [connection signal="body_exited" from="DetectRadius" to="." method="_on_DetectRadius_body_exited"]

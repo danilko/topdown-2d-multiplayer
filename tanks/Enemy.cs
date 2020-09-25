@@ -268,6 +268,8 @@ public class Enemy : Tank
                 {
                     targetPaths = null;
                 }
+
+                slowDownBoostTrail();
             }
             else
             {
@@ -277,6 +279,8 @@ public class Enemy : Tank
                 flock();
                 Velocity += acceleration;
                 MoveAndSlide(Velocity);
+
+                speedUpBoostTrail();
             }
         }
 

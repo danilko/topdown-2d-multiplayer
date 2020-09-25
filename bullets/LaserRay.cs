@@ -1,0 +1,109 @@
+using Godot;
+using System;
+
+public class LaserRay : RayCast2D
+{
+    bool isCasting;
+
+    public Node2D source;
+
+    Tween tween;
+    Line2D line2DLaser;
+    Particles2D particles2Dcasting;
+    Particles2D particles2Dcollision;
+    Particles2D particles2DBeam;
+
+    public override void _Ready()
+    {
+        isCasting = false;
+        SetPhysicsProcess(isCasting);
+
+        tween = ((Tween)GetNode("Tween"));
+        line2DLaser = ((Line2D)GetNode("Line2D"));
+        line2DLaser.Points[1] = Vector2.Zero;
+
+        particles2Dcasting = ((Particles2D)GetNode("particles2DCasting"));
+        particles2Dcollision = ((Particles2D)GetNode("particles2DCollision"));
+        particles2DBeam = ((Particles2D)GetNode("particles2DBeam"));
+    }
+
+    public override void _PhysicsProcess(float delta)
+    {
+        Vector2 castPoint = CastTo;
+        ForceRaycastUpdate();
+
+        particles2Dcollision.Emitting = IsColliding();
+
+        if (IsColliding())
+        {
+            castPoint = ToLocal(GetCollisionPoint());
+            particles2Dcollision.GlobalRotation = GetCollisionNormal().Angle();
+            particles2Dcollision.Position = castPoint;
+
+        if (GetCollider().HasMethod("TakeDamage"))
+        {
+            Tank tank = (Tank)(GetCollider());
+            tank.TakeDamage(10, GetCollisionNormal() * -1, (Tank)source);
+        }
+        }
+
+        // Workaround to update points, as the Line2D points are not updatable
+        Vector2 [] newPoints = {new Vector2(0,0), new Vector2(castPoint)};
+        line2DLaser.Points = newPoints;
+
+        particles2DBeam.Position = castPoint * 0.5f;
+        // particles2DBeam.ProcessMaterial = castPoint.Length * 0.5f;
+
+    }
+
+    public void setSource(Node2D source)
+    {
+        this.source = source;
+    }
+
+    public Node2D getSource(Node2D source)
+    {
+        return source;
+    }
+
+    public bool getIsCasting()
+    {
+        return isCasting;
+    }
+    public void setIsCasting(bool isCasting)
+    {
+        this.isCasting = isCasting;
+        particles2Dcasting.Emitting = isCasting;
+
+        if (isCasting)
+        {
+            appear();
+        }
+        else
+        {
+            particles2Dcollision.Emitting = false;
+            disappear();
+        }
+
+        SetPhysicsProcess(isCasting);
+    }
+
+
+    public void appear()
+    {
+
+
+        tween.StopAll();
+        tween.InterpolateProperty(line2DLaser, "width", 0.0f, 10.0f, 0.2f);
+        tween.Start();
+    }
+
+
+    public void disappear()
+    {
+        tween.StopAll();
+        tween.InterpolateProperty(line2DLaser, "width", 10.0f, 0.0f, 0.1f);
+        tween.Start();
+    }
+
+}

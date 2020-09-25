@@ -1,10 +1,36 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://tanks/Tank.cs" type="Script" id=1]
 [ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=2]
 [ext_resource path="res://effects/Smoke.tscn" type="PackedScene" id=3]
-[ext_resource path="res://effects/BoosterTrail.tscn" type="PackedScene" id=4]
 [ext_resource path="res://ui/UnitDisplay.tscn" type="PackedScene" id=5]
+[ext_resource path="res://assets/ui/blue_tick.png" type="Texture" id=6]
+
+[sub_resource type="Gradient" id=4]
+offsets = PoolRealArray( 0, 0.540416, 1 )
+colors = PoolColorArray( 0.5, 3, 9, 1, 0.5, 3, 9, 1, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=5]
+gradient = SubResource( 4 )
+
+[sub_resource type="Curve" id=2]
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 0.502193, 0.990909 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=3]
+curve = SubResource( 2 )
+
+[sub_resource type="ParticlesMaterial" id=1]
+emission_shape = 2
+emission_box_extents = Vector3( 100, 20, 1 )
+flag_disable_z = true
+direction = Vector3( -1, 0, 0 )
+spread = 10.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 120.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale_curve = SubResource( 3 )
+color_ramp = SubResource( 5 )
 
 [node name="Tank" type="KinematicBody2D"]
 collision_layer = 15
@@ -21,12 +47,16 @@ visible = false
 position = Vector2( -40, 0 )
 rotation = 3.14159
 
-[node name="BoosterTrail" parent="." instance=ExtResource( 4 )]
-position = Vector2( -50, 0 )
-rotation = 3.14159
-
 [node name="UnitDisplay" parent="." instance=ExtResource( 5 )]
 
 [node name="Weapon" type="Position2D" parent="."]
+
+[node name="Partilcle2DBoosterTrail" type="Particles2D" parent="."]
+modulate = Color( 0.5, 3, 6, 1 )
+self_modulate = Color( 0.5, 3, 6, 1 )
+light_mask = -2147483647
+position = Vector2( -100, -1.25 )
+process_material = SubResource( 1 )
+texture = ExtResource( 6 )
 [connection signal="HealthChangedSignal" from="." to="UnitDisplay" method="_updateHealthBar"]
 [connection signal="animation_finished" from="Explosion" to="." method="_OnExplosionAnimationFinished"]

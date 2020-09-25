@@ -195,30 +195,61 @@ public class Tank : KinematicBody2D
 
     public void move(Vector2 moveDir, Vector2 pointPosition, float delta)
     {
-        // Need to times 100 to catch up with AI movement as there is delay in updating
-        Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
+        if (moveDir.x == 0 && moveDir.y == 0)
+        {
+            slowDownBoostTrail();
+        }
+        else
+        {
+            speedUpBoostTrail();
+
+            AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+            audioManager.playSoundEffect(moveMusicClip);
+
+            // Need to times 100 to catch up with AI movement as there is delay in updating
+            Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
+            MoveAndSlide(Velocity);
+        }
+
+
         LookAt(pointPosition);
-        MoveAndSlide(Velocity);
     }
+
+    protected void speedUpBoostTrail()
+    {
+        Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
+ 
+        boosterTrail.SpeedScale = 10;
+        boosterTrail.Lifetime = 3;
+
+    }
+
+    protected void slowDownBoostTrail()
+    {
+        Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
+ 
+        boosterTrail.SpeedScale = 1;
+        boosterTrail.Lifetime = 1;
+    }
+
 
     public void set(Vector2 position, float rotation, bool primaryWeapon, bool secondaryWeapon, bool playerMove)
     {
 
-        Particles2D boosterTrail = (Particles2D)GetNode("BoosterTrail");
+        Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
+        Tween tween = (Tween)GetNode("Tween");
 
         // Move effect
-        if (playerMove)
+        if (position != Position)
         {
             AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
             audioManager.playSoundEffect(moveMusicClip);
-        }
-        if (Velocity.x != 0 || Velocity.y != 0)
-        {
-            boosterTrail.SpeedScale = 2;
+
+            speedUpBoostTrail();
         }
         else
         {
-            boosterTrail.SpeedScale = 1;
+            slowDownBoostTrail();
         }
 
         _shoot(primaryWeapon, secondaryWeapon);
@@ -262,13 +293,13 @@ public class Tank : KinematicBody2D
     }
 
     public void incrementDefeatedAgentCount()
-    { 
+    {
         defeatedAgentCount++;
         EmitSignal(nameof(DefeatedAgentChangedSignal), defeatedAgentCount);
     }
 
     public int getDefeatedAgentCount()
-    { 
+    {
         return defeatedAgentCount;
     }
 
