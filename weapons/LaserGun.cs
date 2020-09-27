@@ -33,7 +33,7 @@ public class LaserGun : Weapon
             CanShoot = false;
             Ammo -= 1;
             EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
-            laserRay.source = (Tank)source;
+            laserRay.setSource((Tank)source);
             laserRay.setIsCasting(true);
 
             timer.Start();

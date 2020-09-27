@@ -75,6 +75,7 @@
     <Compile Include="ui\UIPlayerListEntry.cs" />
     <Compile Include="ui\UnitDisplay.cs" />
     <Compile Include="weapons\LaserGun.cs" />
+    <Compile Include="weapons\MissleLauncher.cs" />
     <Compile Include="weapons\Rifile.cs" />
     <Compile Include="weapons\Weapon.cs" />
   </ItemGroup>

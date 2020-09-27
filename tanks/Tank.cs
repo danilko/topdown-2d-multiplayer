@@ -44,7 +44,7 @@ public class Tank : KinematicBody2D
     protected Godot.Collections.Array secondaryWeapons = new Godot.Collections.Array();
 
     [Export]
-    private int MaxPrimaryWeaponCount = 2;
+    private int MaxPrimaryWeaponCount = 3;
 
     [Export]
     private int MaxSecondaryWeaponCount = 1;
@@ -57,7 +57,7 @@ public class Tank : KinematicBody2D
 
     private int energy;
 
-    protected AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
+    protected AudioStream explosionMusicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
     protected AudioStream moveMusicClip = (AudioStream)GD.Load("res://assets/sounds/sci-fi_device_item_power_up_flash_01.wav");
 
     protected GameStates gameStates;
@@ -92,8 +92,7 @@ public class Tank : KinematicBody2D
         // Temporary script to automatic load weapon
         updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
         updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
-
-        EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
+        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
     }
 
     public void changePrimaryWeapon(int weaponIndex)
@@ -203,8 +202,8 @@ public class Tank : KinematicBody2D
         {
             speedUpBoostTrail();
 
-            AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-            audioManager.playSoundEffect(moveMusicClip);
+            //AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+            //audioManager.playSoundEffect(moveMusicClip);
 
             // Need to times 100 to catch up with AI movement as there is delay in updating
             Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
@@ -218,7 +217,7 @@ public class Tank : KinematicBody2D
     protected void speedUpBoostTrail()
     {
         Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
- 
+
         boosterTrail.SpeedScale = 10;
         boosterTrail.Lifetime = 3;
 
@@ -227,7 +226,7 @@ public class Tank : KinematicBody2D
     protected void slowDownBoostTrail()
     {
         Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
- 
+
         boosterTrail.SpeedScale = 1;
         boosterTrail.Lifetime = 1;
     }
@@ -242,8 +241,8 @@ public class Tank : KinematicBody2D
         // Move effect
         if (position != Position)
         {
-            AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-            audioManager.playSoundEffect(moveMusicClip);
+            //AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+            //audioManager.playSoundEffect(moveMusicClip);
 
             speedUpBoostTrail();
         }
@@ -306,25 +305,40 @@ public class Tank : KinematicBody2D
     public void TakeDamage(int amount, Vector2 dir, Tank source)
     {
         int originalHealth = health;
-        health -= amount;
+        bool trackDamage = true;
+        bool sourceAlive = true;
 
-        EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
-
-        if (health < MaxHealth / 2)
+        if (source == null || !IsInstanceValid(source))
         {
-            Particles2D smoke = (Particles2D)GetNode("Smoke");
-            smoke.Emitting = true;
+            sourceAlive = false;
         }
 
-        // Only the one that actually damange agent to 0 will be count as the one defeated
-        if (originalHealth > 0 && health <= 0)
+        if (source != null && IsInstanceValid(source) && source.getTeamIdentifier() == getTeamIdentifier())
         {
-            if (source != null && IsInstanceValid(source))
+            trackDamage = false;
+        }
+
+        if (trackDamage)
+        {
+            health -= amount;
+
+            EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
+
+            if (health < MaxHealth / 2)
             {
-                source.incrementDefeatedAgentCount();
+                Particles2D smoke = (Particles2D)GetNode("Smoke");
+                smoke.Emitting = true;
+            }
+
+            // Only the one that actually damange agent to 0 will be count as the one defeated
+            if (originalHealth > 0 && health <= 0)
+            {
+                if (sourceAlive)
+                {
+                    source.incrementDefeatedAgentCount();
+                }
             }
         }
-
 
 
         // knock back effect
@@ -393,7 +407,7 @@ public class Tank : KinematicBody2D
         animatedSprite.Play("fire");
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        audioManager.playSoundEffect(musicClip);
+        audioManager.playSoundEffect(explosionMusicClip);
     }
 
     private void _OnExplosionAnimationFinished()

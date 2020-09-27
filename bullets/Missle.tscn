@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/spr_smoke_strip24.png" type="Texture" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 28.8353, 20.6115 )
+extents = Vector2( 27.0382, 9.10533 )
 
 [sub_resource type="CanvasItemMaterial" id=2]
 resource_local_to_scene = true
@@ -29,15 +29,17 @@ scale_curve = SubResource( 4 )
 anim_speed = 1.0
 
 [node name="Missle" instance=ExtResource( 1 )]
+modulate = Color( 1, 1, 1, 1 )
 Speed = 500
 Damage = 30
 Lifetime = 3.0
 steer_force = 5.0
 
 [node name="Sprite" parent="." index="0"]
+rotation = 3.14159
 texture = ExtResource( 2 )
 region_enabled = true
-region_rect = Rect2( 510, 70, 54, 40 )
+region_rect = Rect2( 361, 37, 58, 30 )
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource( 1 )

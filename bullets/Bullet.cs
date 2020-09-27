@@ -3,6 +3,9 @@ using System;
 
 public class Bullet : Area2D
 {
+    [Signal]
+    public delegate void ProjectileDamageSignal();
+
     [Export]
     int Speed;
 
@@ -28,6 +31,9 @@ public class Bullet : Area2D
 
     public void start(Vector2 position, Vector2 direction, Node2D inSource, Node2D inTarget)
     {
+
+        Connect(nameof(ProjectileDamageSignal), GetParent(), "_onDamageCalculation");
+        
         Position = position;
         Rotation = direction.Angle();
         velocity = direction * Speed;
@@ -57,7 +63,7 @@ public class Bullet : Area2D
     public override void _Process(float delta)
     {
         // Validate if target is available or is freed up (maybe no longer in scene)
-        if(target != null && IsInstanceValid(target))
+        if (target != null && IsInstanceValid(target))
         {
             target = null;
         }
@@ -97,12 +103,7 @@ public class Bullet : Area2D
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(musicHitClip);
-        if (body.HasMethod("TakeDamage"))
-        {
-            Tank tank = (Tank)(body);
-            tank.TakeDamage(Damage, hitDir, (Tank)source);
-        }
-
+        EmitSignal(nameof(ProjectileDamageSignal), Damage, hitDir, source, body);
     }
 
     private void _onBulletAreaEntered(Area2D body)

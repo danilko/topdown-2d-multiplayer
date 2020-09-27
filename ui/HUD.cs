@@ -90,13 +90,19 @@ public class HUD : CanvasLayer
 
         if (weaponType == Weapon.WeaponType.lasergun)
         {
-            symbol.RegionRect = new Rect2(new Vector2(419, 36), new Vector2(121, 32));
+            symbol.RegionRect = new Rect2(-1f, 263f, 96f, 93f);
+            symbol.Scale = new Vector2(0.5f, 0.5f);
         }
         else if (weaponType == Weapon.WeaponType.rifile)
         {
-            symbol.RegionRect = new Rect2(new Vector2(763, 39), new Vector2(71, 28));
+            symbol.RegionRect = new Rect2(763f, 39f, 71f, 28f);
+            symbol.Scale = new Vector2(1f, 1f);
         }
-
+        else if (weaponType == Weapon.WeaponType.misslelauncher)
+        {
+            symbol.RegionRect = new Rect2(763f, 39f, 71f, 28f);
+            symbol.Scale = new Vector2(1f, 1f);
+        }
     }
     public void _updateSecondaryWeapon(Weapon.WeaponType weaponType)
     {

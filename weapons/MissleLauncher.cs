@@ -1,9 +1,8 @@
 using Godot;
 using System;
 
-public class Rifile : Weapon
+public class MissleLauncher : Weapon
 {
-
 
     public override void _Ready()
     {
@@ -35,10 +34,7 @@ public class Rifile : Weapon
             {
                 EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, (Tank)source, target);
             }
-
-            AnimationPlayer animationPlayer = (AnimationPlayer)GetNode("AnimationPlayer");
-            animationPlayer.Play("MuzzleFlash");
-
+            
             return true;
         }
 

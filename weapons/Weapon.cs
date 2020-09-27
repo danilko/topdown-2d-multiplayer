@@ -8,7 +8,7 @@ public class Weapon : Node2D
     [Export]
     public WeaponAmmoType weaponAmmoType  {get; set;}
 
-    public enum WeaponType {rifile, lasergun}
+    public enum WeaponType {rifile, lasergun, misslelauncher}
 
     [Export]
     public WeaponType weaponType {get; set;}

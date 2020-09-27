@@ -617,12 +617,14 @@ public class GameWorld : Node2D
             Camera2D camera2D = new Camera2D();
             camera2D.Name = "Camera2D";
             client.AddChild(camera2D);
-            // client.Connect("AmmoChangedSignal", GetNode("HUD"), "_updateAmmoBar");
-            // client.Connect("DeadSignal", this, "_on_Player_Dead");
             client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updatePrimaryWeapon");
             client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updateSecondaryWeapon");
             client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
             client.Connect("DefeatedAgentChangedSignal", GetNode("HUD"), "_updateDefeatedAgentBar");
+
+            // Notify HUD about weapon 0
+            client.changePrimaryWeapon(0);
+
             _setCameraLimit();
         }
 
@@ -773,6 +775,24 @@ public class GameWorld : Node2D
         Bullet newBullet = (Bullet)bullet.Instance();
         AddChild(newBullet);
         newBullet.start(_position, _direction, source, target);
+    }
+
+    private void _onDamageCalculation(int damage, Vector2 hitDir, Godot.Object source, Godot.Object target)
+    {
+        if (target != null && IsInstanceValid(target))
+        {
+
+            if (target.HasMethod("TakeDamage"))
+            {
+                Tank tankTarget = (Tank)(target);
+                Tank tankSource = (Tank)(source);
+                tankTarget.TakeDamage(damage, hitDir, tankSource);
+            }
+            else if (target.HasMethod("TakeEnvironmentDamage"))
+            {
+                ((Obstacle)(target)).TakeEnvironmentDamage(damage);
+            }
+        }
     }
 
     private void _onPlayerDead()

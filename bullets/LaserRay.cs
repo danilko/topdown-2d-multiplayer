@@ -3,9 +3,15 @@ using System;
 
 public class LaserRay : RayCast2D
 {
+    [Signal]
+    public delegate void RayDamageSignal();
+
+    [Export]
+    int Damage;
+
     bool isCasting;
 
-    public Node2D source;
+    private Node2D source;
 
     Tween tween;
     Line2D line2DLaser;
@@ -40,15 +46,11 @@ public class LaserRay : RayCast2D
             particles2Dcollision.GlobalRotation = GetCollisionNormal().Angle();
             particles2Dcollision.Position = castPoint;
 
-        if (GetCollider().HasMethod("TakeDamage"))
-        {
-            Tank tank = (Tank)(GetCollider());
-            tank.TakeDamage(10, GetCollisionNormal() * -1, (Tank)source);
-        }
+            EmitSignal(nameof(RayDamageSignal), Damage, GetCollisionNormal() * -1, source, GetCollider());
         }
 
         // Workaround to update points, as the Line2D points are not updatable
-        Vector2 [] newPoints = {new Vector2(0,0), new Vector2(castPoint)};
+        Vector2[] newPoints = { new Vector2(0, 0), new Vector2(castPoint) };
         line2DLaser.Points = newPoints;
 
         particles2DBeam.Position = castPoint * 0.5f;
@@ -59,6 +61,12 @@ public class LaserRay : RayCast2D
     public void setSource(Node2D source)
     {
         this.source = source;
+
+        // Set the parent to player
+        if (! IsConnected(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation"))
+        {
+            Connect(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation");
+        }
     }
 
     public Node2D getSource(Node2D source)

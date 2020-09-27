@@ -13,13 +13,13 @@ GunCooldown = 0.1
 WeaponName = "LaserGun"
 
 [node name="TriggerPoint" parent="." index="1"]
-position = Vector2( 100, 0 )
+position = Vector2( 80, 0 )
 
 [node name="Body" type="Sprite" parent="." index="2"]
-position = Vector2( 36.8704, 0 )
+scale = Vector2( 0.75, 0.75 )
 texture = ExtResource( 3 )
 region_enabled = true
-region_rect = Rect2( 420, 36, 120, 32 )
+region_rect = Rect2( -1, 263, 96, 93 )
 
 [node name="LaserRay" parent="." index="3" instance=ExtResource( 5 )]
-position = Vector2( 100, 0 )
+position = Vector2( 80, 0 )

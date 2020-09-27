@@ -50,6 +50,7 @@ enabled = true
 cast_to = Vector2( 1000, 0 )
 collision_mask = 31
 script = ExtResource( 1 )
+Damage = 10
 
 [node name="Line2D" type="Line2D" parent="."]
 points = PoolVector2Array( 0, 0, 100, 0 )

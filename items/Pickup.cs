@@ -3,7 +3,6 @@ using System;
 
 public class Pickup : Area2D
 {
-
     enum Items { health, ammo }
 
     private Texture[] iconTextures = { (Texture)GD.Load("res://assets/wrench_white.png"), (Texture)GD.Load("res://assets/ammo_machinegun.png") };
@@ -15,11 +14,6 @@ public class Pickup : Area2D
     [Export]
     Vector2 amount = new Vector2(10, 25);
 
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
-
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         Sprite icon = (Sprite)GetNode("Icon");
