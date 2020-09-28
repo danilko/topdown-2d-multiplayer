@@ -66,12 +66,6 @@ region_rect = Rect2( 764, 39, 71, 26 )
 [node name="TriggerPoint" parent="." index="2"]
 position = Vector2( 80, 0 )
 
-[node name="Body2" type="Sprite" parent="TriggerPoint" index="0"]
-scale = Vector2( 0.2, 0.2 )
-texture = ExtResource( 3 )
-region_enabled = true
-region_rect = Rect2( 764, 39, 71, 26 )
-
 [node name="Flash" type="Sprite" parent="." index="3"]
 modulate = Color( 20, 1, 1, 0 )
 self_modulate = Color( 20, 1, 1, 1 )

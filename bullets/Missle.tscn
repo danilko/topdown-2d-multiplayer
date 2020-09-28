@@ -30,7 +30,7 @@ anim_speed = 1.0
 
 [node name="Missle" instance=ExtResource( 1 )]
 modulate = Color( 1, 1, 1, 1 )
-Speed = 500
+Speed = 1000
 Damage = 30
 Lifetime = 3.0
 steer_force = 10.0

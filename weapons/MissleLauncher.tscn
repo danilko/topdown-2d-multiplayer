@@ -9,7 +9,7 @@
 script = ExtResource( 2 )
 weaponAmmoType = 2
 weaponType = 2
-KnockbackForce = 10.0
+KnockbackForce = 50.0
 GunShot = 3
 GunSpread = 0.2
 Bullet = ExtResource( 4 )
