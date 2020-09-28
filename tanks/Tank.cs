@@ -91,8 +91,8 @@ public class Tank : KinematicBody2D
 
         // Temporary script to automatic load weapon
         updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
-        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
         updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
+        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
     }
 
     public void changePrimaryWeapon(int weaponIndex)

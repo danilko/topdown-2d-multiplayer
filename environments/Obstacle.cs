@@ -4,7 +4,7 @@ using System;
 public class Obstacle : StaticBody2D
 {
 
-    enum Items
+    public enum Items
     {
         crate_wood,
         crate_steel,
@@ -21,7 +21,7 @@ public class Obstacle : StaticBody2D
     new Rect2(1042.576f, 810.563f, 31.155f, 103.693f),
     new Rect2(1075.159f, 818.412f, 29.966f, 95.844f),
     new Rect2(1075.159f, 818.412f, 29.966f, 95.844f),
-    new Rect2(935.97f, 112.485f, 53.59f, 54.361f)};
+    new Rect2(1046.708f, 527.378f, 45.187f, 45.187f)};
 
     private int[] itemHealth = {
     50,
@@ -32,7 +32,7 @@ public class Obstacle : StaticBody2D
     0};
 
     [Export]
-    Items type = Items.crate_wood;
+    public Items type = Items.crate_wood;
 
     protected AudioStream explosionMusicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
 

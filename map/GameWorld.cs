@@ -93,6 +93,8 @@ public class GameWorld : Node2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        buildObstacles();
+
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
 
@@ -125,8 +127,6 @@ public class GameWorld : Node2D
         {
             RpcId(1, nameof(spwanPlayer), convertToString(network.gamestateNetworkPlayer, -1));
         }
-
-
     }
 
     public Vector2 getSpawnPointPosition(int spawnPointIndex)
@@ -151,6 +151,55 @@ public class GameWorld : Node2D
         return nextSpawnIndex;
     }
 
+    public void buildObstacles()
+    {
+        TileMap tilemap = (TileMap)GetNode("Navigation2D/Ground");
+
+        Vector2 cellSize = tilemap.CellSize;
+        Rect2 usedRect = tilemap.GetUsedRect();
+
+        int startPointX = (int)usedRect.Position.x;
+        int startPointY = (int)usedRect.Position.y;
+
+        int maxLengthX = (int)usedRect.Size.x;
+        int maxLengthY = (int)usedRect.Size.y;
+
+        for (int xIndex = startPointX; xIndex < maxLengthX; xIndex++)
+        {
+            for (int yIndex = startPointY; yIndex < maxLengthY; yIndex++)
+            {
+                Vector2 position;
+                Obstacle.Items item = Obstacle.Items.remain;
+
+                if (tilemap.GetCell(xIndex, yIndex) == 0)
+                {
+                    item = Obstacle.Items.crate_wood;
+                }
+                else if (tilemap.GetCell(xIndex, yIndex) == 45 || tilemap.GetCell(xIndex, yIndex) == 46)
+                {
+                    item = Obstacle.Items.crate_steel;
+                }
+                else if (tilemap.GetCell(xIndex, yIndex) == 7)
+                {
+                    item = Obstacle.Items.roadblock_red;
+                }
+
+                if (item != Obstacle.Items.remain)
+                {
+                    position = tilemap.MapToWorld(new Vector2(xIndex, yIndex));
+
+                    Obstacle obstacle = (Obstacle)((PackedScene)GD.Load("res://environments/Obstacle.tscn")).Instance();
+                    obstacle.type = item;
+                    obstacle.Position = position;
+
+                    obstacle.Name = "obstacle_" + xIndex + "_" + yIndex;
+
+                    GetNode("Obstacles").AddChild(obstacle);
+                }
+            }
+        }
+
+    }
 
     public Godot.Collections.Array getPaths(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array excludes)
     {
@@ -622,8 +671,8 @@ public class GameWorld : Node2D
             client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
             client.Connect("DefeatedAgentChangedSignal", GetNode("HUD"), "_updateDefeatedAgentBar");
 
-            // Notify HUD about weapon 0
-            client.changePrimaryWeapon(0);
+            // Notify HUD about weapon 2
+            client.changePrimaryWeapon(2);
 
             _setCameraLimit();
         }
@@ -736,6 +785,9 @@ public class GameWorld : Node2D
             bot.setCurrentSpawnIndex(currentSpawnPoint);
 
             AddChild(bot);
+
+            // Randomize weapon between 0, 1, 2
+            bot.changePrimaryWeapon((int)botCounter % 3);
         }
     }
 

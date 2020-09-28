@@ -50,6 +50,7 @@ rotation = 3.14159
 [node name="UnitDisplay" parent="." instance=ExtResource( 5 )]
 
 [node name="Weapon" type="Position2D" parent="."]
+position = Vector2( 80, 0 )
 
 [node name="Partilcle2DBoosterTrail" type="Particles2D" parent="."]
 modulate = Color( 0.5, 3, 6, 1 )

@@ -5,7 +5,7 @@
 [ext_resource path="res://bullets/RifileBullet.cs" type="Script" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 19.4892, 13.4633 )
+extents = Vector2( 16.98, 13.3653 )
 
 [sub_resource type="Gradient" id=2]
 offsets = PoolRealArray( 0, 0.648961, 1 )

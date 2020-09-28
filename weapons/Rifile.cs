@@ -3,8 +3,6 @@ using System;
 
 public class Rifile : Weapon
 {
-
-
     public override void _Ready()
     {
         base._Ready();
@@ -23,6 +21,7 @@ public class Rifile : Weapon
             Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
 
             Position2D triggerPoint = (Position2D)GetNode("TriggerPoint");
+
             if (GunShot > 1)
             {
                 for (int i = 0; i < GunShot; i++)

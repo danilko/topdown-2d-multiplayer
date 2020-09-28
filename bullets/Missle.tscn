@@ -33,7 +33,7 @@ modulate = Color( 1, 1, 1, 1 )
 Speed = 500
 Damage = 30
 Lifetime = 3.0
-steer_force = 5.0
+steer_force = 10.0
 
 [node name="Sprite" parent="." index="0"]
 rotation = 3.14159

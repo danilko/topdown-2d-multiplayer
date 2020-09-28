@@ -14,7 +14,7 @@ script = ExtResource( 2 )
 [node name="Icon" type="Sprite" parent="."]
 texture = ExtResource( 1 )
 region_enabled = true
-region_rect = Rect2( 935.971, 112.485, 53.5896, 54.3607 )
+region_rect = Rect2( 751.992, 110.978, 54.2603, 55.0097 )
 region_filter_clip = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

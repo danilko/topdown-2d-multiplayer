@@ -31,10 +31,10 @@ public class Bullet : Area2D
 
     public void start(Vector2 position, Vector2 direction, Node2D inSource, Node2D inTarget)
     {
-
         Connect(nameof(ProjectileDamageSignal), GetParent(), "_onDamageCalculation");
         
-        Position = position;
+        GlobalPosition = position;
+
         Rotation = direction.Angle();
         velocity = direction * Speed;
 
