@@ -51,15 +51,15 @@ public class RaycastAStar
     }
 
     // Uses raycasting to find the traversable neighbors of the given position
-    // Cache results
+    // No cache of results
     public Godot.Collections.Array getNeighbors(Vector2 vector)
     {
         String vectorId = vector2ToId(vector);
 
-        if (neighborsMap.Contains(vectorId))
-        {
-            return (Godot.Collections.Array)neighborsMap[vectorId];
-        }
+        //if (neighborsMap.Contains(vectorId))
+        //{
+        //    return (Godot.Collections.Array)neighborsMap[vectorId];
+        //}
 
         Godot.Collections.Array targets = new Godot.Collections.Array();
         targets.Add(vector + new Vector2(GRID_SIZE, 0));
@@ -77,11 +77,18 @@ public class RaycastAStar
         foreach (Vector2 target in targets)
         {
 
-            Physics2DDirectSpaceState ray = space.DirectSpaceState;
-            Godot.Collections.Dictionary result = ray.IntersectRay(vector, target, excludes);
+            //Physics2DDirectSpaceState ray = space.DirectSpaceState;
+            //Godot.Collections.Dictionary result = ray.IntersectRay(vector, target, excludes);
 
             // There's nothing there, so we can visit the neighbor
-            if (result.Count == 0)
+            //if (result.Count == 0)
+            //{
+            //    debugDraw(target);
+            //    valid.Add(target);
+            //}
+
+            // Replace raycast with dictionary
+            if(! gameWorld.checkObstacles(target))
             {
                 debugDraw(target);
                 valid.Add(target);
@@ -89,7 +96,7 @@ public class RaycastAStar
         }
 
 
-        neighborsMap.Add(vectorId, valid);
+        //neighborsMap.Add(vectorId, valid);
 
         return valid;
     }

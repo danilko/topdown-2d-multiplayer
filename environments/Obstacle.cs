@@ -3,6 +3,8 @@ using System;
 
 public class Obstacle : StaticBody2D
 {
+    [Signal]
+    public delegate void ObstacleDestroy();
 
     public enum Items
     {
@@ -50,7 +52,7 @@ public class Obstacle : StaticBody2D
         health -= amount;
         if (health < 0)
         {
-            explode();
+            EmitSignal(nameof(ObstacleDestroy), Name);
         }
     }
 
@@ -72,7 +74,7 @@ public class Obstacle : StaticBody2D
 
     private void _OnExplosionAnimationFinished()
     {
-        Sprite newIcon = (Sprite) GetNode("Icon").Duplicate();
+        Sprite newIcon = (Sprite)GetNode("Icon").Duplicate();
         newIcon.Name = this.Name + "_remained";
         newIcon.RegionRect = itemRegions[itemRegions.Length - 1];
         newIcon.Position = Position;

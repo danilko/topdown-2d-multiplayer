@@ -64,6 +64,8 @@ public class GameWorld : Node2D
 
     Dictionary<String, ClientState> clientStates = new Dictionary<String, ClientState>();
 
+    private Godot.Collections.Dictionary<String, Vector2> obstacles = new Godot.Collections.Dictionary<String, Vector2>();
+    private Godot.Collections.Array obstaclesDestroyed = new Godot.Collections.Array();
 
     int spawned_bots = 0;
 
@@ -219,30 +221,15 @@ public class GameWorld : Node2D
             }
         }
 
+        if (GetTree().IsNetworkServer())
+        {
+            buildObstaclesCache();
+        }
     }
 
     public Godot.Collections.Array getPaths(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array excludes)
     {
         return aStarSolver.path(start, end, space_state, excludes, this);
-    }
-
-
-    public Godot.Collections.Array getPaths2(Vector2 startPosition, Vector2 endPosition)
-    {
-
-        Godot.Collections.Array pathArray = new Godot.Collections.Array();
-        if ((Navigation2D)GetNode("Navigation2D") != null)
-        {
-            Vector2[] paths = ((Navigation2D)GetNode("Navigation2D")).GetSimplePath(startPosition, endPosition);
-
-            foreach (Vector2 point in paths)
-            {
-                pathArray.Add(point);
-            }
-
-        }
-
-        return pathArray;
     }
 
 
@@ -657,6 +644,13 @@ public class GameWorld : Node2D
             {
                 RpcId(pininfo.net_id, nameof(addBot), spawnBot.name);
             }
+
+            // Sync the destoryed obstacles
+            foreach (Obstacle obstacle in obstaclesDestroyed)
+            {
+                RpcId(pininfo.net_id, nameof(destroyObstacle), obstacle);
+            }
+
         }
 
         // Load the scene and create an instance
@@ -863,6 +857,88 @@ public class GameWorld : Node2D
             else if (target.HasMethod("TakeEnvironmentDamage"))
             {
                 ((Obstacle)(target)).TakeEnvironmentDamage(damage);
+            }
+        }
+    }
+
+    public void buildObstaclesCache()
+    {
+        TileMap tilemap = (TileMap)GetNode("Navigation2D/Ground");
+        foreach (Node node in GetNode("Obstacles").GetChildren())
+        {
+            Obstacle obstacle = (Obstacle)node;
+
+            Vector2 tileMapPosition = tilemap.WorldToMap(obstacle.Position);
+
+            float xIndex = tileMapPosition.x;
+            float yIndex = tileMapPosition.y;
+
+            // Align to the cell deployment (2 x 2 index size)
+            if (xIndex % 2 != 0)
+            {
+                xIndex = xIndex - 1;
+            }
+            if (yIndex % 2 != 0)
+            {
+                yIndex = yIndex - 1;
+            }
+
+            if (!obstacle.IsConnected("ObstacleDestroy", this, nameof(_onObstacleDestroy)))
+            {
+                obstacle.Connect("ObstacleDestroy", this, nameof(_onObstacleDestroy));
+            }
+            obstacles.Add("obstacle_" + xIndex + "_" + yIndex, obstacle.Position);
+        }
+    }
+
+    public bool checkObstacles(Vector2 input)
+    {
+        TileMap tilemap = (TileMap)GetNode("Navigation2D/Ground");
+        Vector2 tileMapPosition = tilemap.WorldToMap(input);
+
+        float xIndex = tileMapPosition.x;
+        float yIndex = tileMapPosition.y;
+
+        // Align to the cell deployment (2 x 2 index size)
+        if (xIndex % 2 != 0)
+        {
+            xIndex = xIndex - 1;
+        }
+        if (yIndex % 2 != 0)
+        {
+            yIndex = yIndex - 1;
+        }
+
+        return obstacles.ContainsKey("obstacle_" + xIndex + "_" + yIndex);
+    }
+
+    private void _onObstacleDestroy(String obstacleName)
+    {
+        if (GetTree().IsNetworkServer())
+        {
+            if (obstacles.ContainsKey(obstacleName))
+            {
+                obstacles.Remove(obstacleName);
+            }
+
+            obstaclesDestroyed.Add(obstacleName);
+
+            destroyObstacle(obstacleName);
+
+            Rpc(nameof(destroyObstacle), obstacleName);
+        }
+        
+    }
+
+    [Remote]
+    private void destroyObstacle(String name)
+    {
+        if (GetNode("Obstacles").HasNode(name))
+        {
+            Obstacle obstacle = (Obstacle)GetNode("Obstacles/" + name);
+            if (IsInstanceValid(obstacle))
+            {
+                obstacle.explode();
             }
         }
     }
