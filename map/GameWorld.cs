@@ -188,13 +188,33 @@ public class GameWorld : Node2D
                 {
                     position = tilemap.MapToWorld(new Vector2(xIndex, yIndex));
 
+                    //for (int tileIndex = 0; tileIndex < 4; tileIndex++)
+                    //{
                     Obstacle obstacle = (Obstacle)((PackedScene)GD.Load("res://environments/Obstacle.tscn")).Instance();
                     obstacle.type = item;
-                    obstacle.Position = position;
+                    obstacle.Position = position + (cellSize / 2);
+
+                    // if (tileIndex == 0)
+                    // {
+                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2), position.y + (cellSize.y / 2));
+                    // }
+                    // else if (tileIndex == 1)
+                    // {
+                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2) + cellSize.x, position.y + (cellSize.y / 2));
+                    // }
+                    // else if (tileIndex == 2)
+                    // {
+                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2), position.y + (cellSize.y / 2) + cellSize.y);
+                    // }
+                    // else if (tileIndex == 3)
+                    // {
+                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2) + cellSize.x, position.y + (cellSize.y / 2) + cellSize.y);
+                    // }
 
                     obstacle.Name = "obstacle_" + xIndex + "_" + yIndex;
 
                     GetNode("Obstacles").AddChild(obstacle);
+                    //}
                 }
             }
         }

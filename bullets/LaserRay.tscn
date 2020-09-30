@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://bullets/LaserRay.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/blue_circle.png" type="Texture" id=2]
+[ext_resource path="res://assets/ui/blue_tick.png" type="Texture" id=3]
 
 [sub_resource type="Gradient" id=1]
 offsets = PoolRealArray( 0, 0.688222 )
@@ -38,19 +39,21 @@ color_ramp = SubResource( 2 )
 
 [sub_resource type="ParticlesMaterial" id=7]
 emission_shape = 2
-emission_box_extents = Vector3( 0, 0, 0 )
+emission_box_extents = Vector3( 20, 20, 0 )
 flag_disable_z = true
 gravity = Vector3( 0, 0, 0 )
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 linear_accel = 100.0
+scale = 0.25
+color = Color( 0.5, 3, 6, 1 )
 
 [node name="LaserRay" type="RayCast2D"]
 enabled = true
 cast_to = Vector2( 1000, 0 )
 collision_mask = 31
 script = ExtResource( 1 )
-Damage = 10
+Damage = 60
 
 [node name="Line2D" type="Line2D" parent="."]
 points = PoolVector2Array( 0, 0, 100, 0 )
@@ -72,4 +75,7 @@ process_material = SubResource( 6 )
 texture = ExtResource( 2 )
 
 [node name="particles2DBeam" type="Particles2D" parent="."]
+emitting = false
+amount = 20
 process_material = SubResource( 7 )
+texture = ExtResource( 3 )

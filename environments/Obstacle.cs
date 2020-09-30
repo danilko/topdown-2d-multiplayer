@@ -79,7 +79,6 @@ public class Obstacle : StaticBody2D
         GetParent().AddChild(newIcon);
         newIcon.Show();
 
-
         QueueFree();
     }
 }

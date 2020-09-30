@@ -19,6 +19,12 @@ public class LaserRay : RayCast2D
     Particles2D particles2Dcollision;
     Particles2D particles2DBeam;
 
+    AudioManager audioManager;
+
+    // https://gamesounds.xyz/?dir=FXHome
+    AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
+    AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
+
     public override void _Ready()
     {
         isCasting = false;
@@ -31,6 +37,8 @@ public class LaserRay : RayCast2D
         particles2Dcasting = ((Particles2D)GetNode("particles2DCasting"));
         particles2Dcollision = ((Particles2D)GetNode("particles2DCollision"));
         particles2DBeam = ((Particles2D)GetNode("particles2DBeam"));
+
+        audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
     }
 
     public override void _PhysicsProcess(float delta)
@@ -42,6 +50,8 @@ public class LaserRay : RayCast2D
 
         if (IsColliding())
         {
+            audioManager.playSoundEffect(musicHitClip);
+
             castPoint = ToLocal(GetCollisionPoint());
             particles2Dcollision.GlobalRotation = GetCollisionNormal().Angle();
             particles2Dcollision.Position = castPoint;
@@ -54,8 +64,7 @@ public class LaserRay : RayCast2D
         line2DLaser.Points = newPoints;
 
         particles2DBeam.Position = castPoint * 0.5f;
-        // particles2DBeam.ProcessMaterial = castPoint.Length * 0.5f;
-
+        particles2DBeam.ProcessMaterial.Set("emission_box_extents", new Vector3(castPoint.x, 10.0f, 0.0f));
     }
 
     public void setSource(Node2D source)
@@ -63,7 +72,7 @@ public class LaserRay : RayCast2D
         this.source = source;
 
         // Set the parent to player
-        if (! IsConnected(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation"))
+        if (!IsConnected(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation"))
         {
             Connect(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation");
         }
@@ -82,10 +91,13 @@ public class LaserRay : RayCast2D
     {
         this.isCasting = isCasting;
         particles2Dcasting.Emitting = isCasting;
+        particles2DBeam.Emitting = isCasting;
 
         if (isCasting)
         {
             appear();
+
+            audioManager.playSoundEffect(musicClip);
         }
         else
         {
@@ -99,8 +111,6 @@ public class LaserRay : RayCast2D
 
     public void appear()
     {
-
-
         tween.StopAll();
         tween.InterpolateProperty(line2DLaser, "width", 0.0f, 10.0f, 0.2f);
         tween.Start();
