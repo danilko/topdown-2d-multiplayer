@@ -469,11 +469,18 @@ public class GameWorld : Node2D
 
         foreach (KeyValuePair<int, NetworkPlayer> networkPlayer in network.networkPlayers)
         {
+            // Node may not being created yet
+            if(! HasNode("client_" + networkPlayer.Value.net_id))
+            {
+                // Ideally should give a warning that a player node wasn't found
+                continue;
+            }
+
             // Locate the player's node. Even if there is no input/update, it's state will be dumped
             // into the snapshot anyway
             Player playerNode = (Player)GetNode("client_" + networkPlayer.Value.net_id);
 
-            if (playerNode == null)
+            if (! IsInstanceValid(playerNode) || playerNode == null)
             {
                 // Ideally should give a warning that a player node wasn't found
                 continue;
@@ -646,7 +653,7 @@ public class GameWorld : Node2D
             }
 
             // Sync the destoryed obstacles
-            foreach (Obstacle obstacle in obstaclesDestroyed)
+            foreach (String obstacle in obstaclesDestroyed)
             {
                 RpcId(pininfo.net_id, nameof(destroyObstacle), obstacle);
             }

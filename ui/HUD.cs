@@ -100,7 +100,7 @@ public class HUD : CanvasLayer
         }
         else if (weaponType == Weapon.WeaponType.misslelauncher)
         {
-            symbol.RegionRect = new Rect2(763f, 39f, 71f, 28f);
+            symbol.RegionRect = new Rect2(510f, 70f, 53f, 39f);
             symbol.Scale = new Vector2(1f, 1f);
         }
     }
