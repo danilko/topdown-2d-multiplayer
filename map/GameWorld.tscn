@@ -32,7 +32,7 @@ rotation = 1.5708
 type = 4
 
 [node name="Obstacle2" parent="Obstacles" instance=ExtResource( 9 )]
-position = Vector2( 1161.85, 1344.02 )
+position = Vector2( 1204.06, 1344.02 )
 type = 4
 
 [node name="Pickups" type="Node2D" parent="."]

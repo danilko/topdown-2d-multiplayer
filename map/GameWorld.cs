@@ -70,6 +70,7 @@ public class GameWorld : Node2D
     int spawned_bots = 0;
 
     Dictionary<String, SpawnBot> spawnBots = new Dictionary<String, SpawnBot>();
+    Dictionary<String, SpawnBot> spawnPlayers = new Dictionary<String, SpawnBot>();
 
     Network network;
 
@@ -417,7 +418,7 @@ public class GameWorld : Node2D
 
     private void onPlayerRemoved(int id)
     {
-        despawnPlayer(id);
+        removeDisconnectedPlayer(id);
         syncBots(-1);
     }
 
@@ -426,7 +427,9 @@ public class GameWorld : Node2D
         gameStates.restart();
     }
 
-    private void despawnPlayer(int id)
+
+    [Remote]
+    private void removeDisconnectedPlayer(int id)
     {
 
         if (GetTree().IsNetworkServer())
@@ -434,25 +437,57 @@ public class GameWorld : Node2D
             foreach (KeyValuePair<int, NetworkPlayer> item in network.networkPlayers)
             {
                 // Skip disconnecte player and server from replication code
-                if (item.Key == id || id == 1)
+                if (item.Key == id || item.Key == 1)
                 {
                     continue;
                 }
                 // Replicate despawn into currently iterated player
-                RpcId(id, "despawnPlayer", id);
+                RpcId(item.Key, "removeDisconnectedPlayer", id);
             }
         }
-        // Try to locate the player actor
-        Tank playerNode = (Tank)GetNode("client_" + id);
 
-        if (playerNode == null)
+        removePlayer(id);
+    }
+
+
+    private void removePlayer(int id)
+    {
+        if (!HasNode("client_" + id))
         {
             GD.Print("Cannoot remove invalid node from tree");
             return;
         }
 
+        // Try to locate the player actor
+        Tank playerNode = (Tank)GetNode("client_" + id);
+
+        if (playerNode == null || !IsInstanceValid(playerNode))
+        {
+            GD.Print("Cannoot remove invalid node from tree");
+            return;
+        }
+
+        Vector2 deSpawnPosition = new Vector2(playerNode.GlobalPosition.x, playerNode.GlobalPosition.y);
+
         // Mark the node for deletion
         playerNode.explode();
+
+        // If this is the player attach to current client, respawn the client with observer
+        if (id == network.gamestateNetworkPlayer.net_id)
+        {
+            // Load the scene and create an instance
+            Observer client;
+
+            client = (Observer)((PackedScene)GD.Load("res://tanks/Observer.tscn")).Instance();
+
+            client.Position = deSpawnPosition;
+
+            client.Name = "client_observer_" + id;
+
+            AddChild(client);
+
+            client.setCameraLimit();
+        }
     }
 
     // Update and generate a game state snapshot
@@ -467,10 +502,13 @@ public class GameWorld : Node2D
         Snapshot snapshot = new Snapshot();
         snapshot.signature = snapshotSignature;
 
+
+        Godot.Collections.Array<int> removeSpawnPlayers = new Godot.Collections.Array<int>();
+
         foreach (KeyValuePair<int, NetworkPlayer> networkPlayer in network.networkPlayers)
         {
             // Node may not being created yet
-            if(! HasNode("client_" + networkPlayer.Value.net_id))
+            if (!HasNode("client_" + networkPlayer.Value.net_id))
             {
                 // Ideally should give a warning that a player node wasn't found
                 continue;
@@ -480,7 +518,7 @@ public class GameWorld : Node2D
             // into the snapshot anyway
             Player playerNode = (Player)GetNode("client_" + networkPlayer.Value.net_id);
 
-            if (! IsInstanceValid(playerNode) || playerNode == null)
+            if (playerNode == null || !IsInstanceValid(playerNode))
             {
                 // Ideally should give a warning that a player node wasn't found
                 continue;
@@ -489,55 +527,66 @@ public class GameWorld : Node2D
             Vector2 pPosition = playerNode.Position;
             float pRotation = playerNode.Rotation;
 
-
-            // Check if there is any input for this player. In that case, update the state
-            if (gameStates.playerInputs.ContainsKey(networkPlayer.Key) && gameStates.playerInputs[networkPlayer.Key].Count > 0)
+            // Only update if player is not dead yet
+            if (playerNode.getHealth() > 0)
             {
-
-                bool primaryWeapon = false;
-                bool secondaryWeapon = false;
-
-                // Calculate the delta
-                float delta = gameStates.updateDelta / (float)(gameStates.playerInputs[networkPlayer.Key].Count);
-
-                foreach (KeyValuePair<int, GameStates.PlayerInput> input in gameStates.playerInputs[networkPlayer.Key])
+                // Check if there is any input for this player. In that case, update the state
+                if (gameStates.playerInputs.ContainsKey(networkPlayer.Key) && gameStates.playerInputs[networkPlayer.Key].Count > 0)
                 {
 
-                    Vector2 moveDir = new Vector2();
-                    if (input.Value.up) { moveDir.y = -1; }
-                    if (input.Value.down) { moveDir.y = 1; }
-                    if (input.Value.left) { moveDir.x = -1; }
-                    if (input.Value.right) { moveDir.x = 1; }
-                    primaryWeapon = input.Value.primaryWepaon;
-                    secondaryWeapon = input.Value.secondaryWepaon;
-                    if (input.Value.changePrimaryWeapon) { playerNode.changePrimaryWeapon(playerNode.currentPrimaryWeaponIndex + 1); }
-                    if (input.Value.changeSecondaryWeapon) { playerNode.changeSecondaryWeapon(playerNode.currentSecondaryWeaponIndex + 1); }
-                    playerNode._shoot(primaryWeapon, secondaryWeapon);
-                    playerNode.move(moveDir, input.Value.mousePosition, delta);
+                    bool primaryWeapon = false;
+                    bool secondaryWeapon = false;
+
+                    // Calculate the delta
+                    float delta = gameStates.updateDelta / (float)(gameStates.playerInputs[networkPlayer.Key].Count);
+
+                    foreach (KeyValuePair<int, GameStates.PlayerInput> input in gameStates.playerInputs[networkPlayer.Key])
+                    {
+
+                        Vector2 moveDir = new Vector2();
+                        if (input.Value.up) { moveDir.y = -1; }
+                        if (input.Value.down) { moveDir.y = 1; }
+                        if (input.Value.left) { moveDir.x = -1; }
+                        if (input.Value.right) { moveDir.x = 1; }
+                        primaryWeapon = input.Value.primaryWepaon;
+                        secondaryWeapon = input.Value.secondaryWepaon;
+                        if (input.Value.changePrimaryWeapon) { playerNode.changePrimaryWeapon(playerNode.currentPrimaryWeaponIndex + 1); }
+                        if (input.Value.changeSecondaryWeapon) { playerNode.changeSecondaryWeapon(playerNode.currentSecondaryWeaponIndex + 1); }
+                        playerNode._shoot(primaryWeapon, secondaryWeapon);
+                        playerNode.move(moveDir, input.Value.mousePosition, delta);
+                    }
+
+                    // Cleanup the input vector
+                    gameStates.playerInputs[networkPlayer.Key].Clear();
+
+                    gameStates.playerInputs.Remove(networkPlayer.Key);
+
+                    ClientData clientData = new ClientData();
+                    clientData.id = networkPlayer.Key + "";
+                    clientData.position = playerNode.Position;
+                    clientData.rotation = playerNode.Rotation;
+                    clientData.primaryWepaon = primaryWeapon;
+                    clientData.secondaryWepaon = secondaryWeapon;
+                    clientData.primaryWeaponIndex = playerNode.currentPrimaryWeaponIndex;
+                    clientData.secondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
+                    clientData.health = playerNode.getHealth();
+
+                    snapshot.playerData.Add(networkPlayer.Key, clientData);
                 }
-
-                // Cleanup the input vector
-                gameStates.playerInputs[networkPlayer.Key].Clear();
-
-                gameStates.playerInputs.Remove(networkPlayer.Key);
-
-                ClientData clientData = new ClientData();
-                clientData.id = networkPlayer.Key + "";
-                clientData.position = playerNode.Position;
-                clientData.rotation = playerNode.Rotation;
-                clientData.primaryWepaon = primaryWeapon;
-                clientData.secondaryWepaon = secondaryWeapon;
-                clientData.primaryWeaponIndex = playerNode.currentPrimaryWeaponIndex;
-                clientData.secondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
-                clientData.health = playerNode.getHealth();
-
-                snapshot.playerData.Add(networkPlayer.Key, clientData);
             }
-
+            else
+            {
+                removeSpawnPlayers.Insert(0, networkPlayer.Key);
+            }
         }
 
         // Clean the input
         gameStates.playerInputs.Clear();
+
+        foreach (int spawnPlayerId in removeSpawnPlayers)
+        {
+            removeClient(spawnPlayerId + "");
+        }
 
         Godot.Collections.Array<String> removeSpawnBots = new Godot.Collections.Array<String>();
 
@@ -546,7 +595,7 @@ public class GameWorld : Node2D
             // Locate the bot node
             Enemy enemyNode = (Enemy)GetNode(spawnBot.name);
 
-            if (enemyNode == null)
+            if (enemyNode == null || !IsInstanceValid(enemyNode))
             {
                 // Ideally should give a warning that a bot node wasn't found
                 continue;
@@ -603,6 +652,7 @@ public class GameWorld : Node2D
         spwanInfo.spawn_index = Int32.Parse(info.Split(";")[3]);
         return spwanInfo;
     }
+
     private String convertToString(NetworkPlayer networkPlayer, int spawn_index)
     {
         return networkPlayer.ToString() + ";" + spawn_index;
@@ -706,12 +756,26 @@ public class GameWorld : Node2D
     {
         if (GetTree().IsNetworkServer())
         {
-            Rpc(nameof(removeClient), id);
+            foreach (KeyValuePair<int, NetworkPlayer> item in network.networkPlayers)
+            {
+                // Skip server from replication code
+                if (item.Key == 1)
+                {
+                    continue;
+                }
+                // Replicate despawn into currently iterated player
+
+                RpcId(item.Key, nameof(removeClient), id);
+            }
         }
 
         if (spawnBots.ContainsKey(id))
         {
             removeBot(id);
+        }
+        else
+        {
+            removePlayer(Int32.Parse(id));
         }
     }
 
@@ -934,7 +998,7 @@ public class GameWorld : Node2D
 
             Rpc(nameof(destroyObstacle), obstacleName);
         }
-        
+
     }
 
     [Remote]

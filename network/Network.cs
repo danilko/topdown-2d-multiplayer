@@ -77,6 +77,8 @@ public class Network : Node
 
         // Initialize the networking system
         NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
+        peer.CompressionMode = NetworkedMultiplayerENet.CompressionModeEnum.Zstd;
+
         // Try to create the server
         if (peer.CreateServer(serverinfo.used_port, serverinfo.max_players) != Error.Ok)
         {
@@ -96,6 +98,8 @@ public class Network : Node
     {
         hostType = "Client";
         NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
+        peer.CompressionMode = NetworkedMultiplayerENet.CompressionModeEnum.Zstd;
+
         if (peer.CreateClient(ip, port) != Error.Ok)
         {
             EmitSignal(nameof(JoinFailSignal));
