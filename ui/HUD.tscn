@@ -1,17 +1,119 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
 [ext_resource path="res://assets/ui/green_circle.png" type="Texture" id=3]
 [ext_resource path="res://assets/ui/yellow_boxTick.png" type="Texture" id=4]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=5]
+[ext_resource path="res://assets/fonts/Kenney Pixel Square.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://assets/fonts/Kenney Rocket Square.ttf" type="DynamicFontData" id=7]
+
+[sub_resource type="DynamicFont" id=1]
+size = 20
+font_data = ExtResource( 7 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 42
+font_data = ExtResource( 6 )
+
+[sub_resource type="Animation" id=3]
+length = 2.0
+tracks/0/type = "bezier"
+tracks/0/path = NodePath("controlOverallMessage/lblMainMessage:percent_visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1 )
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("controlOverallMessage/lblSubMessage:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
+}
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource( 1 )
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="lblTimerStatus" type="Label" parent="."]
+margin_left = 25.0
+margin_top = 552.0
+margin_right = 568.0
+margin_bottom = 577.0
+custom_fonts/font = SubResource( 1 )
+custom_colors/font_color = Color( 0.588235, 1, 0.356863, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ControlPlayerList" type="Control" parent="."]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="ControlPlayerList"]
+margin_left = 63.0
+margin_top = 28.0
+margin_right = 979.0
+margin_bottom = 572.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblPlayerList" type="Label" parent="ControlPlayerList/Panel"]
+margin_left = 35.8394
+margin_top = 59.9213
+margin_right = 113.839
+margin_bottom = 90.9213
+text = "Player List
+-------------------------------------------------------------"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="boxList" type="VBoxContainer" parent="ControlPlayerList/Panel"]
+margin_left = 18.3811
+margin_top = 95.3323
+margin_right = 899.381
+margin_bottom = 510.332
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblNetworkRate" type="Label" parent="."]
+margin_left = 482.095
+margin_top = 580.087
+margin_right = 645.095
+margin_bottom = 595.087
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="controlGame" type="Control" parent="."]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Margin" type="MarginContainer" parent="controlGame"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_right = 270.0
+margin_bottom = 49.0
 custom_constants/margin_right = 20
 custom_constants/margin_top = 20
 custom_constants/margin_left = 20
@@ -20,57 +122,47 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Container" type="HBoxContainer" parent="Margin"]
+[node name="Container" type="HBoxContainer" parent="controlGame/Margin"]
 margin_left = 20.0
 margin_top = 20.0
-margin_right = 1004.0
-margin_bottom = 580.0
+margin_right = 290.0
+margin_bottom = 69.0
 
-[node name="TextureRect" type="TextureRect" parent="Margin/Container"]
+[node name="TextureRect" type="TextureRect" parent="controlGame/Margin/Container"]
 margin_right = 36.0
-margin_bottom = 560.0
+margin_bottom = 49.0
 texture = ExtResource( 3 )
 
-[node name="HealthBar" type="TextureProgress" parent="Margin/Container"]
+[node name="HealthBar" type="TextureProgress" parent="controlGame/Margin/Container"]
 margin_left = 40.0
 margin_right = 230.0
-margin_bottom = 560.0
+margin_bottom = 49.0
 value = 75.0
 texture_progress = ExtResource( 2 )
 
-[node name="Tween" type="Tween" parent="Margin/Container/HealthBar"]
+[node name="Tween" type="Tween" parent="controlGame/Margin/Container/HealthBar"]
 
-[node name="AmmoBar" type="TextureProgress" parent="Margin/Container"]
+[node name="AmmoBar" type="TextureProgress" parent="controlGame/Margin/Container"]
 margin_left = 234.0
 margin_right = 270.0
-margin_bottom = 560.0
+margin_bottom = 49.0
 value = 90.0
 texture_progress = ExtResource( 4 )
 fill_mode = 4
 radial_initial_angle = 270.0
 radial_fill_degrees = 180.0
 
-[node name="lblPrimaryWeaponLabel" type="Label" parent="."]
-margin_left = 320.378
-margin_top = 10.1396
-margin_right = 423.378
-margin_bottom = 24.1396
-text = "PrimaryWeapon"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblDefeatedAgentCountLabel" type="Label" parent="."]
-margin_left = 766.595
-margin_top = 470.405
-margin_right = 875.595
-margin_bottom = 486.405
+[node name="lblDefeatedAgentCountLabel" type="Label" parent="controlGame"]
+margin_left = 716.39
+margin_top = 471.819
+margin_right = 825.39
+margin_bottom = 487.819
 text = "Defeated Agent"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblDefeatedAgentCount" type="Label" parent="."]
+[node name="lblDefeatedAgentCount" type="Label" parent="controlGame"]
 margin_left = 875.407
 margin_top = 470.405
 margin_right = 984.407
@@ -79,7 +171,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblLocalPlayer" type="Label" parent="."]
+[node name="lblLocalPlayer" type="Label" parent="controlGame"]
 margin_left = 27.3425
 margin_top = 83.4875
 margin_right = 172.343
@@ -88,38 +180,91 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="boxList" type="VBoxContainer" parent="."]
-margin_left = 785.0
-margin_top = 12.0
-margin_right = 1004.0
-margin_bottom = 88.0
+[node name="PanelServerInfo" type="Panel" parent="controlGame"]
+visible = false
+margin_left = 597.0
+margin_top = 484.0
+margin_right = 701.0
+margin_bottom = 504.0
+rect_scale = Vector2( 3.88731, 2.12269 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblServerName" type="Label" parent="."]
-margin_left = 605.0
-margin_top = 563.0
-margin_right = 1010.0
-margin_bottom = 580.0
+[node name="lblPing" type="Label" parent="controlGame/PanelServerInfo"]
+margin_left = 0.643118
+margin_top = 16.4885
+margin_right = 104.643
+margin_bottom = 30.4885
+
+[node name="lblServerName" type="Label" parent="controlGame"]
+margin_left = 687.0
+margin_top = 548.0
+margin_right = 1020.0
+margin_bottom = 570.0
 align = 1
 valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelServerInfo" type="Panel" parent="."]
-margin_left = 606.189
-margin_top = 501.161
-margin_right = 710.189
-margin_bottom = 517.161
-rect_scale = Vector2( 3.88731, 2.12269 )
+[node name="lblPrimaryWeaponLabel" type="Label" parent="controlGame"]
+margin_left = 317.0
+margin_top = 7.0
+margin_right = 418.0
+margin_bottom = 21.0
+text = "PrimaryWeapon"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="spPrimaryWeaponSymbol" type="Sprite" parent="."]
+[node name="spPrimaryWeaponSymbol" type="Sprite" parent="controlGame"]
 position = Vector2( 383.145, 45.0868 )
 scale = Vector2( 1.18019, 1.18019 )
 texture = ExtResource( 5 )
 region_enabled = true
+
+[node name="controlOverallMessage" type="Control" parent="."]
+visible = false
+margin_right = 62.0
+margin_bottom = 48.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblMainMessage" type="Label" parent="controlOverallMessage"]
+margin_left = 2.0
+margin_top = 260.0
+margin_right = 1026.0
+margin_bottom = 363.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+custom_fonts/font = SubResource( 2 )
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "YOU ARE ELIMINATED"
+align = 1
+valign = 1
+percent_visible = 0.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblSubMessage" type="Label" parent="controlOverallMessage"]
+visible = false
+margin_left = 2.37006
+margin_top = 368.37
+margin_right = 1022.37
+margin_bottom = 382.37
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "PRESS SPACE TO CONTINUE AS OBSERVER"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/MessageAnnounce = SubResource( 3 )
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationPlayerFinished"]

@@ -35,12 +35,33 @@ https://gamesounds.xyz/?dir=Sonniss.com%20-%20GDC%202016%20-%20Game%20Audio%20Bu
 
 What is working
 ======
-Basic top down 2D player effect with project tile shooting with networking support
+
+Basic top down shooter can attack and record health throughout network
+
+Basic network skeleton based on Authoritative Server network design with snapshot
+
+Basic audio and some basic effects 
+
+Basic enemy AI base on A* search and avoid collision with each other by disable collision between enemy
+
+Basic flocking/steer behavior (still need to improve)
+
+Weapon switch ability and framework (to support expansion of new weapon): laser/rifile/homing missles
+
+Destructible Obstacles
+
+Basic game flow conditions (base on exinging agent counts from bots and players)
+
+support of game time period and expire (force winning condition base on available agents on the battlefied at that point) of 15 seconds and at server control (so server will sync time against connected client)
+
+Support of team concept (fridend firing vs firing from other teams)
 
 TODO
 ======
 The bot is equip with basic AI, but still not good with collision avoidance with each other (workaround now with no collision to save AI resource (there is basic code avoidance also in there can be enabled if need))
-Secondary weapson laser effect damages
+
 Better Game Play
+
 Character end of life behavior
+
 More complete game play

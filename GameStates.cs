@@ -13,6 +13,7 @@ public class GameStates : Node
 
     public String[] levels = { "res://ui/TitleScreen.tscn", "res://map/GameWorld.tscn" };
 
+    public String endResultScreen = "res://ui/EndGameScreen.tscn";
 
     public float currentTime = 0;
 
@@ -38,11 +39,13 @@ public class GameStates : Node
     //This will be filled only on the server
     public Dictionary<int, Dictionary<int, PlayerInput>> playerInputs = new Dictionary<int, Dictionary<int, PlayerInput>>();
 
+    private String messages;
 
     public override void _Ready()
     {
         set_update_rate(updateRate);
     }
+
 
     public void cacheInput(int net_id, PlayerInput playerInput)
     {
@@ -59,6 +62,16 @@ public class GameStates : Node
         playerInputs[net_id].Add(playerInputs[net_id].Count, playerInput);
     }
 
+    public void setMessagesForNextScene(String inputMessages)
+    {
+        messages = inputMessages;
+
+    }
+
+    public String getMessgesForNextScene()
+    {
+        return messages;
+    }
 
     private void set_update_rate(float rate)
     {
@@ -70,7 +83,13 @@ public class GameStates : Node
     {
         return updateDelta;
     }
+
     private void noSet(float rate) { }
+
+    public void endGameScreen()
+    {   
+        GetTree().ChangeScene(endResultScreen);
+    }
 
     public void restart()
     {

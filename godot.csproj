@@ -70,6 +70,7 @@
     <Compile Include="tanks\Player.cs" />
     <Compile Include="tanks\Tank.cs" />
     <Compile Include="terrain\TileSetMaker.cs" />
+    <Compile Include="ui\EndGameScreen.cs" />
     <Compile Include="ui\HealthBar.cs" />
     <Compile Include="ui\HUD.cs" />
     <Compile Include="ui\TitleScreen.cs" />

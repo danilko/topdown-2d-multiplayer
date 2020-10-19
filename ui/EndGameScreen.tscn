@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://ui/EndGameScreen.cs" type="Script" id=1]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ResultPanel" type="Panel" parent="."]
+margin_right = 1023.0
+margin_bottom = 594.0
+
+[node name="lblResultTitle" type="Label" parent="ResultPanel"]
+margin_left = 61.498
+margin_top = 23.0
+margin_right = 303.498
+margin_bottom = 60.0
+
+[node name="lblResultSummary" type="Label" parent="ResultPanel"]
+margin_left = 65.1498
+margin_top = 78.0
+margin_right = 954.15
+margin_bottom = 175.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblElapsedTime" type="Label" parent="ResultPanel"]
+margin_left = 65.0
+margin_top = 261.0
+margin_right = 959.0
+margin_bottom = 296.0
+
+[node name="btContinue" type="Button" parent="."]
+margin_left = 666.0
+margin_top = 530.0
+margin_right = 898.0
+margin_bottom = 550.0
+text = "Continue"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="btContinue" to="." method="btContinue"]

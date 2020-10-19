@@ -5,7 +5,7 @@
 [ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 39.4833, 41.0087 )
+extents = Vector2( 36.1608, 37.356 )
 
 [node name="Obstacle" type="StaticBody2D"]
 collision_layer = 15

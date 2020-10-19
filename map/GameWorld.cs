@@ -6,7 +6,16 @@ public class GameWorld : Node2D
 {
 
     [Signal]
-    public delegate void SnapshotReceivedSignal();
+    private delegate void SnapshotReceivedSignal();
+
+    [Signal]
+    private delegate void NeworkRateUpdateSignal();
+
+    [Signal]
+    private delegate void PlayerDefeatedSignal();
+
+    [Signal]
+    private delegate void WaitingPeriodSignal();
 
     private GameStates gameStates;
     private class SpwanInfo
@@ -75,11 +84,14 @@ public class GameWorld : Node2D
     Network network;
 
     long botCounter = 0;
-    private long MAX_BOT_COUNT = 1000;
+    private long MAX_BOT_COUNT = 100;
 
     float currentTime;
 
     // The "signature" (timestamp) added into each generated state snapshot
+    // int max is 2,147,483,647 
+    // 2,147,483,647 / 60 (snapshots) / 60 (seconds => 1 min) /60 (mins = > 1 hr) /24 (24 hrs => 1 day) = 414 days (before the snapshot expire)
+    // So as long as this round of games end in 1 year, the snapshot signature will be unique
     int snapshotSignature = 1;
 
     // The signature of the last snapshot received
@@ -94,6 +106,24 @@ public class GameWorld : Node2D
     private RaycastAStar aStarSolver;
 
     // Called when the node enters the scene tree for the first time.
+
+    private float currentNetworkBytes = 0;
+    private float currentNetworkSnapshots = 0;
+    private float currentAppliedNetworkSnapshots = 0;
+
+    private bool waitingPeriod;
+
+    [Export]
+    private int MaxWaitingTime = 15;
+
+    [Export]
+    private int MaxGameTime = 3600;
+
+    // Use as tick to track countdown time
+    private int internalTimer;
+
+    private Timer timer;
+
     public override void _Ready()
     {
         buildObstacles();
@@ -130,6 +160,31 @@ public class GameWorld : Node2D
         {
             RpcId(1, nameof(spwanPlayer), convertToString(network.gamestateNetworkPlayer, -1));
         }
+
+
+        // Update network flow
+        this.Connect(nameof(NeworkRateUpdateSignal), GetNode("HUD"), "_onNetworkRateUpdate");
+        this.Connect(nameof(PlayerDefeatedSignal), GetNode("HUD"), "_onPlayerDefeatedMessage");
+
+        this.Connect("PlayerListChangedSignal", GetNode("HUD"), "_onPlayerDefeatedMessage");
+
+        this.Connect(nameof(WaitingPeriodSignal), GetNode("HUD"), "_onUpdateTimer");
+
+        // Update playerlist
+        EmitSignal("PlayerListChangedSignal");
+
+        waitingPeriod = true;
+
+        // Set the timer on server to do waiting period count down
+        if (GetTree().IsNetworkServer())
+        {
+            timer = (Timer)GetNode("Timer");
+            internalTimer = MaxWaitingTime;
+            timer.WaitTime = 1;
+            timer.Connect("timeout", this, nameof(waitingPeriodTimerTimeout));
+            timer.Start();
+        }
+
     }
 
     public Vector2 getSpawnPointPosition(int spawnPointIndex)
@@ -154,6 +209,23 @@ public class GameWorld : Node2D
         return nextSpawnIndex;
     }
 
+    // Cacluate network rate base on send bytes, received snapshots, applied snapshots
+    private void _onNetworkRateTimerUpdate()
+    {
+        // Convert from bytes to Kb (kio bits)
+        String message = (currentNetworkBytes / (8 * 1000)) + " Kb/s, "
+        + currentNetworkSnapshots + " obtained snapshots/s, "
+        + currentAppliedNetworkSnapshots + " applied snapshots/s";
+
+        EmitSignal(nameof(NeworkRateUpdateSignal), message);
+
+        currentNetworkBytes = 0;
+        currentNetworkSnapshots = 0;
+        currentAppliedNetworkSnapshots = 0;
+    }
+
+    // Build obstacles base on tile map
+    // Will not build obstacles on the road automatically
     public void buildObstacles()
     {
         TileMap tilemap = (TileMap)GetNode("Navigation2D/Ground");
@@ -196,23 +268,6 @@ public class GameWorld : Node2D
                     Obstacle obstacle = (Obstacle)((PackedScene)GD.Load("res://environments/Obstacle.tscn")).Instance();
                     obstacle.type = item;
                     obstacle.Position = position + (cellSize / 2);
-
-                    // if (tileIndex == 0)
-                    // {
-                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2), position.y + (cellSize.y / 2));
-                    // }
-                    // else if (tileIndex == 1)
-                    // {
-                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2) + cellSize.x, position.y + (cellSize.y / 2));
-                    // }
-                    // else if (tileIndex == 2)
-                    // {
-                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2), position.y + (cellSize.y / 2) + cellSize.y);
-                    // }
-                    // else if (tileIndex == 3)
-                    // {
-                    //     obstacle.Position = new Vector2(position.x + (cellSize.x / 2) + cellSize.x, position.y + (cellSize.y / 2) + cellSize.y);
-                    // }
 
                     obstacle.Name = "obstacle_" + xIndex + "_" + yIndex;
 
@@ -283,6 +338,9 @@ public class GameWorld : Node2D
             encodedData = encodedData + item.secondaryWeaponIndex + ";";
         }
 
+        currentNetworkBytes += encodedData.Length * sizeof(Char);
+        currentNetworkSnapshots++;
+
         // First add the snapshot signature (timestamp)
         RpcUnreliable(nameof(clientGetSnapshot), encodedData);
     }
@@ -290,6 +348,9 @@ public class GameWorld : Node2D
     [Remote]
     private void clientGetSnapshot(String encodedData)
     {
+        currentNetworkBytes += encodedData.Length * sizeof(Char);
+        currentNetworkSnapshots++;
+
         int parseIndex = 0;
 
         // Extract the signature
@@ -369,6 +430,9 @@ public class GameWorld : Node2D
 
         //  Update the "last_snapshot"
         lastSnapshotSignature = signature;
+
+        // Update snapshots counter
+        currentAppliedNetworkSnapshots++;
 
         // Emit the signal indicating that there is a new snapshot do be applied
         EmitSignal(nameof(SnapshotReceivedSignal), snapshot);
@@ -467,10 +531,10 @@ public class GameWorld : Node2D
             return;
         }
 
-        Vector2 deSpawnPosition = new Vector2(playerNode.GlobalPosition.x, playerNode.GlobalPosition.y);
-
-        // Mark the node for deletion
-        playerNode.explode();
+        if (spawnPlayers.ContainsKey(id + ""))
+        {
+            spawnPlayers.Remove(id + "");
+        }
 
         // If this is the player attach to current client, respawn the client with observer
         if (id == network.gamestateNetworkPlayer.net_id)
@@ -480,14 +544,27 @@ public class GameWorld : Node2D
 
             client = (Observer)((PackedScene)GD.Load("res://tanks/Observer.tscn")).Instance();
 
-            client.Position = deSpawnPosition;
+            client.Position = playerNode.GlobalPosition;
 
             client.Name = "client_observer_" + id;
 
             AddChild(client);
 
             client.setCameraLimit();
+            EmitSignal(nameof(PlayerDefeatedSignal));
         }
+
+        // Mark the node for deletion
+        playerNode.explode();
+
+        if (GetTree().IsNetworkServer())
+        {
+            if (spawnPlayers.Count == 0)
+            {
+                endGame();
+            }
+        }
+
     }
 
     // Update and generate a game state snapshot
@@ -501,7 +578,6 @@ public class GameWorld : Node2D
         // Initialize the "high level" snapshot
         Snapshot snapshot = new Snapshot();
         snapshot.signature = snapshotSignature;
-
 
         Godot.Collections.Array<int> removeSpawnPlayers = new Godot.Collections.Array<int>();
 
@@ -548,8 +624,14 @@ public class GameWorld : Node2D
                         if (input.Value.down) { moveDir.y = 1; }
                         if (input.Value.left) { moveDir.x = -1; }
                         if (input.Value.right) { moveDir.x = 1; }
-                        primaryWeapon = input.Value.primaryWepaon;
-                        secondaryWeapon = input.Value.secondaryWepaon;
+
+                        // If waiting period, no fire, else use the current user setup
+                        if (!waitingPeriod)
+                        {
+                            primaryWeapon = input.Value.primaryWepaon;
+                            secondaryWeapon = input.Value.secondaryWepaon;
+                        }
+
                         if (input.Value.changePrimaryWeapon) { playerNode.changePrimaryWeapon(playerNode.currentPrimaryWeaponIndex + 1); }
                         if (input.Value.changeSecondaryWeapon) { playerNode.changeSecondaryWeapon(playerNode.currentSecondaryWeaponIndex + 1); }
                         playerNode._shoot(primaryWeapon, secondaryWeapon);
@@ -601,7 +683,18 @@ public class GameWorld : Node2D
                 continue;
             }
 
-            enemyNode._shoot(enemyNode.isPrimaryWeapon, enemyNode.isSecondaryWeapon);
+
+            bool primaryWeapon = false;
+            bool secondaryWeapon = false;
+
+            // If waiting period, no fire, else use the current bot setup
+            if (!waitingPeriod)
+            {
+                primaryWeapon = enemyNode.isPrimaryWeapon;
+                secondaryWeapon = enemyNode.isSecondaryWeapon;
+            }
+
+            enemyNode._shoot(primaryWeapon, secondaryWeapon);
 
             if (enemyNode.getHealth() > 0)
             {
@@ -611,8 +704,8 @@ public class GameWorld : Node2D
                 clientData.position = enemyNode.GlobalPosition;
                 clientData.rotation = enemyNode.GlobalRotation;
                 clientData.health = enemyNode.getHealth();
-                clientData.primaryWepaon = enemyNode.isPrimaryWeapon;
-                clientData.secondaryWepaon = enemyNode.isSecondaryWeapon;
+                clientData.primaryWepaon = primaryWeapon;
+                clientData.secondaryWepaon = secondaryWeapon;
                 clientData.primaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
                 clientData.secondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
 
@@ -644,13 +737,153 @@ public class GameWorld : Node2D
         snapshotSignature += 1;
     }
 
-
     private SpwanInfo convertToObject(String info)
     {
         SpwanInfo spwanInfo = new SpwanInfo();
         spwanInfo.networkPlayer = new NetworkPlayer(info);
         spwanInfo.spawn_index = Int32.Parse(info.Split(";")[3]);
         return spwanInfo;
+    }
+
+    private String formatTwoDigits(int input)
+    {
+        if (input < 10)
+        {
+            return "0" + input;
+        }
+        else
+        {
+            return "" + input;
+        }
+    }
+
+    private void waitingPeriodTimerTimeout()
+    {
+        internalTimer -= 1;
+        String message = "00:00:" + formatTwoDigits(internalTimer);
+
+        // Stop the timer
+        if (internalTimer == 0)
+        {
+            timer.Stop();
+        }
+
+        Rpc(nameof(getWaitingPeriodStatus), message);
+        if (GetTree().IsNetworkServer())
+        {
+            getWaitingPeriodStatus(message);
+        }
+
+        // Start to count against game time
+        if (internalTimer == 0)
+        {
+            internalTimer = MaxGameTime;
+
+            if (timer.IsConnected("timeout", this, nameof(waitingPeriodTimerTimeout)))
+            {
+                timer.Disconnect("timeout", this, nameof(waitingPeriodTimerTimeout));
+            }
+
+            timer.Connect("timeout", this, nameof(gamePeriodTimeout));
+            timer.Start();
+        }
+    }
+
+    [Remote]
+    private void getWaitingPeriodStatus(String message)
+    {
+        EmitSignal(nameof(WaitingPeriodSignal), message + " WAITING PERIOD");
+        if (message == "00:00:00")
+        {
+            waitingPeriod = false;
+        }
+    }
+
+    private void gamePeriodTimeout()
+    {
+        internalTimer -= 1;
+
+        int hour = internalTimer / 3600;
+
+        int minutes = (internalTimer % 3600) / 60;
+
+        int seconds = (internalTimer % 3600) % 60;
+
+        String message = formatTwoDigits(hour) + ":" + formatTwoDigits(minutes) + ":" + formatTwoDigits(seconds);
+
+        RpcUnreliable(nameof(getGamePeriodStatus), message);
+
+        if (GetTree().IsNetworkServer())
+        {
+            getGamePeriodStatus(message);
+        }
+
+        if (internalTimer == 0)
+        {
+            timer.Stop();
+            endGame();
+        }
+    }
+
+    [Remote]
+    private void getGamePeriodStatus(String message)
+    {
+        EmitSignal(nameof(WaitingPeriodSignal), message + " GAME PERIOD");
+
+    }
+
+    private String validateGameResult()
+    {
+        String message = "";
+
+
+        // Record elaspse time
+        int elapseTime = MaxGameTime - internalTimer;
+
+        if (spawnPlayers.Count < spawnBots.Count)
+        {
+            message = "You Lost;Players Remain (" + spawnPlayers.Count + ") is less than Bots Remain(" + spawnBots.Count + ")";
+        }
+        else if (spawnPlayers.Count == spawnBots.Count)
+        {
+            message = "Tie;Players Remain (" + spawnPlayers.Count + ") is equal to Bots Remain(" + spawnBots.Count + ")";
+        }
+        else if (spawnPlayers.Count > spawnBots.Count)
+        {
+            message = "You Win; Players Remain (" + spawnPlayers.Count + ") is greater than Bots Remain(" + spawnBots.Count + ")";
+        }
+
+
+        if (elapseTime == MaxGameTime)
+        {
+            message = message + "at game period timeout";
+        }
+
+        int hour = elapseTime / 3600;
+
+        int minutes = (elapseTime % 3600) / 60;
+
+        int seconds = (elapseTime % 3600) % 60;
+
+        message = message + ";" + formatTwoDigits(hour) + ":" + formatTwoDigits(minutes) + ":" + formatTwoDigits(seconds);
+
+        return message;
+    }
+
+    private void endGame()
+    {
+        String message = validateGameResult();
+
+        Rpc(nameof(notifyEndGameStatus), validateGameResult());
+
+        notifyEndGameStatus(message);
+    }
+
+    [Remote]
+    private void notifyEndGameStatus(String message)
+    {
+        gameStates.setMessagesForNextScene(message);
+        gameStates.endGameScreen();
     }
 
     private String convertToString(NetworkPlayer networkPlayer, int spawn_index)
@@ -672,6 +905,8 @@ public class GameWorld : Node2D
             spawnIndex = network.networkPlayers.Count;
         }
 
+        spawnPlayers.Add(pininfo.net_id + "", null);
+
         if (GetTree().IsNetworkServer() && pininfo.net_id != 1)
         {
             // We are on the server and the requested spawn does not belong to the server
@@ -680,6 +915,12 @@ public class GameWorld : Node2D
 
             foreach (KeyValuePair<int, NetworkPlayer> item in network.networkPlayers)
             {
+                // If it is not one of active player, then no need to sync (as the player is either observer or dead)
+                if (!spawnPlayers.ContainsKey(item.Key + ""))
+                {
+                    continue;
+                }
+
                 // Spawn currently iterated player within the new player's scene, skipping the new player for now
                 if (item.Key != pininfo.net_id)
                 {
@@ -708,6 +949,11 @@ public class GameWorld : Node2D
                 RpcId(pininfo.net_id, nameof(destroyObstacle), obstacle);
             }
 
+            // Sync the waiting period if it is already end
+            if (!waitingPeriod)
+            {
+                RpcId(pininfo.net_id, nameof(getWaitingPeriodStatus), "00:00");
+            }
         }
 
         // Load the scene and create an instance
@@ -819,6 +1065,12 @@ public class GameWorld : Node2D
                         addBot(botId);
                     }
                 }
+            }
+
+            // If there is no new bots can be deployed, and there is no current bot, end game
+            if (spawnBots.Count == 0 && botCounter == MAX_BOT_COUNT)
+            {
+                endGame();
             }
         }
 
@@ -1014,8 +1266,4 @@ public class GameWorld : Node2D
         }
     }
 
-    private void _onPlayerDead()
-    {
-        ((GameStates)GetNode("/root/GAMESTATES")).restart();
-    }
 }

@@ -94,6 +94,24 @@ public class Network : Node
         registerPlayer(gamestateNetworkPlayer.ToString());
     }
 
+    public void closeServer()
+    {
+        // Unregister all player except masters
+        foreach (KeyValuePair<int, NetworkPlayer> item in networkPlayers)
+        {
+            if (item.Key != 1)
+            {
+                // Unregister the player from the server's list
+                ((NetworkedMultiplayerENet)GetTree().NetworkPeer).DisconnectPeer(item.Key);
+            }
+        }
+
+        networkPlayers.Clear();
+
+        // Close network server
+        GetTree().NetworkPeer = null;
+    }
+
     public void joinServer(String ip, int port)
     {
         hostType = "Client";

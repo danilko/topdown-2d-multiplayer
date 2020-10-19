@@ -5,9 +5,10 @@
 [ext_resource path="res://tanks/Enemy.cs" type="Script" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 47.1943, 48.4166 )
+extents = Vector2( 34.3803, 35.1768 )
 
 [node name="Enemy" instance=ExtResource( 1 )]
+scale = Vector2( 0.5, 0.5 )
 collision_layer = 4
 collision_mask = 27
 script = ExtResource( 3 )

@@ -50,18 +50,22 @@ environment = SubResource( 1 )
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="SpawnPoint_0" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 122.187, 952.107 )
+position = Vector2( 133.513, 880.373 )
 
 [node name="SpawnPoint_1" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 761.355, 917.735 )
+position = Vector2( 700.947, 1265.08 )
 
 [node name="SpawnPoint_2" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 2487.19, 2699.18 )
+position = Vector2( 1801.79, 2049.06 )
 
 [node name="SpawnPoint_3" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 2428.56, 637.108 )
+position = Vector2( 2426.67, 637.108 )
 
 [node name="dot" type="Sprite" parent="."]
 texture = ExtResource( 2 )
 
 [node name="pathchart" type="Node2D" parent="."]
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+[connection signal="timeout" from="Timer" to="." method="_onNetworkRateTimerUpdate"]

@@ -5,9 +5,10 @@
 [ext_resource path="res://tanks/Player.cs" type="Script" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 39.4285, 9.34732 )
+extents = Vector2( 34.2187, 8.99288 )
 
 [node name="Player" instance=ExtResource( 1 )]
+scale = Vector2( 0.5, 0.5 )
 collision_layer = 2
 collision_mask = 31
 script = ExtResource( 3 )

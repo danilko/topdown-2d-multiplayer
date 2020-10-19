@@ -24,14 +24,13 @@ public class Enemy : Tank
     Godot.Collections.Array detourPaths = null;
     Godot.Collections.Array members = null;
     // 10 px / s
-    float maxForces = 100;
-    float mass = 4.0f;
+    float maxForces = 500;
 
     float cohesionDistance = 64;
     float alignmentDistance = 20;
-    float separationDistance = 10;
+    float separationDistance = 10.0f;
 
-    int slowingDistance = 128;
+    int slowingDistance = 10;
 
     private Vector2 acceleration;
 
@@ -92,13 +91,6 @@ public class Enemy : Tank
         return ((targetPosition - Position).Normalized() * MaxSpeed - Velocity).Clamped(maxForces);
     }
 
-    public Vector2 seekWithMass(Vector2 targetPosition)
-    {
-        // Return the force that needs to be added to the current velocity to seek the target position
-        // Use the mass attribute to divded the force mangnitude
-
-        return ((targetPosition - Position).Normalized() * MaxSpeed - Velocity) / mass;
-    }
     public Vector2 seekAndArrive(Vector2 targetPosition)
     {
         // Return the force that needs to be added to the current velocity to seek and slowly approch the target position
@@ -206,9 +198,9 @@ public class Enemy : Tank
 
     public void flock()
     {
-        applyForce(cohesion() * 1.0f);
-        applyForce(alignment() * 0.8f);
-        applyForce(separation() * 1.4f);
+        ///Velocity += cohesion() * 1.0f;
+        //Velocity += alignment() * 0.8f;
+        //Velocity += separation() * 1.0f;
     }
 
     public void applyForce(Vector2 force)
@@ -240,7 +232,7 @@ public class Enemy : Tank
         acceleration = new Vector2();
 
         // Validate if target is available or is freed up (maybe no longer in scene)
-        if (target != null && ! IsInstanceValid(target))
+        if (target != null && !IsInstanceValid(target))
         {
             target = null;
         }
@@ -273,11 +265,12 @@ public class Enemy : Tank
             }
             else
             {
-
                 Velocity = targetDir * MaxSpeed;
 
-                flock();
-                Velocity += acceleration;
+                Vector2 seekVelocity = seekAndArrive(targetPoint);
+                Vector2 separationVelocity = separation() * 0.5f;
+                Velocity = Velocity + seekVelocity + separationVelocity;
+                
                 MoveAndSlide(Velocity);
 
                 speedUpBoostTrail();

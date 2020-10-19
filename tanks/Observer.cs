@@ -9,7 +9,6 @@ public class Observer : Camera2D
 
     public void gatherInput(float delta)
     {
-
         float yAxis = 0.0f;
         float xAxis = 0.0f;
         float moveFactor = 1000.0f;
@@ -48,6 +47,8 @@ public class Observer : Camera2D
         LimitRight = (int)(mapLimit.End.x * mapCellSize.x);
         LimitTop = (int)(mapLimit.Position.y * mapCellSize.y);
         LimitBottom = (int)(mapLimit.End.y * mapCellSize.y);
+
+        
     }
 
     public override void _Process(float delta)

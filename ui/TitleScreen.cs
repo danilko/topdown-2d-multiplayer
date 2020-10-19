@@ -5,6 +5,9 @@ public class TitleScreen : Control
 {
     Network network;
 
+    enum GameModeState { Server, Client }
+    private GameModeState gameModeState;
+
     public override void _Ready()
     {
         network = (Network)GetNode("/root/NETWORK");
@@ -33,11 +36,29 @@ public class TitleScreen : Control
         label.Text = "Join Failed";
     }
 
-    private void onbtCreatePressed()
+    private void _onbtnCreateServerPanel()
     {
-        // Properly set the local player information
-        setPlayerInfo();
+        ((Panel)GetNode("PanelJoin")).Visible = false;
+        ((Panel)GetNode("PanelPlayer")).Visible = false;
 
+        ((Panel)GetNode("PanelHost")).Visible = true;
+    }
+
+    private void _onbtnJoinServerPanel()
+    {
+        ((Panel)GetNode("PanelHost")).Visible = false;
+        ((Panel)GetNode("PanelPlayer")).Visible = false;
+
+        ((Panel)GetNode("PanelJoin")).Visible = true;
+    }
+
+    private void _onbtnExit()
+    {
+        GetTree().Quit();
+    }
+
+    private void createServer()
+    {
         //  Gather values from the GUI and fill the network info
         LineEdit lineEdit = (LineEdit)GetNode("PanelHost/txtServerPort");
         int port = Int32.Parse(lineEdit.Text);
@@ -51,16 +72,60 @@ public class TitleScreen : Control
         network.createServer(ServerName, port, maxPlayers);
     }
 
-    private void onbtJoinPressed()
+    private void joinServer()
     {
-        // Properly set the local player information
-        setPlayerInfo();
-
         LineEdit lineEdit = (LineEdit)GetNode("PanelJoin/txtJoinPort");
         int port = Int32.Parse(lineEdit.Text);
         lineEdit = (LineEdit)GetNode("PanelJoin/txtJoinIp");
         String ip = lineEdit.Text;
         network.joinServer(ip, port);
+    }
+
+    private void _onbtCreatePressed()
+    {
+        ((Panel)GetNode("PanelJoin")).Visible = false;
+        ((Panel)GetNode("PanelHost")).Visible = false;
+
+        gameModeState = GameModeState.Server;
+
+        ((Panel)GetNode("PanelPlayer")).Visible = true;
+    }
+
+    private void _onbtJoinPressed()
+    {
+        ((Panel)GetNode("PanelJoin")).Visible = false;
+        ((Panel)GetNode("PanelHost")).Visible = false;
+
+        gameModeState = GameModeState.Client;
+
+        ((Panel)GetNode("PanelPlayer")).Visible = true;
+    }
+
+    private void _onbtPlayerConfirmPressed()
+    {
+        ((Panel)GetNode("PanelJoin")).Visible = false;
+        ((Panel)GetNode("PanelHost")).Visible = false;
+        ((Panel)GetNode("PanelPlayer")).Visible = false;
+
+        // Properly set the local player information
+        setPlayerInfo();
+
+        if (gameModeState == GameModeState.Server)
+        {
+            createServer();
+        }
+        else
+        {
+            joinServer();
+        }
+    }
+
+
+    private void _onbtCancelPressed()
+    {
+        ((Panel)GetNode("PanelJoin")).Visible = false;
+        ((Panel)GetNode("PanelHost")).Visible = false;
+        ((Panel)GetNode("PanelPlayer")).Visible = false;
     }
 
     public override void _Input(InputEvent @event)
