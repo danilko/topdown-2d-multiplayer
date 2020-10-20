@@ -6,6 +6,12 @@ top - down 2D multiplayer base on godot
 [![Youtube Video Demo](https://img.youtube.com/vi/MiTIhxKtvRg/0.jpg)](https://www.youtube.com/playlist?list=PLlwvRbWsWmGUtEd47nyo0MUZJVJqvd4Iv)
 
 
+Build Downloads
+======
+Builds for supported platforms can be downloaded below
+
+[Builds](https://github.com/danilko/topdown-2d-multiplayer/releases)
+
 Code Reference
 ======
 Base on following tutorials and rebuilt in C Sharp Godot Implementation (however, there are additional tweaks, so the code is no longer like their original codes)
