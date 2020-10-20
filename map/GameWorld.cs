@@ -1064,6 +1064,11 @@ public class GameWorld : Node2D
 
                         addBot(botId);
                     }
+                    else
+                    {
+                        // Break from loop
+                        break;
+                    }
                 }
             }
 
