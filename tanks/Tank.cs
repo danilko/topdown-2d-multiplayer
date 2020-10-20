@@ -236,7 +236,6 @@ public class Tank : KinematicBody2D
     {
 
         Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
-        Tween tween = (Tween)GetNode("Tween");
 
         // Move effect
         if (position != Position)

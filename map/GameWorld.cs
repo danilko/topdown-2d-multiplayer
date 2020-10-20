@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+using System.IO;
+using System.IO.Compression;
+using System.Text;
+
 public class GameWorld : Node2D
 {
 
@@ -342,12 +346,48 @@ public class GameWorld : Node2D
         currentNetworkSnapshots++;
 
         // First add the snapshot signature (timestamp)
-        RpcUnreliable(nameof(clientGetSnapshot), encodedData);
+        RpcUnreliable(nameof(clientGetSnapshot), compressString(encodedData));
     }
 
-    [Remote]
-    private void clientGetSnapshot(String encodedData)
+
+    // Compress tring into gzip compressed bytes
+    // Referece https://gigi.nullneuron.net/gigilabs/compressing-strings-using-gzip-in-c/
+    public byte[]  compressString(String input)
     {
+        byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+        using(var outputStream = new MemoryStream())
+        {
+            using (var gZipStream = new GZipStream(outputStream, CompressionMode.Compress))
+            gZipStream.Write(inputBytes, 0, inputBytes.Length);
+
+            return outputStream.ToArray();
+        }
+    }
+
+    // Decompress gzip bytes into string
+    // Referece https://gigi.nullneuron.net/gigilabs/compressing-strings-using-gzip-in-c/
+    public String decompressString(byte[] input)
+    {
+
+        using(var inputStream = new MemoryStream(input))
+        using(var gZipStream = new GZipStream(inputStream, CompressionMode.Decompress))
+        using(var outputStream = new MemoryStream())
+        {
+            gZipStream.CopyTo(outputStream);
+
+            var outputBytes = outputStream.ToArray();
+
+            return Encoding.UTF8.GetString(outputBytes);
+        }
+    }
+
+
+    [Remote]
+    private void clientGetSnapshot(byte[] encodedDataCompress)
+    {
+        String encodedData = decompressString(encodedDataCompress);
+
         currentNetworkBytes += encodedData.Length * sizeof(Char);
         currentNetworkSnapshots++;
 
@@ -447,7 +487,7 @@ public class GameWorld : Node2D
             // Depending on the synchronization mechanism, this may not be an error!
             // For now assume the entities are spawned and kept in sync so just continue
             // the loop
-            if (!HasNode("client_" + item.id))
+            if (!HasNode("client_" + item.id) || !IsInstanceValid(GetNode("client_" + item.id)))
             {
                 continue;
             }
@@ -465,7 +505,7 @@ public class GameWorld : Node2D
             // Only need to do on client, as logic already perform on server through calculation
             if (!GetTree().IsNetworkServer())
             {
-                if (!HasNode(item.id))
+                if (!HasNode(item.id) || !IsInstanceValid(GetNode(item.id)))
                 {
                     continue;
                 }
