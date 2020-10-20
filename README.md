@@ -62,6 +62,4 @@ The bot is equip with basic AI, but still not good with collision avoidance with
 
 Better Game Play
 
-Character end of life behavior
-
 More complete game play
