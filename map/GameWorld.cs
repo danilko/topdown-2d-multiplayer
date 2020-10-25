@@ -299,67 +299,146 @@ public class GameWorld : Node2D
     // it is meant to be run only on the server
     private void encodeSnapshot(Snapshot snapshot)
     {
+        int clientAgentInfoSentCount = 0;
+        int botAgentInfoSentCount = 0;
+
+
         if (!GetTree().IsNetworkServer())
         {
             return;
         }
-        String encodedData = "";
 
-        // First add the snapshot signature (timestamp)
-        encodedData = encodedData + snapshot.signature + ";";
+        ClientData[] clientValues = new ClientData[snapshot.playerData.Count];
+        snapshot.playerData.Values.CopyTo(clientValues, 0);
 
-        // Player data count
-        encodedData = encodedData + snapshot.playerData.Count + ";";
-        // snapshot_data should contain a "players" field which must be an array
-        // of player data. Each entry in this array should be a dictionary, containing
-        // the following fields: network_id, position, rotation, col
-        foreach (ClientData item in snapshot.playerData.Values)
+        ClientData[] botValues = new ClientData[snapshot.botData.Count];
+        snapshot.botData.Values.CopyTo(botValues, 0);
+
+        // Loop through until all data are sent to clients
+        while (clientAgentInfoSentCount < snapshot.playerData.Count || botAgentInfoSentCount < snapshot.botData.Count)
         {
-            encodedData = encodedData + item.id + ";";
-            encodedData = encodedData + item.position.x + ";";
-            encodedData = encodedData + item.position.y + ";";
-            encodedData = encodedData + item.rotation + ";";
-            encodedData = encodedData + item.primaryWepaon + ";";
-            encodedData = encodedData + item.secondaryWepaon + ";";
-            encodedData = encodedData + item.health + ";";
-            encodedData = encodedData + item.primaryWeaponIndex + ";";
-            encodedData = encodedData + item.secondaryWeaponIndex + ";";
-        }
-        // Bot data count
-        encodedData = encodedData + snapshot.botData.Count + ";";
-        // The bot_data field should be an array, each entry containing the following
-        // fields: bot_id, position, rotation
-        foreach (ClientData item in snapshot.botData.Values)
-        {
-            encodedData = encodedData + item.id + ";";
-            encodedData = encodedData + item.position.x + ";";
-            encodedData = encodedData + item.position.y + ";";
-            encodedData = encodedData + item.rotation + ";";
-            encodedData = encodedData + item.primaryWepaon + ";";
-            encodedData = encodedData + item.secondaryWepaon + ";";
-            encodedData = encodedData + item.health + ";";
-            encodedData = encodedData + item.primaryWeaponIndex + ";";
-            encodedData = encodedData + item.secondaryWeaponIndex + ";";
-        }
+            // Max agent sent info before being truncated
+            int remainAvailableSlots = 20;
 
-        currentNetworkBytes += encodedData.Length * sizeof(Char);
-        currentNetworkSnapshots++;
+            String encodedData = "";
 
-        // First add the snapshot signature (timestamp)
-        RpcUnreliable(nameof(clientGetSnapshot), compressString(encodedData));
+            // First add the snapshot signature (timestamp)
+            encodedData = encodedData + snapshot.signature + ";";
+
+            // Player data count
+            // Only need to process if there are remain agent data not sent yet
+            if (clientAgentInfoSentCount < snapshot.playerData.Count)
+            {
+                int targetCount = 0;
+
+                // Chunck data base on available slots
+                // Basically check snapshots into smaller size package, which each package maximize at remainAvailableSlots
+
+                // If already sent count + available slots is still less than total client agents
+                // Then maximum can sent is remainavailableslots
+                if (snapshot.playerData.Count > (remainAvailableSlots + clientAgentInfoSentCount))
+                {
+                    encodedData = encodedData + remainAvailableSlots + ";";
+                    targetCount = remainAvailableSlots + clientAgentInfoSentCount;
+                }
+                // Otherwise is remain agent counts need to be sent
+                else
+                {
+                    encodedData = encodedData + (snapshot.playerData.Count - clientAgentInfoSentCount) + ";";
+                    targetCount = snapshot.playerData.Count;
+                }
+
+                for (int index = clientAgentInfoSentCount; index < targetCount; index++)
+                {
+                    // snapshot_data should contain a "players" field which must be an array
+                    // of player data. Each entry in this array should be a dictionary, containing
+                    // the following fields: network_id, position, rotation, col
+                    ClientData item = clientValues[index];
+
+                    encodedData = encodedData + item.id + ";";
+                    encodedData = encodedData + item.position.x + ";";
+                    encodedData = encodedData + item.position.y + ";";
+                    encodedData = encodedData + item.rotation + ";";
+                    encodedData = encodedData + item.primaryWepaon + ";";
+                    encodedData = encodedData + item.secondaryWepaon + ";";
+                    encodedData = encodedData + item.health + ";";
+                    encodedData = encodedData + item.primaryWeaponIndex + ";";
+                    encodedData = encodedData + item.secondaryWeaponIndex + ";";
+
+                    remainAvailableSlots--;
+                    clientAgentInfoSentCount++;
+                }
+            }
+            else
+            {
+                // Inidcate no client data to process
+                encodedData = encodedData + 0 + ";";
+            }
+
+            // Bot data count
+            // Only need to process if there are remain agent data not sent yet and there are available slots to send data
+            if (botAgentInfoSentCount < snapshot.botData.Count && remainAvailableSlots > 0)
+            {
+                int targetCount = 0;
+
+                // If already sent count + available slots is still less than total client agents
+                // Then maximum can sent is remainavailableslots
+                if (snapshot.botData.Count > (remainAvailableSlots + botAgentInfoSentCount))
+                {
+                    encodedData = encodedData + remainAvailableSlots + ";";
+                    targetCount = remainAvailableSlots + botAgentInfoSentCount;
+                }
+                // Otherwise is remain agent counts need to be sent
+                else
+                {
+                    encodedData = encodedData + (snapshot.botData.Count - botAgentInfoSentCount) + ";";
+                    targetCount = snapshot.botData.Count;
+                }
+
+                // The bot_data field should be an array, each entry containing the following
+                // fields: bot_id, position, rotation
+                for (int index = botAgentInfoSentCount; index < targetCount; index++)
+                {
+                    ClientData item = botValues[index];
+                    encodedData = encodedData + item.id + ";";
+                    encodedData = encodedData + item.position.x + ";";
+                    encodedData = encodedData + item.position.y + ";";
+                    encodedData = encodedData + item.rotation + ";";
+                    encodedData = encodedData + item.primaryWepaon + ";";
+                    encodedData = encodedData + item.secondaryWepaon + ";";
+                    encodedData = encodedData + item.health + ";";
+                    encodedData = encodedData + item.primaryWeaponIndex + ";";
+                    encodedData = encodedData + item.secondaryWeaponIndex + ";";
+
+                    remainAvailableSlots--;
+                    botAgentInfoSentCount++;
+                }
+            }
+            else
+            {
+                // Inidcate no client data to process
+                encodedData = encodedData + 0 + ";";
+            }
+
+            currentNetworkBytes += encodedData.Length * sizeof(Char);
+            currentNetworkSnapshots++;
+
+            // First add the snapshot signature (timestamp)
+            RpcUnreliable(nameof(clientGetSnapshot), compressString(encodedData));
+        }
     }
 
 
     // Compress tring into gzip compressed bytes
     // Referece https://gigi.nullneuron.net/gigilabs/compressing-strings-using-gzip-in-c/
-    public byte[]  compressString(String input)
+    public byte[] compressString(String input)
     {
         byte[] inputBytes = Encoding.UTF8.GetBytes(input);
 
-        using(var outputStream = new MemoryStream())
+        using (var outputStream = new MemoryStream())
         {
             using (var gZipStream = new GZipStream(outputStream, CompressionMode.Compress))
-            gZipStream.Write(inputBytes, 0, inputBytes.Length);
+                gZipStream.Write(inputBytes, 0, inputBytes.Length);
 
             return outputStream.ToArray();
         }
@@ -370,9 +449,9 @@ public class GameWorld : Node2D
     public String decompressString(byte[] input)
     {
 
-        using(var inputStream = new MemoryStream(input))
-        using(var gZipStream = new GZipStream(inputStream, CompressionMode.Decompress))
-        using(var outputStream = new MemoryStream())
+        using (var inputStream = new MemoryStream(input))
+        using (var gZipStream = new GZipStream(inputStream, CompressionMode.Decompress))
+        using (var outputStream = new MemoryStream())
         {
             gZipStream.CopyTo(outputStream);
 
