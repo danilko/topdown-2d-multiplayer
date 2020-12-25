@@ -1,11 +1,10 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
 [ext_resource path="res://map/GameWorld.cs" type="Script" id=3]
 [ext_resource path="res://ui/HUD.tscn" type="PackedScene" id=5]
 [ext_resource path="res://items/Pickup.tscn" type="PackedScene" id=8]
-[ext_resource path="res://environments/Obstacle.tscn" type="PackedScene" id=9]
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
@@ -26,19 +25,10 @@ tile_data = PoolIntArray( 0, 0, 0, 2, 0, 0, 4, 0, 0, 6, 0, 0, 8, 1, 0, 10, 1, 0,
 
 [node name="Obstacles" type="Node2D" parent="."]
 
-[node name="Obstacle" parent="Obstacles" instance=ExtResource( 9 )]
-position = Vector2( 702.661, 649.906 )
-rotation = 1.5708
-type = 4
-
-[node name="Obstacle2" parent="Obstacles" instance=ExtResource( 9 )]
-position = Vector2( 1204.06, 1344.02 )
-type = 4
-
 [node name="Pickups" type="Node2D" parent="."]
 
 [node name="Pickup" parent="Pickups" instance=ExtResource( 8 )]
-position = Vector2( 1453.95, 1283.78 )
+position = Vector2( 1198.08, 1226.59 )
 
 [node name="Pickup2" parent="Pickups" instance=ExtResource( 8 )]
 position = Vector2( 1390.92, 2052.33 )

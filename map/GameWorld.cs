@@ -103,11 +103,9 @@ public class GameWorld : Node2D
 
     private Navigation2D navigation2D;
 
-    private AStar aStar;
+    private AgentAStar aStar;
 
     private Godot.RandomNumberGenerator random;
-
-    private RaycastAStar aStarSolver;
 
     // Called when the node enters the scene tree for the first time.
 
@@ -155,7 +153,6 @@ public class GameWorld : Node2D
         // Spawn the players
         if (GetTree().IsNetworkServer())
         {
-            aStarSolver = new RaycastAStar();
             spwanPlayer(convertToString(network.gamestateNetworkPlayer, 1));
             // The amount doesn't matter because it will be calculated in the function body
             syncBots(-1);
@@ -243,10 +240,33 @@ public class GameWorld : Node2D
         int maxLengthX = (int)usedRect.Size.x;
         int maxLengthY = (int)usedRect.Size.y;
 
+        Godot.Collections.Dictionary prebuildObstacles = new Godot.Collections.Dictionary();
+
+        if (GetTree().IsNetworkServer())
+        {
+            aStar = new AgentAStar(tilemap);
+
+            // Add pre - added obstacles
+            foreach (Node2D obstacle in GetNode("Obstacles").GetChildren())
+            {
+                Vector2 pos = tilemap.WorldToMap(obstacle.Position);
+                prebuildObstacles.Add(pos.x + "+" + pos.y, pos);
+            }
+        }
+
+
+
         for (int xIndex = startPointX; xIndex < maxLengthX; xIndex++)
         {
             for (int yIndex = startPointY; yIndex < maxLengthY; yIndex++)
             {
+
+                // if there is already obstacle on it, then ignore this tile, this is also not workable tile, so skip entire logic to next tile
+                if (prebuildObstacles.Contains(xIndex + "+" + yIndex))
+                {
+                    continue;
+                }
+
                 Vector2 position;
                 Obstacle.Items item = Obstacle.Items.remain;
 
@@ -267,8 +287,6 @@ public class GameWorld : Node2D
                 {
                     position = tilemap.MapToWorld(new Vector2(xIndex, yIndex));
 
-                    //for (int tileIndex = 0; tileIndex < 4; tileIndex++)
-                    //{
                     Obstacle obstacle = (Obstacle)((PackedScene)GD.Load("res://environments/Obstacle.tscn")).Instance();
                     obstacle.type = item;
                     obstacle.Position = position + (cellSize / 2);
@@ -276,20 +294,33 @@ public class GameWorld : Node2D
                     obstacle.Name = "obstacle_" + xIndex + "_" + yIndex;
 
                     GetNode("Obstacles").AddChild(obstacle);
-                    //}
+                }
+                else
+                {
+                    if (GetTree().IsNetworkServer())
+                    {
+                        // As there is no obstacle, this cell is a workable path
+                        aStar.addCell(new Vector2(xIndex, yIndex));
+                    }
                 }
             }
         }
 
+
+
         if (GetTree().IsNetworkServer())
         {
+            aStar.connectPoints();
             buildObstaclesCache();
         }
     }
 
+
+
     public Godot.Collections.Array getPaths(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array excludes)
     {
-        return aStarSolver.path(start, end, space_state, excludes, this);
+        //return aStarSolver.path(start, end, space_state, excludes, this);
+        return aStar.getPath(start, end);
     }
 
 

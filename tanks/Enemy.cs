@@ -19,7 +19,7 @@ public class Enemy : Tank
 
     private int currentSpawnPointIndex = 0;
 
-    private float PATHRADIUS = 5.0f;
+    private float PATHRADIUS = 2.0f;
 
     Godot.Collections.Array detourPaths = null;
     Godot.Collections.Array members = null;
@@ -81,6 +81,12 @@ public class Enemy : Tank
         {
             targetPaths.RemoveAt(0);
         }
+
+      //  cleanDrawing();
+      //  foreach(Vector2 point in targetPaths )
+       // {
+      //       debugDrawing(point);
+       // }
     }
 
     public Vector2 seek(Vector2 targetPosition)
@@ -242,6 +248,7 @@ public class Enemy : Tank
             targetPaths = null;
         }
 
+
         // Execute next path when target is not empty
         if (targetPaths != null && target == null)
         {
@@ -251,6 +258,7 @@ public class Enemy : Tank
             Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
 
             GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
+
 
             if (GlobalPosition.DistanceTo(targetPoint) < PATHRADIUS)
             {
@@ -268,8 +276,8 @@ public class Enemy : Tank
                 Velocity = targetDir * MaxSpeed;
 
                 Vector2 seekVelocity = seekAndArrive(targetPoint);
-                Vector2 separationVelocity = separation() * 0.5f;
-                Velocity = Velocity + seekVelocity + separationVelocity;
+                //Vector2 separationVelocity = separation() * 0.5f;
+                //Velocity = Velocity + seekVelocity + separationVelocity;
                 
                 MoveAndSlide(Velocity);
 
@@ -310,16 +318,11 @@ public class Enemy : Tank
     {
         Node2D path = (Node2D)gameworld.GetNode("path_" + Name);
 
-        if (path == null)
+        if (path != null && IsInstanceValid(path))
         {
             path = (Node2D)gameworld.GetNode("pathchart").Duplicate();
             path.Name = "path_" + Name;
             gameworld.AddChild(path);
-        }
-
-        foreach (Node2D node in path.GetChildren())
-        {
-            node.QueueFree();
         }
 
         Node2D pointNode = (Node2D)gameworld.GetNode("dot").Duplicate();
@@ -332,7 +335,7 @@ public class Enemy : Tank
     {
         Node2D path = (Node2D)gameworld.GetNode("path_" + Name);
 
-        if (path != null)
+        if (path != null && IsInstanceValid(path))
         {
             foreach (Node2D node in path.GetChildren())
             {
@@ -396,5 +399,5 @@ public class Enemy : Tank
                 members.Remove(removeIndex);
             }
         }
-    }
+     }
 }

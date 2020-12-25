@@ -343,7 +343,7 @@ public class Tank : KinematicBody2D
         // knock back effect
         if (MaxSpeed != 0)
         {
-            MoveAndSlide(dir * 50 * amount);
+            MoveAndSlide(dir * 100 * amount);
         }
     }
 
