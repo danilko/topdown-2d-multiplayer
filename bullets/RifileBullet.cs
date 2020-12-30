@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class RifileBullet : Bullet
+public class RifileBullet : Projectile
 {
 
     // Called when the node enters the scene tree for the first time.

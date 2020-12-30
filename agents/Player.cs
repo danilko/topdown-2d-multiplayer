@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Player : Tank
+public class Player : Agent
 {
 
 

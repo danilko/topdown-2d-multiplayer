@@ -40,22 +40,29 @@ environment = SubResource( 1 )
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="SpawnPoint_0" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 133.513, 880.373 )
+position = Vector2( 64.2166, 845.018 )
 
 [node name="SpawnPoint_1" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 700.947, 1265.08 )
+position = Vector2( 703.947, 1218.58 )
 
 [node name="SpawnPoint_2" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 1801.79, 2049.06 )
+position = Vector2( 1796.45, 2092.47 )
 
 [node name="SpawnPoint_3" type="Node2D" parent="SpawnPoints"]
-position = Vector2( 2426.67, 637.108 )
+position = Vector2( 2369.94, 669.144 )
 
 [node name="dot" type="Sprite" parent="."]
 texture = ExtResource( 2 )
 
-[node name="pathchart" type="Node2D" parent="."]
-
 [node name="Timer" type="Timer" parent="."]
 autostart = true
+
+[node name="MapCoordinate" type="Label" parent="."]
+margin_right = 40.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "TEST"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="timeout" from="Timer" to="." method="_onNetworkRateTimerUpdate"]

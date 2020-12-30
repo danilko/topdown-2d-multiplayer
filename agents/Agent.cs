@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Tank : KinematicBody2D
+public class Agent : KinematicBody2D
 {
 
 
@@ -21,7 +21,7 @@ public class Tank : KinematicBody2D
     public delegate void SecondaryWeaponChangeSignal();
 
     [Export]
-    protected int MaxSpeed;
+    public int MaxSpeed {get; set;}
 
     [Export]
     protected float RotationSpeed;
@@ -39,6 +39,8 @@ public class Tank : KinematicBody2D
 
     public int currentPrimaryWeaponIndex { get; set; }
     public int currentSecondaryWeaponIndex { get; set; }
+    public bool PrimaryWeaponFiring { set; get; }
+    public bool SecondaryWeaponFiring { set; get; }
 
     protected Godot.Collections.Array primaryWeapons = new Godot.Collections.Array();
     protected Godot.Collections.Array secondaryWeapons = new Godot.Collections.Array();
@@ -48,7 +50,6 @@ public class Tank : KinematicBody2D
 
     [Export]
     private int MaxSecondaryWeaponCount = 1;
-
 
     [Export]
     private String unitName = "Default";
@@ -63,31 +64,39 @@ public class Tank : KinematicBody2D
     protected GameStates gameStates;
     protected Network network;
 
-    protected Node2D target = null;
+    protected Agent target = null;
 
-    private String teamIdentifier = "UNKOWN";
-
-    protected GameWorld gameworld { get; set; }
+    protected GameWorld _gameWorld;
 
     private int defeatedAgentCount = 0;
+
+    private Team _team;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
-        gameworld = (GameWorld)GetParent();
         network = (Network)GetNode("/root/NETWORK");
-
-        health = MaxHealth;
-        energy = MaxEnergy;
 
         Particles2D smoke = (Particles2D)GetNode("Smoke");
         smoke.Emitting = false;
 
-        EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
-
+        health = MaxHealth;
+        energy = MaxEnergy;
+        
         currentPrimaryWeaponIndex = -1;
         currentSecondaryWeaponIndex = -1;
+
+        EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
+    }
+
+    public virtual void Initialize(GameWorld gameWorld, String inputUnitName, Team.TeamCode inputTeamCode)
+    {
+        _gameWorld = gameWorld;
+
+         _team = (Team)GetNode("Team");
+        SetTeam(inputTeamCode);
+        SetUnitName(inputUnitName);
 
         // Temporary script to automatic load weapon
         updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
@@ -130,12 +139,12 @@ public class Tank : KinematicBody2D
             }
 
             Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
-            Weapon curretnWeapon = (Weapon)(weapon.Instance());
-            curretnWeapon.gameWorld = gameworld;
-            primaryWeapons.Add(curretnWeapon);
+            Weapon currentWeapon = (Weapon)(weapon.Instance());
+            currentWeapon.Initialize(_gameWorld, this);
+            primaryWeapons.Add(currentWeapon);
             // Update to use this weapon as primary
             currentPrimaryWeaponIndex = primaryWeapons.Count - 1;
-            weaponHolder.AddChild(curretnWeapon);
+            weaponHolder.AddChild(currentWeapon);
             EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
             return true;
         }
@@ -154,12 +163,12 @@ public class Tank : KinematicBody2D
             }
 
             Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
-            Weapon curretnWeapon = (Weapon)(weapon.Instance());
-            curretnWeapon.gameWorld = gameworld;
-            secondaryWeapons.Add(curretnWeapon);
+            Weapon currentWeapon = (Weapon)(weapon.Instance());
+            currentWeapon.Initialize(_gameWorld, this);
+            secondaryWeapons.Add(currentWeapon);
             // Update to use this weapon as secondary
             currentSecondaryWeaponIndex = secondaryWeapons.Count - 1;
-            weaponHolder.AddChild(curretnWeapon);
+            weaponHolder.AddChild(currentWeapon);
             EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
 
             return true;
@@ -168,50 +177,35 @@ public class Tank : KinematicBody2D
         return false;
     }
 
-    public void setTeamIdentifier(String inputTeamIdentifier)
+    public void SetTeam(Team.TeamCode inputTeamCode)
     {
-        teamIdentifier = inputTeamIdentifier;
-        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + teamIdentifier + ")";
+        _team.CurrentTeamCode = inputTeamCode;
+        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + _team.CurrentTeamCode + ")";
     }
 
-    public String getTeamIdentifier()
+    public Team.TeamCode GetTeam()
     {
-        return teamIdentifier;
+        return _team.CurrentTeamCode;
     }
 
-    public void setUnitName(String unitName)
+    public void SetUnitName(String unitName)
     {
         this.unitName = unitName;
-        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + teamIdentifier + ")";
+        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + _team.CurrentTeamCode + ")";
     }
 
-    public String getUnitName()
+    public String GetUnitName()
     {
         return unitName;
     }
 
     public virtual void _Control(float delta) { }
 
-    public void move(Vector2 moveDir, Vector2 pointPosition, float delta)
+    public virtual void MoveToward(Vector2 moveDir, float delta)
     {
-        if (moveDir.x == 0 && moveDir.y == 0)
-        {
-            slowDownBoostTrail();
-        }
-        else
-        {
-            speedUpBoostTrail();
-
-            //AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-            //audioManager.playSoundEffect(moveMusicClip);
-
-            // Need to times 100 to catch up with AI movement as there is delay in updating
-            Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
-            MoveAndSlide(Velocity);
-        }
-
-
-        LookAt(pointPosition);
+        // Need to times 100 to catch up with AI movement as there is delay in updating
+        Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
+        MoveAndSlide(Velocity);
     }
 
     protected void speedUpBoostTrail()
@@ -232,7 +226,7 @@ public class Tank : KinematicBody2D
     }
 
 
-    public void set(Vector2 position, float rotation, bool primaryWeapon, bool secondaryWeapon, bool playerMove)
+    public void Sync(Vector2 position, float rotation, bool primaryWeapon, bool secondaryWeapon, bool playerMove)
     {
 
         Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
@@ -250,18 +244,24 @@ public class Tank : KinematicBody2D
             slowDownBoostTrail();
         }
 
-        _shoot(primaryWeapon, secondaryWeapon);
+        Fire(primaryWeapon, secondaryWeapon);
 
         Position = position;
         Rotation = rotation;
     }
 
-    public void _shoot(bool primaryWeapon, bool secondaryWeapon)
+
+    public void RotateToward(Vector2 location, float delta)
+    {
+        GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
+    }
+
+    public void Fire(bool primaryWeapon, bool secondaryWeapon)
     {
         if (primaryWeapon && currentPrimaryWeaponIndex != -1)
         {
             // knock back effect
-            if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).fire(this, target) && MaxSpeed != 0)
+            if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                 MoveAndSlide(dir * -1 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
@@ -271,7 +271,7 @@ public class Tank : KinematicBody2D
         if (secondaryWeapon && currentSecondaryWeaponIndex != -1)
         {
             // knock back effect
-            if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).fire(this, target) && MaxSpeed != 0)
+            if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                 MoveAndSlide(dir * -1 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
@@ -301,7 +301,7 @@ public class Tank : KinematicBody2D
         return defeatedAgentCount;
     }
 
-    public void TakeDamage(int amount, Vector2 dir, Tank source)
+    public void TakeDamage(int amount, Vector2 dir, Agent source, Team sourceTeam)
     {
         int originalHealth = health;
         bool trackDamage = true;
@@ -312,7 +312,7 @@ public class Tank : KinematicBody2D
             sourceAlive = false;
         }
 
-        if (source != null && IsInstanceValid(source) && source.getTeamIdentifier() == getTeamIdentifier())
+        if (sourceTeam.CurrentTeamCode == GetTeam())
         {
             trackDamage = false;
         }
@@ -329,7 +329,7 @@ public class Tank : KinematicBody2D
                 smoke.Emitting = true;
             }
 
-            // Only the one that actually damange agent to 0 will be count as the one defeated
+            // Only the one that actually damage agent to 0 will be count as the one defeated
             if (originalHealth > 0 && health <= 0)
             {
                 if (sourceAlive)
@@ -376,7 +376,7 @@ public class Tank : KinematicBody2D
                 if (weaponAmmoType == currentWeapon.weaponAmmoType)
                 {
                     consume = true;
-                    ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).ammoIncrease(amount);
+                    ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).AmmoIncrease(amount);
                 }
             }
         }

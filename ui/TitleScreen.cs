@@ -22,7 +22,7 @@ public class TitleScreen : Control
     private void setPlayerInfo()
     {
         network.gamestateNetworkPlayer.name = ((LineEdit)GetNode("PanelPlayer/txtPlayerName")).Text;
-        network.gamestateNetworkPlayer.team = ((LineEdit)GetNode("PanelPlayer/txtPlayerTeam")).Text;
+        network.gamestateNetworkPlayer.team = Int32.Parse(((LineEdit)GetNode("PanelPlayer/txtPlayerTeam")).Text);
     }
 
     private void readyToPlay()

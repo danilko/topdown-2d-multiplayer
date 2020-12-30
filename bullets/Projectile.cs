@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Bullet : Area2D
+public class Projectile : Area2D
 {
     [Signal]
     public delegate void ProjectileDamageSignal();
@@ -22,26 +22,29 @@ public class Bullet : Area2D
 
     Node2D source = null;
 
-    Vector2 velocity;
+    private Team _sourceTeam;
+
+    protected Vector2 _velocity;
     Vector2 acceleration;
 
     // https://gamesounds.xyz/?dir=FXHome
     AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
     AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
 
-    public void start(Vector2 position, Vector2 direction, Node2D inSource, Node2D inTarget)
+    public void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget)
     {
         Connect(nameof(ProjectileDamageSignal), GetParent(), "_onDamageCalculation");
         
         GlobalPosition = position;
 
         Rotation = direction.Angle();
-        velocity = direction * Speed;
+        _velocity = direction * Speed;
 
         acceleration = new Vector2();
 
         target = inTarget;
         source = inSource;
+        _sourceTeam = sourceTeam;
 
         Timer timer = (Timer)GetNode("Lifetime");
         timer.WaitTime = Lifetime;
@@ -56,7 +59,7 @@ public class Bullet : Area2D
     private Vector2 seek()
     {
         Vector2 desired = (target.Position - Position).Normalized() * Speed;
-        Vector2 steer = (desired - velocity).Normalized() * steer_force;
+        Vector2 steer = (desired - _velocity).Normalized() * steer_force;
         return steer;
     }
 
@@ -71,20 +74,17 @@ public class Bullet : Area2D
         if (target != null)
         {
             acceleration += seek();
-            velocity += acceleration * delta;
-            Rotation = velocity.Angle();
+            _velocity += acceleration * delta;
+            Rotation = _velocity.Angle();
         }
-        Position = Position + velocity * delta;
+        Position = Position + _velocity * delta;
     }
 
-    public override void _Ready()
-    {
-    }
 
     private void explode()
     {
 
-        velocity = new Vector2();
+        _velocity = new Vector2();
         Sprite sprite = (Sprite)GetNode("Sprite");
         sprite.Hide();
         AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
@@ -94,30 +94,26 @@ public class Bullet : Area2D
 
     }
 
-    private void _on_Bullet_body_entered(Node2D body)
+    private void _onProjectileBodyEntered(Node2D body)
     {
-        // Need to see how to avoid missle hit missle from enemy during spread sheet
         // This is the code responsible for able to shoot down bullet with bullet
-        Vector2 hitDir = velocity.Normalized();
+        Vector2 hitDir = _velocity.Normalized();
         explode();
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(musicHitClip);
-        EmitSignal(nameof(ProjectileDamageSignal), Damage, hitDir, source, body);
+        EmitSignal(nameof(ProjectileDamageSignal), Damage, hitDir, source, _sourceTeam, body);
     }
 
-    private void _onBulletAreaEntered(Area2D body)
+    private void _onProjectileAreaEntered(Area2D body)
     {
-        //   if (body.HasMethod("TakeBulletDamage")){
-        //     explode();
-        //   }
+        // Projectile will collide
+         if (body.HasMethod("_onProjectileAreaEntered")){
+            explode();
+         }
     }
 
-    public void TakeBulletDamage(int amount)
-    {
-    }
-
-    private void _on_Lifetime_timeout()
+    private void _onLifetimeTimeout()
     {
         explode();
     }

@@ -116,7 +116,7 @@ public class GameWorld : Node2D
     private bool waitingPeriod;
 
     [Export]
-    private int MaxWaitingTime = 15;
+    private int MaxWaitingTime = 1;
 
     [Export]
     private int MaxGameTime = 3600;
@@ -128,12 +128,10 @@ public class GameWorld : Node2D
 
     public override void _Ready()
     {
-        buildObstacles();
+        //buildObstacles();
 
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
-
-        Navigation2D navigation2D = (Navigation2D)GetNode("Navigation2D");
 
         Input.SetCustomMouseCursor(GD.Load("res://assets/ui/blue_cross.png"), Input.CursorShape.Arrow, new Vector2(16, 16));
         //  AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
@@ -251,14 +249,38 @@ public class GameWorld : Node2D
             {
                 Vector2 pos = tilemap.WorldToMap(obstacle.Position);
                 prebuildObstacles.Add(pos.x + "+" + pos.y, pos);
+
+                float x = pos.x - 2;
+                float y = pos.y - 2;
+                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
+
+                x = pos.x;
+                y = pos.y - 2;
+                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
+
+                x = pos.x - 2;
+                y = pos.y;
+                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
+
+                x = pos.x + 2;
+                y = pos.y + 2;
+                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
+
+                x = pos.x;
+                y = pos.y + 2;
+                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
+
+                x = pos.x + 2;
+                y = pos.y;
+                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
             }
         }
 
 
-
-        for (int xIndex = startPointX; xIndex < maxLengthX; xIndex++)
+        // As the grid use in this game is 2 x 2 of a normal godot grid, so need to increment by 2
+        for (int xIndex = startPointX; xIndex < maxLengthX; xIndex = xIndex + 2)
         {
-            for (int yIndex = startPointY; yIndex < maxLengthY; yIndex++)
+            for (int yIndex = startPointY; yIndex < maxLengthY; yIndex = yIndex + 2)
             {
 
                 // if there is already obstacle on it, then ignore this tile, this is also not workable tile, so skip entire logic to next tile
@@ -283,17 +305,25 @@ public class GameWorld : Node2D
                     item = Obstacle.Items.roadblock_red;
                 }
 
+                Label mapLabel = (Label)GetNode("MapCoordinate").Duplicate();
+                mapLabel.Text = ("(" + xIndex + "," + yIndex + ")");
+                mapLabel.Name = "maplabel_" + xIndex + "_" + yIndex;
+
+                position = tilemap.MapToWorld(new Vector2(xIndex, yIndex));
+
                 if (item != Obstacle.Items.remain)
                 {
-                    position = tilemap.MapToWorld(new Vector2(xIndex, yIndex));
 
                     Obstacle obstacle = (Obstacle)((PackedScene)GD.Load("res://environments/Obstacle.tscn")).Instance();
                     obstacle.type = item;
-                    obstacle.Position = position + (cellSize / 2);
 
                     obstacle.Name = "obstacle_" + xIndex + "_" + yIndex;
 
                     GetNode("Obstacles").AddChild(obstacle);
+
+                    obstacle.GlobalPosition = position + cellSize;
+
+                    mapLabel.Set("custom_colors/font_color", new Color("#ff0000"));
                 }
                 else
                 {
@@ -302,7 +332,13 @@ public class GameWorld : Node2D
                         // As there is no obstacle, this cell is a workable path
                         aStar.addCell(new Vector2(xIndex, yIndex));
                     }
+
+                    mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
                 }
+
+                mapLabel.SetGlobalPosition(position + cellSize);
+
+                this.AddChild(mapLabel);
             }
         }
 
@@ -606,7 +642,7 @@ public class GameWorld : Node2D
 
             client.changePrimaryWeapon(item.primaryWeaponIndex);
             client.changeSecondaryWeapon(item.secondaryWeaponIndex);
-            client.set(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
+            client.Sync(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
             client.setHealth(item.health);
         }
 
@@ -620,11 +656,11 @@ public class GameWorld : Node2D
                     continue;
                 }
 
-                Enemy client = (Enemy)GetNode(item.id);
+                AIAgent client = (AIAgent)GetNode(item.id);
 
                 client.changePrimaryWeapon(item.primaryWeaponIndex);
                 client.changeSecondaryWeapon(item.secondaryWeaponIndex);
-                client.set(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
+                client.Sync(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
                 client.setHealth(item.health);
             }
         }
@@ -673,7 +709,7 @@ public class GameWorld : Node2D
         }
 
         // Try to locate the player actor
-        Tank playerNode = (Tank)GetNode("client_" + id);
+        AIAgent playerNode = (AIAgent)GetNode("client_" + id);
 
         if (playerNode == null || !IsInstanceValid(playerNode))
         {
@@ -692,7 +728,7 @@ public class GameWorld : Node2D
             // Load the scene and create an instance
             Observer client;
 
-            client = (Observer)((PackedScene)GD.Load("res://tanks/Observer.tscn")).Instance();
+            client = (Observer)((PackedScene)GD.Load("res://agents/Observer.tscn")).Instance();
 
             client.Position = playerNode.GlobalPosition;
 
@@ -784,8 +820,9 @@ public class GameWorld : Node2D
 
                         if (input.Value.changePrimaryWeapon) { playerNode.changePrimaryWeapon(playerNode.currentPrimaryWeaponIndex + 1); }
                         if (input.Value.changeSecondaryWeapon) { playerNode.changeSecondaryWeapon(playerNode.currentSecondaryWeaponIndex + 1); }
-                        playerNode._shoot(primaryWeapon, secondaryWeapon);
-                        playerNode.move(moveDir, input.Value.mousePosition, delta);
+                        playerNode.Fire(primaryWeapon, secondaryWeapon);
+                        playerNode.MoveToward(moveDir, delta);
+                        playerNode.RotateToward(input.Value.mousePosition, delta);
                     }
 
                     // Cleanup the input vector
@@ -825,7 +862,7 @@ public class GameWorld : Node2D
         foreach (SpawnBot spawnBot in spawnBots.Values)
         {
             // Locate the bot node
-            Enemy enemyNode = (Enemy)GetNode(spawnBot.name);
+            AIAgent enemyNode = (AIAgent)GetNode(spawnBot.name);
 
             if (enemyNode == null || !IsInstanceValid(enemyNode))
             {
@@ -840,11 +877,11 @@ public class GameWorld : Node2D
             // If waiting period, no fire, else use the current bot setup
             if (!waitingPeriod)
             {
-                primaryWeapon = enemyNode.isPrimaryWeapon;
-                secondaryWeapon = enemyNode.isSecondaryWeapon;
+                primaryWeapon = enemyNode.PrimaryWeaponFiring;
+                secondaryWeapon = enemyNode.SecondaryWeaponFiring;
             }
 
-            enemyNode._shoot(primaryWeapon, secondaryWeapon);
+            enemyNode.Fire(primaryWeapon, secondaryWeapon);
 
             if (enemyNode.getHealth() > 0)
             {
@@ -1109,16 +1146,13 @@ public class GameWorld : Node2D
         // Load the scene and create an instance
         Player client;
 
-        client = (Player)((PackedScene)GD.Load("res://tanks/Player.tscn")).Instance();
+        client = (Player)((PackedScene)GD.Load("res://agents/Player.tscn")).Instance();
 
         // Get spawn position, -1 as to utilize 0 spawn point
         Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + getNextSpawnIndex(spawnIndex - 1));
         client.Position = nodeSpawnPoint.GlobalPosition;
 
         client.Name = "client_" + pininfo.net_id;
-        client.setUnitName(pininfo.name);
-        client.setTeamIdentifier(pininfo.team);
-
         // If this actor does not belong to the server, change the network master accordingly
         if (pininfo.net_id != 1)
         {
@@ -1126,6 +1160,9 @@ public class GameWorld : Node2D
         }
 
         AddChild(client);
+
+        // Set other info afterward as depend on child nodes to be initialized
+        client.Initialize(this, pininfo.name, (Team.TeamCode)pininfo.team);
 
         // If this actor is the current client controlled, add camera and attach HUD
         if (pininfo.net_id == network.gamestateNetworkPlayer.net_id)
@@ -1235,8 +1272,8 @@ public class GameWorld : Node2D
     {
         if (HasNode(spawnBots[botId].name))
         {
-            Tank node = null;
-            node = (Tank)GetNode(botId);
+            Agent node = null;
+            node = (Agent)GetNode(botId);
 
             if (!IsInstanceValid(node))
             {
@@ -1259,18 +1296,15 @@ public class GameWorld : Node2D
     {
         if (!spawnBots.ContainsKey(botId))
         {
-            spawnBots.Add(botId, new SpawnBot(botId, (PackedScene)GD.Load("res://tanks/Enemy.tscn")));
+            spawnBots.Add(botId, new SpawnBot(botId, (PackedScene)GD.Load("res://agents/AIAgent.tscn")));
 
-            Enemy bot = (Enemy)((PackedScene)GD.Load("res://tanks/Enemy.tscn")).Instance();
+            AIAgent bot = (AIAgent)((PackedScene)GD.Load("res://agents/AIAgent.tscn")).Instance();
 
             // Get spawn position, -1 as to utilize 0 spawn point
             int currentSpawnPoint = (int)botCounter % GetNode("SpawnPoints").GetChildCount();
             Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
 
             bot.Name = botId;
-            bot.setUnitName(botId);
-            bot.setTeamIdentifier("TEAM_BOT");
-
             bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
 
             bot.SetNetworkMaster(1);
@@ -1278,8 +1312,12 @@ public class GameWorld : Node2D
 
             AddChild(bot);
 
+            // Set the info afterward as some of these depend on child node to be available
+            bot.Initialize(this, botId, (Team.TeamCode)(int)(botCounter % 3));
+
             // Randomize weapon between 0, 1, 2
-            bot.changePrimaryWeapon((int)botCounter % 3);
+            // bot.changePrimaryWeapon((int)botCounter % 3);
+            bot.changePrimaryWeapon(2);
         }
     }
 
@@ -1314,23 +1352,22 @@ public class GameWorld : Node2D
         playerCamera.LimitBottom = (int)(mapLimit.End.y * mapCellSize.y);
     }
 
-    private void _onTankShoot(PackedScene bullet, Vector2 _position, Vector2 _direction, Node2D source = null, Node2D target = null)
+    private void _onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target)
     {
-        Bullet newBullet = (Bullet)bullet.Instance();
-        AddChild(newBullet);
-        newBullet.start(_position, _direction, source, target);
+        Projectile newProjectile = (Projectile)projectile.Instance();
+        AddChild(newProjectile);
+        newProjectile.Initialize(_position, _direction, source, sourceTeam, target);
     }
 
-    private void _onDamageCalculation(int damage, Vector2 hitDir, Godot.Object source, Godot.Object target)
+    private void _onDamageCalculation(int damage, Vector2 hitDir, Godot.Object source, Team sourceTeam, Godot.Object target)
     {
         if (target != null && IsInstanceValid(target))
         {
-
             if (target.HasMethod("TakeDamage"))
             {
-                Tank tankTarget = (Tank)(target);
-                Tank tankSource = (Tank)(source);
-                tankTarget.TakeDamage(damage, hitDir, tankSource);
+                Agent targetAgent = (Agent)(target);
+                Agent sourceAgent = (Agent)(source);
+                targetAgent.TakeDamage(damage, hitDir, sourceAgent, sourceTeam);
             }
             else if (target.HasMethod("TakeEnvironmentDamage"))
             {

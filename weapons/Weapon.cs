@@ -46,7 +46,10 @@ public class Weapon : Node2D
     [Export]
     public float KnockbackForce { get; set; }
 
-    public GameWorld gameWorld { get; set; }
+    private GameWorld _gameWorld;
+
+    protected Agent _agent;
+    protected Team _team;
 
     public override void _Ready()
     {
@@ -56,12 +59,20 @@ public class Weapon : Node2D
             timer.WaitTime = GunCooldown;
         }
 
-        Connect(nameof(FireSignal), gameWorld, "_onTankShoot");
+        Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
 
         EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
     }
 
-    public virtual bool fire(Node2D source, Node2D target)
+    public virtual void Initialize(GameWorld gameWorld, Agent agent)
+    {
+        _agent = agent;
+        _team = new Team();
+        _team.CurrentTeamCode = agent.GetTeam();
+        _gameWorld = gameWorld;
+    }
+
+    public virtual bool Fire(Agent targetAgent)
     {
         return false;
     }
@@ -69,7 +80,7 @@ public class Weapon : Node2D
     public void reload() { }
 
 
-    public void ammoIncrease(int amount)
+    public void AmmoIncrease(int amount)
     {
 
         Ammo = +amount;

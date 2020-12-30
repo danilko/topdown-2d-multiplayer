@@ -31,7 +31,7 @@ public class Pickup : Area2D
         {
             if (body.HasMethod("heal"))
             {
-                Tank tank = (Tank)body;
+                Agent tank = (Agent)body;
                 tank.heal((int)GD.RandRange(amount.x, amount.y));
 
             }
@@ -40,7 +40,7 @@ public class Pickup : Area2D
         {
             if (body.HasMethod("ammoIncrease"))
             {
-                Tank tank = (Tank)body;
+                Agent tank = (Agent)body;
                 tank.ammoIncrease(Weapon.WeaponAmmoType.bullet,(int)GD.RandRange(amount.x, amount.y));
 
             }

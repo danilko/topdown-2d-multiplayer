@@ -12,7 +12,14 @@ public class LaserGun : Weapon
     public override void _Ready()
     {
         base._Ready();
+    }
+
+    public override void Initialize(GameWorld gameWorld, Agent agent )
+    {
+        base.Initialize(gameWorld, agent);
+
         laserRay = ((LaserRay)GetNode("LaserRay"));
+        laserRay.Initialize(gameWorld, _agent, _team);
     }
 
     public override void onWeaponTimerTimeout()
@@ -24,7 +31,7 @@ public class LaserGun : Weapon
         }
     }
 
-    public override bool fire(Node2D source, Node2D target)
+    public override bool Fire(Agent targetAgent)
     {
         Timer timer = (Timer)GetNode("WeaponTimer");
 
@@ -33,7 +40,6 @@ public class LaserGun : Weapon
             CanShoot = false;
             Ammo -= 1;
             EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
-            laserRay.setSource((Tank)source);
             laserRay.setIsCasting(true);
 
             timer.Start();

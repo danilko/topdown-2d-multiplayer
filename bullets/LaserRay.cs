@@ -11,7 +11,8 @@ public class LaserRay : RayCast2D
 
     bool isCasting;
 
-    private Node2D source;
+    private Agent _agent;
+    private Team _team;
 
     Tween tween;
     Line2D line2DLaser;
@@ -19,6 +20,7 @@ public class LaserRay : RayCast2D
     Particles2D particles2Dcollision;
     Particles2D particles2DBeam;
 
+    private GameWorld _gameWorld; 
     AudioManager audioManager;
 
     // https://gamesounds.xyz/?dir=FXHome
@@ -41,6 +43,7 @@ public class LaserRay : RayCast2D
         audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
     }
 
+
     public override void _PhysicsProcess(float delta)
     {
         Vector2 castPoint = CastTo;
@@ -56,7 +59,7 @@ public class LaserRay : RayCast2D
             particles2Dcollision.GlobalRotation = GetCollisionNormal().Angle();
             particles2Dcollision.Position = castPoint;
 
-            EmitSignal(nameof(RayDamageSignal), Damage, GetCollisionNormal() * -1, source, GetCollider());
+            EmitSignal(nameof(RayDamageSignal), Damage, GetCollisionNormal() * -1, _agent, _team, GetCollider());
         }
 
         // Workaround to update points, as the Line2D points are not updatable
@@ -67,20 +70,17 @@ public class LaserRay : RayCast2D
         particles2DBeam.ProcessMaterial.Set("emission_box_extents", new Vector3(castPoint.x, 10.0f, 0.0f));
     }
 
-    public void setSource(Node2D source)
+    public void Initialize(GameWorld gameWorld, Agent sourceAgent, Team sourceTeam)
     {
-        this.source = source;
-
+        _agent = sourceAgent;
+        _team = sourceTeam;
+        _gameWorld = gameWorld;
+        
         // Set the parent to player
-        if (!IsConnected(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation"))
+        if (!IsConnected(nameof(RayDamageSignal), _gameWorld, "_onDamageCalculation"))
         {
-            Connect(nameof(RayDamageSignal), source.GetParent(), "_onDamageCalculation");
+            Connect(nameof(RayDamageSignal), _gameWorld, "_onDamageCalculation");
         }
-    }
-
-    public Node2D getSource(Node2D source)
-    {
-        return source;
     }
 
     public bool getIsCasting()

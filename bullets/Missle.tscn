@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://bullets/Bullet.tscn" type="PackedScene" id=1]
+[ext_resource path="res://bullets/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://assets/spr_smoke_strip24.png" type="Texture" id=3]
+[ext_resource path="res://bullets/Missle.cs" type="Script" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 27.0382, 9.10533 )
@@ -30,10 +31,10 @@ anim_speed = 1.0
 
 [node name="Missle" instance=ExtResource( 1 )]
 modulate = Color( 1, 1, 1, 1 )
+script = ExtResource( 4 )
 Speed = 1000
 Damage = 30
-Lifetime = 3.0
-steer_force = 10.0
+Lifetime = 20.0
 
 [node name="Sprite" parent="." index="0"]
 rotation = 3.14159

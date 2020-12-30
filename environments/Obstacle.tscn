@@ -5,14 +5,13 @@
 [ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 36.1608, 37.356 )
+extents = Vector2( 28.3117, 28.808 )
 
 [node name="Obstacle" type="StaticBody2D"]
 collision_layer = 15
 script = ExtResource( 2 )
 
 [node name="Icon" type="Sprite" parent="."]
-scale = Vector2( 1.5, 1.5 )
 texture = ExtResource( 1 )
 region_enabled = true
 region_rect = Rect2( 751.992, 110.978, 54.2603, 55.0097 )
