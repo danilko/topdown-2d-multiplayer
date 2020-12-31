@@ -105,17 +105,18 @@ autoplay = "start"
 anims/start = SubResource( 3 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="."]
-margin_left = 49.0
-margin_top = 357.0
-margin_right = 421.0
-margin_bottom = 626.0
+margin_left = 55.2363
+margin_top = 352.546
+margin_right = 427.236
+margin_bottom = 621.546
 text = "CONTROL INSTRUCTIONS:
 
 W - UP
 A - RIGHT
 S - DOWN
 D - LEFT
-Q - PRIMARY WEAPON CHANGE
+R - RELOAD
+1/2/3 - SWITCH PRIMARY WEAPON
 
 MOUSE - AIM
 MOUSE LEFT CLICK - PRIMARY WEAPON

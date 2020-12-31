@@ -18,16 +18,17 @@
   <ItemGroup>
     <Compile Include="ai\AgentAStar.cs" />
     <Compile Include="ai\AI.cs" />
-    <Compile Include="bullets\Projectile.cs" />
-    <Compile Include="bullets\LaserRay.cs" />
-    <Compile Include="bullets\Missle.cs" />
-    <Compile Include="bullets\RifileBullet.cs" />
+    <Compile Include="projectiles\Projectile.cs" />
+    <Compile Include="projectiles\LaserRay.cs" />
+    <Compile Include="projectiles\Missle.cs" />
+    <Compile Include="projectiles\RifileBullet.cs" />
     <Compile Include="environments\Obstacle.cs" />
     <Compile Include="GameStates.cs" />
     <Compile Include="items\Pickup.cs" />
     <Compile Include="map\GameWorld.cs" />
     <Compile Include="network\Network.cs" />
     <Compile Include="network\NetworkPlayer.cs" />
+    <Compile Include="ProjectileWeapon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="singletons\audios\AudioManager.cs" />
     <Compile Include="agents\AIAgent.cs" />

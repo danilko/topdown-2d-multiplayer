@@ -4,7 +4,6 @@ using System;
 public class Player : Agent
 {
 
-
     [Remote]
     public void serverGetPlayerInput(String inputData)
     {
@@ -14,25 +13,25 @@ public class Player : Agent
             GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
             int parseIndex = 0;
 
-            playerInput.right = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.Right = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.left = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.Left = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.up = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.Up = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.down = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.Down = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.primaryWepaon = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.PrimaryWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.secondaryWepaon = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.SecondaryWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.mousePosition.x = float.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.MousePosition.x = float.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.mousePosition.y = float.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.MousePosition.y = float.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.changePrimaryWeapon = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.PrimaryWeaponIndex = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.changeSecondaryWeapon = bool.Parse(inputData.Split(";")[parseIndex]);
+            playerInput.SecondaryWeaponIndex = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
 
             // Then cache the decoded data
@@ -46,15 +45,105 @@ public class Player : Agent
     {
         GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
 
-        playerInput.right = Input.IsActionPressed("turn_right");
-        playerInput.left = Input.IsActionPressed("turn_left");
-        playerInput.up = Input.IsActionPressed("forward");
-        playerInput.down = Input.IsActionPressed("backward");
-        playerInput.primaryWepaon = Input.IsActionPressed("left_click");
-        playerInput.secondaryWepaon = Input.IsActionPressed("right_click");
-        playerInput.mousePosition = GetGlobalMousePosition();
-        playerInput.changePrimaryWeapon = Input.IsActionJustPressed("change_primary_weapon");
-        playerInput.changeSecondaryWeapon = Input.IsActionJustPressed("change_secondary_weapon");
+        if (Input.IsActionPressed("turn_right"))
+        {
+            playerInput.Right = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+        }
+        else
+        {
+            playerInput.Right = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+        }
+
+        if (Input.IsActionPressed("turn_left"))
+        {
+            playerInput.Left = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+        }
+        else
+        {
+            playerInput.Left = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+        }
+
+        if (Input.IsActionPressed("forward"))
+        {
+            playerInput.Up = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+        }
+        else
+        {
+            playerInput.Up = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+        }
+
+        if (Input.IsActionPressed("backward"))
+        {
+            playerInput.Down = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+        }
+        else
+        {
+            playerInput.Down = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+        }
+
+
+        if (Input.IsActionPressed("reload"))
+        {
+            playerInput.PrimaryWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
+        }
+        else
+        {
+            if (Input.IsActionPressed("left_click"))
+            {
+                playerInput.PrimaryWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+            }
+            else
+            {
+                playerInput.PrimaryWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+            }
+        }
+
+
+        if (Input.IsActionPressed("right_click"))
+        {
+            playerInput.SecondaryWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+        }
+        else
+        {
+            playerInput.SecondaryWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+        }
+
+        playerInput.MousePosition = GetGlobalMousePosition();
+
+        if(Input.IsKeyPressed((int)KeyList.Key1))
+        {
+            playerInput.PrimaryWeaponIndex = 0;
+        }
+        else if(Input.IsKeyPressed((int)KeyList.Key2))
+        {
+            playerInput.PrimaryWeaponIndex = 1;
+        }
+        else if(Input.IsKeyPressed((int)KeyList.Key3))
+        {
+            playerInput.PrimaryWeaponIndex = 2;
+        }
+        else
+        {
+            playerInput.PrimaryWeaponIndex = currentPrimaryWeaponIndex;
+        }
+
+        if(Input.IsKeyPressed((int)KeyList.Key4))
+        {
+            playerInput.SecondaryWeaponIndex = 0;
+        }
+        else if(Input.IsKeyPressed((int)KeyList.Key5))
+        {
+            playerInput.SecondaryWeaponIndex = 1;
+        }
+        else if(Input.IsKeyPressed((int)KeyList.Key6))
+        {
+            playerInput.SecondaryWeaponIndex = 2;
+        }
+        else
+        {
+            playerInput.SecondaryWeaponIndex = currentSecondaryWeaponIndex;
+        }
+
 
         if (GetTree().IsNetworkServer())
         {
@@ -63,16 +152,16 @@ public class Player : Agent
         else
         {
             String inputData = "";
-            inputData = inputData + playerInput.right + ";";
-            inputData = inputData + playerInput.left + ";";
-            inputData = inputData + playerInput.up + ";";
-            inputData = inputData + playerInput.down + ";";
-            inputData = inputData + playerInput.primaryWepaon + ";";
-            inputData = inputData + playerInput.secondaryWepaon + ";";
-            inputData = inputData + playerInput.mousePosition.x + ";";
-            inputData = inputData + playerInput.mousePosition.y + ";";
-            inputData = inputData + playerInput.changePrimaryWeapon + ";";
-            inputData = inputData + playerInput.changeSecondaryWeapon + ";";
+            inputData = inputData + playerInput.Right + ";";
+            inputData = inputData + playerInput.Left + ";";
+            inputData = inputData + playerInput.Up + ";";
+            inputData = inputData + playerInput.Down + ";";
+            inputData = inputData + playerInput.PrimaryWeaponAction + ";";
+            inputData = inputData + playerInput.SecondaryWeaponAction + ";";
+            inputData = inputData + playerInput.MousePosition.x + ";";
+            inputData = inputData + playerInput.MousePosition.y + ";";
+            inputData = inputData + playerInput.PrimaryWeaponIndex + ";";
+            inputData = inputData + playerInput.SecondaryWeaponIndex + ";";
 
             RpcUnreliableId(1, nameof(serverGetPlayerInput), inputData);
         }

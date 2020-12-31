@@ -54,6 +54,7 @@ public class AI : Node2D
 
         shape.Radius = detectRaidus;
         detectRadius.Shape = shape;
+
     }
 
     public void setState(State newState)
@@ -81,8 +82,25 @@ public class AI : Node2D
     public void Control(float delta)
     {
 
-        _agent.PrimaryWeaponFiring = false;
-        _agent.SecondaryWeaponFiring = false;
+        if (_agent.GetCurrentSecondaryWeapon() != null && _agent.GetCurrentPrimaryWeapon().IsConnected("ReloadStartSignal", this, nameof(_onPrimaryWeaponNeedReload)))
+        {
+            _agent.GetCurrentPrimaryWeapon().Connect("ReloadStartSignal", this, nameof(_onPrimaryWeaponNeedReload));
+        }
+
+        if (_agent.GetCurrentSecondaryWeapon() != null && _agent.GetCurrentSecondaryWeapon().IsConnected("ReloadStartSignal", this, nameof(_onSecondaryWeaponNeedReload)))
+        {
+            _agent.GetCurrentSecondaryWeapon().Connect("ReloadStartSignal", this, nameof(_onSecondaryWeaponNeedReload));
+        }
+
+
+        if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+        {
+            _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        }
+        if (_agent.SecondaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+        {
+            _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        }
 
         switch (_currentState)
         {
@@ -112,8 +130,15 @@ public class AI : Node2D
                     // Only start fire when agent is closely faced to its target agent
                     if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.1)
                     {
-                        _agent.PrimaryWeaponFiring = true;
-                        _agent.SecondaryWeaponFiring = true;
+                        // Only can fire if not in reload
+                        if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+                        {
+                            _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
+                        }
+                        if (_agent.SecondaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+                        {
+                            _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
+                        }
                     }
                 }
                 break;
@@ -123,6 +148,15 @@ public class AI : Node2D
         }
     }
 
+    private void _onPrimaryWeaponNeedReload()
+    {
+        _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+    }
+
+    private void _onSecondaryWeaponNeedReload()
+    {
+        _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+    }
 
     private void _onDetectionZoneBodyEntered(Node body)
     {

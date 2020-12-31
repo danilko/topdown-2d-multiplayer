@@ -21,7 +21,7 @@ DetectRadius = 500.0
 [node name="Body" parent="." index="0"]
 texture = ExtResource( 1 )
 region_enabled = true
-region_rect = Rect2( 567, 98, 79, 76 )
+region_rect = Rect2( 288, 103, 73, 79 )
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource( 1 )

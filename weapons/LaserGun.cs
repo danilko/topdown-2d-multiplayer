@@ -33,16 +33,14 @@ public class LaserGun : Weapon
 
     public override bool Fire(Agent targetAgent)
     {
-        Timer timer = (Timer)GetNode("WeaponTimer");
-
-        if (CanShoot && Ammo != 0)
+        if (Cooldown && Ammo != 0)
         {
-            CanShoot = false;
+            Cooldown = false;
             Ammo -= 1;
             EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
             laserRay.setIsCasting(true);
 
-            timer.Start();
+            CooldownTimer.Start();
 
             return true;
         }

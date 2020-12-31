@@ -11,8 +11,8 @@ public class LaserRay : RayCast2D
 
     bool isCasting;
 
-    private Agent _agent;
-    private Team _team;
+    private Agent _sourceAgent;
+    private Team _sourceTeam;
 
     Tween tween;
     Line2D line2DLaser;
@@ -20,12 +20,12 @@ public class LaserRay : RayCast2D
     Particles2D particles2Dcollision;
     Particles2D particles2DBeam;
 
-    private GameWorld _gameWorld; 
-    AudioManager audioManager;
+    private GameWorld _gameWorld;
+    private AudioManager _audioManager;
 
     // https://gamesounds.xyz/?dir=FXHome
-    AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
-    AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
+    private AudioStream _musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
+    private AudioStream _musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
 
     public override void _Ready()
     {
@@ -40,7 +40,7 @@ public class LaserRay : RayCast2D
         particles2Dcollision = ((Particles2D)GetNode("particles2DCollision"));
         particles2DBeam = ((Particles2D)GetNode("particles2DBeam"));
 
-        audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+        _audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
     }
 
 
@@ -53,13 +53,28 @@ public class LaserRay : RayCast2D
 
         if (IsColliding())
         {
-            audioManager.playSoundEffect(musicHitClip);
+            _audioManager.playSoundEffect(_musicHitClip);
 
             castPoint = ToLocal(GetCollisionPoint());
             particles2Dcollision.GlobalRotation = GetCollisionNormal().Angle();
             particles2Dcollision.Position = castPoint;
 
-            EmitSignal(nameof(RayDamageSignal), Damage, GetCollisionNormal() * -1, _agent, _team, GetCollider());
+            // Projectile will collide
+            if (GetCollider().HasMethod("_onProjectileAreaEntered"))
+            {
+
+                Projectile collider = (Projectile)GetCollider();
+
+                // Only bullets from different team will cloide
+                if (collider.GetTeam() != _sourceTeam.CurrentTeamCode)
+                {
+                    collider.Explode();
+                }
+            }
+            else
+            {
+                EmitSignal(nameof(RayDamageSignal), Damage, GetCollisionNormal() * -1, _sourceAgent, _sourceTeam, GetCollider());
+            }
         }
 
         // Workaround to update points, as the Line2D points are not updatable
@@ -72,10 +87,10 @@ public class LaserRay : RayCast2D
 
     public void Initialize(GameWorld gameWorld, Agent sourceAgent, Team sourceTeam)
     {
-        _agent = sourceAgent;
-        _team = sourceTeam;
+        _sourceAgent = sourceAgent;
+        _sourceTeam = sourceTeam;
         _gameWorld = gameWorld;
-        
+
         // Set the parent to player
         if (!IsConnected(nameof(RayDamageSignal), _gameWorld, "_onDamageCalculation"))
         {
@@ -97,7 +112,7 @@ public class LaserRay : RayCast2D
         {
             appear();
 
-            audioManager.playSoundEffect(musicClip);
+            _audioManager.playSoundEffect(_musicClip);
         }
         else
         {

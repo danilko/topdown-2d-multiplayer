@@ -3,13 +3,15 @@
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
 [ext_resource path="res://weapons/LaserGun.cs" type="Script" id=4]
-[ext_resource path="res://bullets/LaserRay.tscn" type="PackedScene" id=5]
+[ext_resource path="res://projectiles/LaserRay.tscn" type="PackedScene" id=5]
 
 [node name="Weapon" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
-weaponType = 1
 KnockbackForce = 100.0
-GunCooldown = 0.1
+MaxAmmo = 100
+Ammo = 100
+CooldownTime = 1.0
+ReloadTime = 5.0
 WeaponName = "LaserGun"
 
 [node name="TriggerPoint" parent="." index="1"]

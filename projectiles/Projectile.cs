@@ -24,12 +24,12 @@ public class Projectile : Area2D
 
     private Team _sourceTeam;
 
-    protected Vector2 _velocity;
-    Vector2 acceleration;
+    protected Vector2 Velocity;
+    private Vector2 acceleration;
 
     // https://gamesounds.xyz/?dir=FXHome
-    AudioStream musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
-    AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
+    private AudioStream _musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
+    private AudioStream _musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
 
     public void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget)
     {
@@ -38,7 +38,7 @@ public class Projectile : Area2D
         GlobalPosition = position;
 
         Rotation = direction.Angle();
-        _velocity = direction * Speed;
+        Velocity = direction * Speed;
 
         acceleration = new Vector2();
 
@@ -52,14 +52,19 @@ public class Projectile : Area2D
 
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        audioManager.playSoundEffect(musicClip);
+        audioManager.playSoundEffect(_musicClip);
 
+    }
+
+    public Team.TeamCode GetTeam()
+    {
+        return _sourceTeam.CurrentTeamCode;
     }
 
     private Vector2 seek()
     {
         Vector2 desired = (target.Position - Position).Normalized() * Speed;
-        Vector2 steer = (desired - _velocity).Normalized() * steer_force;
+        Vector2 steer = (desired - Velocity).Normalized() * steer_force;
         return steer;
     }
 
@@ -74,17 +79,17 @@ public class Projectile : Area2D
         if (target != null)
         {
             acceleration += seek();
-            _velocity += acceleration * delta;
-            Rotation = _velocity.Angle();
+            Velocity += acceleration * delta;
+            Rotation = Velocity.Angle();
         }
-        Position = Position + _velocity * delta;
+        Position = Position + Velocity * delta;
     }
 
 
-    private void explode()
+    public void Explode()
     {
 
-        _velocity = new Vector2();
+        Velocity = new Vector2();
         Sprite sprite = (Sprite)GetNode("Sprite");
         sprite.Hide();
         AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
@@ -97,11 +102,11 @@ public class Projectile : Area2D
     private void _onProjectileBodyEntered(Node2D body)
     {
         // This is the code responsible for able to shoot down bullet with bullet
-        Vector2 hitDir = _velocity.Normalized();
-        explode();
+        Vector2 hitDir = Velocity.Normalized();
+        Explode();
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        audioManager.playSoundEffect(musicHitClip);
+        audioManager.playSoundEffect(_musicHitClip);
         EmitSignal(nameof(ProjectileDamageSignal), Damage, hitDir, source, _sourceTeam, body);
     }
 
@@ -109,13 +114,18 @@ public class Projectile : Area2D
     {
         // Projectile will collide
          if (body.HasMethod("_onProjectileAreaEntered")){
-            explode();
+             
+             // Only bullets from different team will cloide
+             if(((Projectile)body).GetTeam() != _sourceTeam.CurrentTeamCode)
+             {
+                Explode();
+             }
          }
     }
 
     private void _onLifetimeTimeout()
     {
-        explode();
+        Explode();
     }
 
     private void _OnExplosionAnimationFinished()

@@ -3,15 +3,15 @@
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://weapons/MissleLauncher.cs" type="Script" id=2]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
-[ext_resource path="res://bullets/Missle.tscn" type="PackedScene" id=4]
+[ext_resource path="res://projectiles/Missle.tscn" type="PackedScene" id=4]
 
 [node name="MissleLauncher" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
-weaponAmmoType = 2
-weaponType = 2
 KnockbackForce = 50.0
-GunShot = 3
-GunSpread = 0.2
+MaxAmmo = 10
+Ammo = 10
+CooldownTime = 1.0
+ReloadTime = 5.0
 Bullet = ExtResource( 4 )
 
 [node name="TriggerPoint" parent="." index="1"]

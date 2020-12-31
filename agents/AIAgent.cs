@@ -5,12 +5,10 @@ public class AIAgent : Agent
 {
 
     [Export]
-    public int TurretSpeed {get; set;}
+    public int TurretSpeed { get; set; }
 
     [Export]
-    public float DetectRadius {get; set;}
-
-   [Export]
+    public float DetectRadius { get; set; }
 
     private int _speed;
 
@@ -40,8 +38,8 @@ public class AIAgent : Agent
     {
         base._Ready();
 
-        PrimaryWeaponFiring = false;
-        SecondaryWeaponFiring = false;
+        PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
 
         _speed = MaxSpeed;
 

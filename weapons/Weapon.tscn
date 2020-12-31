@@ -97,7 +97,10 @@ public class Weapon : Node2D
 [node name="Weapon" type="Node2D"]
 script = SubResource( 1 )
 
-[node name="WeaponTimer" type="Timer" parent="."]
+[node name="CooldownTimer" type="Timer" parent="."]
 
 [node name="TriggerPoint" type="Position2D" parent="."]
-[connection signal="timeout" from="WeaponTimer" to="." method="onWeaponTimerTimeout"]
+
+[node name="ReloadTimer" type="Timer" parent="."]
+[connection signal="timeout" from="CooldownTimer" to="." method="onWeaponTimerTimeout"]
+[connection signal="timeout" from="ReloadTimer" to="." method="_stopReload"]

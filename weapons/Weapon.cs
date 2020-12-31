@@ -6,15 +6,25 @@ public class Weapon : Node2D
     public enum WeaponAmmoType { machine_energy, external_energy, bullet }
 
     [Export]
-    public WeaponAmmoType weaponAmmoType  {get; set;}
+    public WeaponAmmoType CurrentWeaponAmmoType { get; set; }
 
-    public enum WeaponType {rifile, lasergun, misslelauncher}
+    public enum WeaponType { rifile, lasergun, misslelauncher }
 
     [Export]
-    public WeaponType weaponType {get; set;}
+    public WeaponType CurrentWeaponType { get; set; }
 
     [Signal]
     public delegate void AmmoChangedSignal();
+
+    [Signal]
+    public delegate void AmmoOutSignal();
+
+    [Signal]
+    public delegate void ReloadStartSignal();
+
+    [Signal]
+    public delegate void ReloadStopSignal();
+
 
     [Signal]
     public delegate void FireSignal();
@@ -26,16 +36,18 @@ public class Weapon : Node2D
     protected int Ammo = -1;
 
     [Export]
-    protected int GunShot = 1;
+    protected int Shot = 1;
 
     [Export]
-    protected float GunSpread = 1;
+    protected float Spread = 1;
+
+    protected Boolean Cooldown = true;
 
     [Export]
-    protected Boolean CanShoot = true;
+    protected float CooldownTime = -1;
 
     [Export]
-    protected float GunCooldown = -1;
+    protected float ReloadTime = -1;
 
     [Export]
     protected PackedScene Bullet;
@@ -51,13 +63,16 @@ public class Weapon : Node2D
     protected Agent _agent;
     protected Team _team;
 
+    protected Timer CooldownTimer;
+    protected Timer ReloadTimer;
+
     public override void _Ready()
     {
-        if (GunCooldown > 0)
-        {
-            Timer timer = (Timer)GetNode("WeaponTimer");
-            timer.WaitTime = GunCooldown;
-        }
+        CooldownTimer = (Timer)GetNode("CooldownTimer");
+        CooldownTimer.WaitTime = CooldownTime;
+
+        ReloadTimer = (Timer)GetNode("ReloadTimer");
+        ReloadTimer.WaitTime = ReloadTime;
 
         Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
 
@@ -74,11 +89,59 @@ public class Weapon : Node2D
 
     public virtual bool Fire(Agent targetAgent)
     {
+        if (Cooldown && Ammo != 0)
+        {
+            Cooldown = false;
+            Ammo -= 1;
+            EmitSignal(nameof(AmmoChangedSignal), (Ammo / MaxAmmo) * 100);
+
+            CooldownTimer.Start();
+
+            Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+
+            Position2D triggerPoint = (Position2D)GetNode("TriggerPoint");
+
+            if (Shot > 1)
+            {
+                for (int i = 0; i < Shot; i++)
+                {
+                    float a = -Spread + i * (2 * Spread) / (Shot - 1);
+                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), _agent, _team, targetAgent);
+                }
+            }
+            else
+            {
+                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, _agent, _team, targetAgent);
+            }
+
+            FireEffect();
+
+            return true;
+        }
+
+        if (Ammo == 0)
+        {
+            EmitSignal(nameof(AmmoOutSignal));
+        }
+
         return false;
     }
 
-    public void reload() { }
 
+    protected virtual void FireEffect() { }
+
+    public void StartReload()
+    {
+        Ammo = 0;
+        ReloadTimer.Start();
+        EmitSignal(nameof(ReloadStartSignal));
+    }
+
+    private void _stopReload()
+    {
+        Ammo = MaxAmmo;
+        EmitSignal(nameof(ReloadStopSignal));
+    }
 
     public void AmmoIncrease(int amount)
     {
@@ -95,8 +158,7 @@ public class Weapon : Node2D
 
     public virtual void onWeaponTimerTimeout()
     {
-        CanShoot = true;
-        Timer timer = (Timer)GetNode("WeaponTimer");
+        Cooldown = true;
     }
 
 }

@@ -43,14 +43,14 @@ public class GameWorld : Node2D
 
     public class ClientData : Godot.Object
     {
-        public String id;
-        public Vector2 position;
-        public float rotation;
-        public bool primaryWepaon;
-        public bool secondaryWepaon;
-        public int health;
-        public int primaryWeaponIndex;
-        public int secondaryWeaponIndex;
+        public String Id;
+        public Vector2 Position;
+        public float Rotation;
+        public int PrimaryWeapon;
+        public int SecondaryWeapon;
+        public int Health;
+        public int PrimaryWeaponIndex;
+        public int SecondaryWeaponIndex;
     }
 
     public class Snapshot : Godot.Object
@@ -64,15 +64,15 @@ public class GameWorld : Node2D
 
     public class ClientState
     {
-        public Vector2 fromPosition;
-        public float fromRotation;
-        public Vector2 toPosition;
-        public float toRotation;
-        public bool primaryWepaon;
-        public bool secondaryWepaon;
-        public int health;
-        public float time;
-        public Node2D node;
+        public Vector2 FromPosition;
+        public float FromRotation;
+        public Vector2 ToPosition;
+        public float ToRotation;
+        public int primaryWeapon;
+        public int SecondaryWeapon;
+        public int Health;
+        public float Time;
+        public Node2D Node;
     }
 
     Dictionary<String, ClientState> clientStates = new Dictionary<String, ClientState>();
@@ -422,15 +422,15 @@ public class GameWorld : Node2D
                     // the following fields: network_id, position, rotation, col
                     ClientData item = clientValues[index];
 
-                    encodedData = encodedData + item.id + ";";
-                    encodedData = encodedData + item.position.x + ";";
-                    encodedData = encodedData + item.position.y + ";";
-                    encodedData = encodedData + item.rotation + ";";
-                    encodedData = encodedData + item.primaryWepaon + ";";
-                    encodedData = encodedData + item.secondaryWepaon + ";";
-                    encodedData = encodedData + item.health + ";";
-                    encodedData = encodedData + item.primaryWeaponIndex + ";";
-                    encodedData = encodedData + item.secondaryWeaponIndex + ";";
+                    encodedData = encodedData + item.Id + ";";
+                    encodedData = encodedData + item.Position.x + ";";
+                    encodedData = encodedData + item.Position.y + ";";
+                    encodedData = encodedData + item.Rotation + ";";
+                    encodedData = encodedData + item.PrimaryWeapon + ";";
+                    encodedData = encodedData + item.SecondaryWeapon + ";";
+                    encodedData = encodedData + item.Health + ";";
+                    encodedData = encodedData + item.PrimaryWeaponIndex + ";";
+                    encodedData = encodedData + item.SecondaryWeaponIndex + ";";
 
                     remainAvailableSlots--;
                     clientAgentInfoSentCount++;
@@ -467,15 +467,15 @@ public class GameWorld : Node2D
                 for (int index = botAgentInfoSentCount; index < targetCount; index++)
                 {
                     ClientData item = botValues[index];
-                    encodedData = encodedData + item.id + ";";
-                    encodedData = encodedData + item.position.x + ";";
-                    encodedData = encodedData + item.position.y + ";";
-                    encodedData = encodedData + item.rotation + ";";
-                    encodedData = encodedData + item.primaryWepaon + ";";
-                    encodedData = encodedData + item.secondaryWepaon + ";";
-                    encodedData = encodedData + item.health + ";";
-                    encodedData = encodedData + item.primaryWeaponIndex + ";";
-                    encodedData = encodedData + item.secondaryWeaponIndex + ";";
+                    encodedData = encodedData + item.Id + ";";
+                    encodedData = encodedData + item.Position.x + ";";
+                    encodedData = encodedData + item.Position.y + ";";
+                    encodedData = encodedData + item.Rotation + ";";
+                    encodedData = encodedData + item.PrimaryWeapon + ";";
+                    encodedData = encodedData + item.SecondaryWeapon + ";";
+                    encodedData = encodedData + item.Health + ";";
+                    encodedData = encodedData + item.PrimaryWeaponIndex + ";";
+                    encodedData = encodedData + item.SecondaryWeaponIndex + ";";
 
                     remainAvailableSlots--;
                     botAgentInfoSentCount++;
@@ -562,26 +562,26 @@ public class GameWorld : Node2D
         for (int index = 0; index < clientCount; index++)
         {
             ClientData clientData = new ClientData();
-            clientData.id = encodedData.Split(";")[parseIndex];
+            clientData.Id = encodedData.Split(";")[parseIndex];
             parseIndex++;
-            clientData.position.x = float.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.position.y = float.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.rotation = float.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.primaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.PrimaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.secondaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.SecondaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.health = int.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.primaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.PrimaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.secondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.SecondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
 
-            snapshot.playerData.Add(clientData.id, clientData);
+            snapshot.playerData.Add(clientData.Id, clientData);
         }
 
         // Extract bot data count
@@ -592,26 +592,26 @@ public class GameWorld : Node2D
         for (int index = 0; index < clientCount; index++)
         {
             ClientData clientData = new ClientData();
-            clientData.id = encodedData.Split(";")[parseIndex];
+            clientData.Id = encodedData.Split(";")[parseIndex];
             parseIndex++;
-            clientData.position.x = float.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.position.y = float.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.rotation = float.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.primaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.PrimaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.secondaryWepaon = bool.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.SecondaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.health = int.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.primaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.PrimaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
-            clientData.secondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+            clientData.SecondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
             parseIndex++;
 
-            snapshot.botData.Add(clientData.id, clientData);
+            snapshot.botData.Add(clientData.Id, clientData);
         }
 
         //  Update the "last_snapshot"
@@ -633,17 +633,17 @@ public class GameWorld : Node2D
             // Depending on the synchronization mechanism, this may not be an error!
             // For now assume the entities are spawned and kept in sync so just continue
             // the loop
-            if (!HasNode("client_" + item.id) || !IsInstanceValid(GetNode("client_" + item.id)))
+            if (!HasNode("client_" + item.Id) || !IsInstanceValid(GetNode("client_" + item.Id)))
             {
                 continue;
             }
 
-            Player client = (Player)GetNode("client_" + item.id);
+            Agent client = (Agent)GetNode("client_" + item.Id);
 
-            client.changePrimaryWeapon(item.primaryWeaponIndex);
-            client.changeSecondaryWeapon(item.secondaryWeaponIndex);
-            client.Sync(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
-            client.setHealth(item.health);
+            client.changePrimaryWeapon(item.PrimaryWeaponIndex);
+            client.changeSecondaryWeapon(item.SecondaryWeaponIndex);
+            client.Sync(item.Position, item.Rotation, item.PrimaryWeapon, item.SecondaryWeapon);
+            client.setHealth(item.Health);
         }
 
         foreach (ClientData item in snapshot.botData.Values)
@@ -651,17 +651,17 @@ public class GameWorld : Node2D
             // Only need to do on client, as logic already perform on server through calculation
             if (!GetTree().IsNetworkServer())
             {
-                if (!HasNode(item.id) || !IsInstanceValid(GetNode(item.id)))
+                if (!HasNode(item.Id) || !IsInstanceValid(GetNode(item.Id)))
                 {
                     continue;
                 }
 
-                AIAgent client = (AIAgent)GetNode(item.id);
+                Agent client = (Agent)GetNode(item.Id);
 
-                client.changePrimaryWeapon(item.primaryWeaponIndex);
-                client.changeSecondaryWeapon(item.secondaryWeaponIndex);
-                client.Sync(item.position, item.rotation, item.primaryWepaon, item.secondaryWepaon, (item.position != client.Position));
-                client.setHealth(item.health);
+                client.changePrimaryWeapon(item.PrimaryWeaponIndex);
+                client.changeSecondaryWeapon(item.SecondaryWeaponIndex);
+                client.Sync(item.Position, item.Rotation, item.PrimaryWeapon, item.SecondaryWeapon);
+                client.setHealth(item.Health);
             }
         }
     }
@@ -709,7 +709,7 @@ public class GameWorld : Node2D
         }
 
         // Try to locate the player actor
-        AIAgent playerNode = (AIAgent)GetNode("client_" + id);
+        Agent playerNode = (Agent)GetNode("client_" + id);
 
         if (playerNode == null || !IsInstanceValid(playerNode))
         {
@@ -778,7 +778,7 @@ public class GameWorld : Node2D
 
             // Locate the player's node. Even if there is no input/update, it's state will be dumped
             // into the snapshot anyway
-            Player playerNode = (Player)GetNode("client_" + networkPlayer.Value.net_id);
+            Agent playerNode = (Agent)GetNode("client_" + networkPlayer.Value.net_id);
 
             if (playerNode == null || !IsInstanceValid(playerNode))
             {
@@ -796,8 +796,8 @@ public class GameWorld : Node2D
                 if (gameStates.playerInputs.ContainsKey(networkPlayer.Key) && gameStates.playerInputs[networkPlayer.Key].Count > 0)
                 {
 
-                    bool primaryWeapon = false;
-                    bool secondaryWeapon = false;
+                    int primaryWeapon = 0;
+                    int secondaryWeapon = 0;
 
                     // Calculate the delta
                     float delta = gameStates.updateDelta / (float)(gameStates.playerInputs[networkPlayer.Key].Count);
@@ -806,23 +806,25 @@ public class GameWorld : Node2D
                     {
 
                         Vector2 moveDir = new Vector2();
-                        if (input.Value.up) { moveDir.y = -1; }
-                        if (input.Value.down) { moveDir.y = 1; }
-                        if (input.Value.left) { moveDir.x = -1; }
-                        if (input.Value.right) { moveDir.x = 1; }
+                        moveDir.y = -1 * input.Value.Up;
+                        moveDir.y += 1 * input.Value.Down; 
+                        moveDir.x = -1 * input.Value.Left; 
+                        moveDir.x += 1 * input.Value.Right;
+
+                        playerNode.changePrimaryWeapon(input.Value.PrimaryWeaponIndex); 
+                        playerNode.changeSecondaryWeapon(input.Value.SecondaryWeaponIndex);
 
                         // If waiting period, no fire, else use the current user setup
                         if (!waitingPeriod)
                         {
-                            primaryWeapon = input.Value.primaryWepaon;
-                            secondaryWeapon = input.Value.secondaryWepaon;
+                            primaryWeapon = input.Value.PrimaryWeaponAction;
+                            secondaryWeapon = input.Value.SecondaryWeaponAction;
                         }
 
-                        if (input.Value.changePrimaryWeapon) { playerNode.changePrimaryWeapon(playerNode.currentPrimaryWeaponIndex + 1); }
-                        if (input.Value.changeSecondaryWeapon) { playerNode.changeSecondaryWeapon(playerNode.currentSecondaryWeaponIndex + 1); }
                         playerNode.Fire(primaryWeapon, secondaryWeapon);
+
                         playerNode.MoveToward(moveDir, delta);
-                        playerNode.RotateToward(input.Value.mousePosition, delta);
+                        playerNode.RotateToward(input.Value.MousePosition, delta);
                     }
 
                     // Cleanup the input vector
@@ -831,14 +833,14 @@ public class GameWorld : Node2D
                     gameStates.playerInputs.Remove(networkPlayer.Key);
 
                     ClientData clientData = new ClientData();
-                    clientData.id = networkPlayer.Key + "";
-                    clientData.position = playerNode.Position;
-                    clientData.rotation = playerNode.Rotation;
-                    clientData.primaryWepaon = primaryWeapon;
-                    clientData.secondaryWepaon = secondaryWeapon;
-                    clientData.primaryWeaponIndex = playerNode.currentPrimaryWeaponIndex;
-                    clientData.secondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
-                    clientData.health = playerNode.getHealth();
+                    clientData.Id = networkPlayer.Key + "";
+                    clientData.Position = playerNode.Position;
+                    clientData.Rotation = playerNode.Rotation;
+                    clientData.PrimaryWeapon = primaryWeapon;
+                    clientData.SecondaryWeapon = secondaryWeapon;
+                    clientData.PrimaryWeaponIndex = playerNode.currentPrimaryWeaponIndex;
+                    clientData.SecondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
+                    clientData.Health = playerNode.getHealth();
 
                     snapshot.playerData.Add(networkPlayer.Key, clientData);
                 }
@@ -862,7 +864,7 @@ public class GameWorld : Node2D
         foreach (SpawnBot spawnBot in spawnBots.Values)
         {
             // Locate the bot node
-            AIAgent enemyNode = (AIAgent)GetNode(spawnBot.name);
+            Agent enemyNode = (Agent)GetNode(spawnBot.name);
 
             if (enemyNode == null || !IsInstanceValid(enemyNode))
             {
@@ -871,14 +873,14 @@ public class GameWorld : Node2D
             }
 
 
-            bool primaryWeapon = false;
-            bool secondaryWeapon = false;
+            int primaryWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            int secondaryWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
 
             // If waiting period, no fire, else use the current bot setup
             if (!waitingPeriod)
             {
-                primaryWeapon = enemyNode.PrimaryWeaponFiring;
-                secondaryWeapon = enemyNode.SecondaryWeaponFiring;
+                primaryWeapon = enemyNode.PrimaryWeaponAction;
+                secondaryWeapon = enemyNode.SecondaryWeaponAction;
             }
 
             enemyNode.Fire(primaryWeapon, secondaryWeapon);
@@ -887,14 +889,14 @@ public class GameWorld : Node2D
             {
                 // Build bot_data entry
                 ClientData clientData = new ClientData();
-                clientData.id = spawnBot.name;
-                clientData.position = enemyNode.GlobalPosition;
-                clientData.rotation = enemyNode.GlobalRotation;
-                clientData.health = enemyNode.getHealth();
-                clientData.primaryWepaon = primaryWeapon;
-                clientData.secondaryWepaon = secondaryWeapon;
-                clientData.primaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
-                clientData.secondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
+                clientData.Id = spawnBot.name;
+                clientData.Position = enemyNode.GlobalPosition;
+                clientData.Rotation = enemyNode.GlobalRotation;
+                clientData.Health = enemyNode.getHealth();
+                clientData.PrimaryWeapon = primaryWeapon;
+                clientData.SecondaryWeapon = secondaryWeapon;
+                clientData.PrimaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
+                clientData.SecondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
 
                 // Append into the snapshot
                 snapshot.botData.Add(spawnBot.name, clientData);
@@ -1144,9 +1146,7 @@ public class GameWorld : Node2D
         }
 
         // Load the scene and create an instance
-        Player client;
-
-        client = (Player)((PackedScene)GD.Load("res://agents/Player.tscn")).Instance();
+        Player client = (Player)((PackedScene)GD.Load("res://agents/Player.tscn")).Instance();
 
         // Get spawn position, -1 as to utilize 0 spawn point
         Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + getNextSpawnIndex(spawnIndex - 1));

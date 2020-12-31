@@ -21,7 +21,7 @@ public class Agent : KinematicBody2D
     public delegate void SecondaryWeaponChangeSignal();
 
     [Export]
-    public int MaxSpeed {get; set;}
+    public int MaxSpeed { get; set; }
 
     [Export]
     protected float RotationSpeed;
@@ -39,8 +39,10 @@ public class Agent : KinematicBody2D
 
     public int currentPrimaryWeaponIndex { get; set; }
     public int currentSecondaryWeaponIndex { get; set; }
-    public bool PrimaryWeaponFiring { set; get; }
-    public bool SecondaryWeaponFiring { set; get; }
+    public int PrimaryWeaponAction { set; get; }
+    public int SecondaryWeaponAction{ set; get; }
+    public bool PrimaryWeaponReloading { set; get; }
+    public bool SecondaryWeaponReloading { set; get; }
 
     protected Godot.Collections.Array primaryWeapons = new Godot.Collections.Array();
     protected Godot.Collections.Array secondaryWeapons = new Godot.Collections.Array();
@@ -83,7 +85,7 @@ public class Agent : KinematicBody2D
 
         health = MaxHealth;
         energy = MaxEnergy;
-        
+
         currentPrimaryWeaponIndex = -1;
         currentSecondaryWeaponIndex = -1;
 
@@ -94,14 +96,14 @@ public class Agent : KinematicBody2D
     {
         _gameWorld = gameWorld;
 
-         _team = (Team)GetNode("Team");
+        _team = (Team)GetNode("Team");
         SetTeam(inputTeamCode);
         SetUnitName(inputUnitName);
 
         // Temporary script to automatic load weapon
-        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
-        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
-        updatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
+        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
+        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
+        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
     }
 
     public void changePrimaryWeapon(int weaponIndex)
@@ -112,7 +114,7 @@ public class Agent : KinematicBody2D
             currentPrimaryWeaponIndex = weaponIndex % primaryWeapons.Count;
             if (currentPrimaryWeaponIndex < 0) { currentPrimaryWeaponIndex = currentPrimaryWeaponIndex * -1; }
             ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Show();
-            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
+            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).CurrentWeaponType);
         }
     }
 
@@ -124,11 +126,20 @@ public class Agent : KinematicBody2D
             currentSecondaryWeaponIndex = weaponIndex % secondaryWeapons.Count;
             if (currentSecondaryWeaponIndex < 0) { currentSecondaryWeaponIndex = currentSecondaryWeaponIndex * -1; }
             ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Show();
-            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
+            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).CurrentWeaponType);
         }
-
     }
-    public bool updatePrimaryWeapon(PackedScene weapon)
+    public Weapon GetCurrentPrimaryWeapon()
+    {
+        return (Weapon)primaryWeapons[currentPrimaryWeaponIndex];
+    }
+
+    public Weapon GetCurrentSecondaryWeapon()
+    {
+        return (Weapon)primaryWeapons[currentPrimaryWeaponIndex];
+    }
+
+    public bool UpdatePrimaryWeapon(PackedScene weapon)
     {
         if (primaryWeapons.Count < MaxPrimaryWeaponCount)
         {
@@ -142,17 +153,18 @@ public class Agent : KinematicBody2D
             Weapon currentWeapon = (Weapon)(weapon.Instance());
             currentWeapon.Initialize(_gameWorld, this);
             primaryWeapons.Add(currentWeapon);
+            
             // Update to use this weapon as primary
             currentPrimaryWeaponIndex = primaryWeapons.Count - 1;
             weaponHolder.AddChild(currentWeapon);
-            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).weaponType);
+            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).CurrentWeaponType);
             return true;
         }
 
         return false;
     }
 
-    public bool updateSecondaryWeapon(PackedScene weapon)
+    public bool UpdateSecondaryWeapon(PackedScene weapon)
     {
         if (secondaryWeapons.Count < MaxSecondaryWeaponCount)
         {
@@ -169,7 +181,7 @@ public class Agent : KinematicBody2D
             // Update to use this weapon as secondary
             currentSecondaryWeaponIndex = secondaryWeapons.Count - 1;
             weaponHolder.AddChild(currentWeapon);
-            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).weaponType);
+            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).CurrentWeaponType);
 
             return true;
         }
@@ -226,7 +238,7 @@ public class Agent : KinematicBody2D
     }
 
 
-    public void Sync(Vector2 position, float rotation, bool primaryWeapon, bool secondaryWeapon, bool playerMove)
+    public void Sync(Vector2 position, float rotation, int primaryWeapon, int secondaryWeapon)
     {
 
         Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
@@ -244,6 +256,7 @@ public class Agent : KinematicBody2D
             slowDownBoostTrail();
         }
 
+
         Fire(primaryWeapon, secondaryWeapon);
 
         Position = position;
@@ -256,9 +269,20 @@ public class Agent : KinematicBody2D
         GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
     }
 
-    public void Fire(bool primaryWeapon, bool secondaryWeapon)
+    public void Fire(int primaryWeapon, int secondaryWeapon)
     {
-        if (primaryWeapon && currentPrimaryWeaponIndex != -1)
+
+        if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+        {
+            ReloadPrimaryWeapon();
+        }
+
+        if (secondaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+        {
+            ReloadSecondaryWeapon();
+        }
+
+        if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentPrimaryWeaponIndex != -1)
         {
             // knock back effect
             if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
@@ -268,7 +292,8 @@ public class Agent : KinematicBody2D
             }
         }
 
-        if (secondaryWeapon && currentSecondaryWeaponIndex != -1)
+        // Secondary can only be invoked if primary is not invoked
+        if (primaryWeapon != (int)GameStates.PlayerInput.InputAction.TRIGGER && secondaryWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentSecondaryWeaponIndex != -1)
         {
             // knock back effect
             if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
@@ -290,7 +315,7 @@ public class Agent : KinematicBody2D
         return health;
     }
 
-    public void incrementDefeatedAgentCount()
+    public void IncrementDefeatedAgentCount()
     {
         defeatedAgentCount++;
         EmitSignal(nameof(DefeatedAgentChangedSignal), defeatedAgentCount);
@@ -334,7 +359,7 @@ public class Agent : KinematicBody2D
             {
                 if (sourceAlive)
                 {
-                    source.incrementDefeatedAgentCount();
+                    source.IncrementDefeatedAgentCount();
                 }
             }
         }
@@ -347,6 +372,18 @@ public class Agent : KinematicBody2D
         }
     }
 
+
+    public void ReloadPrimaryWeapon()
+    {
+        ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).StartReload();
+        PrimaryWeaponReloading = false;
+    }
+
+    public void ReloadSecondaryWeapon()
+    {
+        ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).StartReload();
+        SecondaryWeaponReloading = false;
+    }
 
     public void heal(int amount)
     {
@@ -373,7 +410,7 @@ public class Agent : KinematicBody2D
         {
             foreach (Weapon currentWeapon in primaryWeapons)
             {
-                if (weaponAmmoType == currentWeapon.weaponAmmoType)
+                if (weaponAmmoType == currentWeapon.CurrentWeaponAmmoType)
                 {
                     consume = true;
                     ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).AmmoIncrease(amount);

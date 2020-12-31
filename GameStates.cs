@@ -19,20 +19,26 @@ public class GameStates : Node
 
     public class PlayerInput
     {
-        public bool up;
+        public enum InputAction {
+            NOT_TRIGGER,
+            TRIGGER,
+            RELOAD
+        }
 
-        public bool down;
+        public int Up;
 
-        public bool left;
+        public int Down;
 
-        public bool right;
+        public int Left;
 
-        public Vector2 mousePosition;
+        public int Right;
 
-        public bool primaryWepaon;
-        public bool secondaryWepaon;
-        public bool changePrimaryWeapon;
-        public bool changeSecondaryWeapon;
+        public Vector2 MousePosition;
+
+        public int PrimaryWeaponAction;
+        public int SecondaryWeaponAction;
+        public int PrimaryWeaponIndex;
+        public int SecondaryWeaponIndex;
     }
 
     // Holds player input data (including the local one) which will be used to update the game state
