@@ -37,7 +37,7 @@ public class LaserGun : Weapon
         {
             Cooldown = false;
             Ammo -= 1;
-            EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
+            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
             laserRay.setIsCasting(true);
 
             CooldownTimer.Start();

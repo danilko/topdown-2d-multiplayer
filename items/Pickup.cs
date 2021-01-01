@@ -29,19 +29,19 @@ public class Pickup : Area2D
 
         if (type == Items.health)
         {
-            if (body.HasMethod("heal"))
+            if (body.HasMethod(nameof(Agent.Heal)))
             {
-                Agent tank = (Agent)body;
-                tank.heal((int)GD.RandRange(amount.x, amount.y));
+                Agent agent = (Agent)body;
+                agent.Heal((int)GD.RandRange(amount.x, amount.y));
 
             }
         }
         if (type == Items.ammo)
         {
-            if (body.HasMethod("ammoIncrease"))
+            if (body.HasMethod(nameof(Agent.AmmoIncrease)))
             {
-                Agent tank = (Agent)body;
-                tank.ammoIncrease(Weapon.WeaponAmmoType.bullet,(int)GD.RandRange(amount.x, amount.y));
+                Agent agent = (Agent)body;
+                agent.AmmoIncrease(Weapon.WeaponAmmoType.AMMO,(int)GD.RandRange(amount.x, amount.y));
 
             }
         }

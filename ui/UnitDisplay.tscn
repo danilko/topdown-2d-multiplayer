@@ -7,7 +7,7 @@
 scale = Vector2( 0.5, 0.5 )
 script = ExtResource( 1 )
 
-[node name="HealthBar" type="TextureProgress" parent="."]
+[node name="UnitBar" type="TextureProgress" parent="."]
 margin_left = -95.1125
 margin_top = -160.196
 margin_right = 94.8875

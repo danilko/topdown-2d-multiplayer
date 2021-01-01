@@ -3,18 +3,20 @@ using System;
 
 public class Weapon : Node2D
 {
-    public enum WeaponAmmoType { machine_energy, external_energy, bullet }
+    public enum WeaponAmmoType { ENERGY, AMMO }
 
     [Export]
     public WeaponAmmoType CurrentWeaponAmmoType { get; set; }
 
-    public enum WeaponType { rifile, lasergun, misslelauncher }
+    public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER }
+
+    public enum WeaponOrder{ Primary, Secondary}
 
     [Export]
     public WeaponType CurrentWeaponType { get; set; }
 
     [Signal]
-    public delegate void AmmoChangedSignal();
+    public delegate void AmmoChangeSignal();
 
     [Signal]
     public delegate void AmmoOutSignal();
@@ -25,14 +27,12 @@ public class Weapon : Node2D
     [Signal]
     public delegate void ReloadStopSignal();
 
-
     [Signal]
     public delegate void FireSignal();
 
     [Export]
     public int MaxAmmo = -1;
 
-    [Export]
     protected int Ammo = -1;
 
     [Export]
@@ -68,6 +68,13 @@ public class Weapon : Node2D
 
     public override void _Ready()
     {
+        if(MaxAmmo == 0)
+        {
+            MaxAmmo = -1;
+        }
+
+        Ammo = MaxAmmo;
+
         CooldownTimer = (Timer)GetNode("CooldownTimer");
         CooldownTimer.WaitTime = CooldownTime;
 
@@ -76,7 +83,7 @@ public class Weapon : Node2D
 
         Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
 
-        EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
+        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
     }
 
     public virtual void Initialize(GameWorld gameWorld, Agent agent)
@@ -93,7 +100,7 @@ public class Weapon : Node2D
         {
             Cooldown = false;
             Ammo -= 1;
-            EmitSignal(nameof(AmmoChangedSignal), (Ammo / MaxAmmo) * 100);
+            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
 
             CooldownTimer.Start();
 
@@ -127,6 +134,15 @@ public class Weapon : Node2D
         return false;
     }
 
+    public int getMaxAmmo()
+    {
+        return MaxAmmo;
+    }
+
+    public int getAmmo()
+    {
+        return Ammo;
+    }
 
     protected virtual void FireEffect() { }
 
@@ -139,12 +155,17 @@ public class Weapon : Node2D
 
     private void _stopReload()
     {
-        Ammo = MaxAmmo;
+        AmmoIncrease(MaxAmmo);
         EmitSignal(nameof(ReloadStopSignal));
     }
 
     public void AmmoIncrease(int amount)
     {
+        // -1 Indicate no ammo
+        if(Ammo == -1)
+        {
+            return;
+        }
 
         Ammo = +amount;
 
@@ -153,7 +174,7 @@ public class Weapon : Node2D
             Ammo = MaxAmmo;
         }
 
-        EmitSignal(nameof(AmmoChangedSignal), Ammo * 100 / MaxAmmo);
+        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
     }
 
     public virtual void onWeaponTimerTimeout()

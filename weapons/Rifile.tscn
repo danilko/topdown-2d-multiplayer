@@ -51,9 +51,8 @@ tracks/1/keys = {
 
 [node name="Rifile" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
-KnockbackForce = 100.0
-MaxAmmo = 100
-Ammo = 100
+KnockbackForce = 10.0
+MaxAmmo = 50
 CooldownTime = 0.1
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )

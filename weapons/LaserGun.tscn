@@ -7,11 +7,12 @@
 
 [node name="Weapon" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
-KnockbackForce = 100.0
-MaxAmmo = 100
-Ammo = 100
-CooldownTime = 1.0
-ReloadTime = 5.0
+CurrentWeaponAmmoType = 1
+CurrentWeaponType = 1
+KnockbackForce = 500.0
+MaxAmmo = 5
+CooldownTime = 2.0
+ReloadTime = 10.0
 WeaponName = "LaserGun"
 
 [node name="TriggerPoint" parent="." index="1"]

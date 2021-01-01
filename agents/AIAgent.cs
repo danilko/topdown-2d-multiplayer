@@ -62,32 +62,34 @@ public class AIAgent : Agent
         return _currentSpawnPointIndex;
     }
 
-
-    private void calculatePath()
+    protected  override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
-        _currentSpawnPointIndex = _gameWorld.getNextSpawnIndex(_currentSpawnPointIndex);
-        // targetPaths = gameworld.getPaths(GlobalPosition, gameworld.getSpawnPointPosition(currentSpawnPointIndex));
-
-        Godot.Collections.Array excludes = new Godot.Collections.Array() { this };
-
-        targetPaths = _gameWorld.getPaths(GlobalPosition, _gameWorld.getSpawnPointPosition(_currentSpawnPointIndex + 1), GetWorld2d(), excludes);
-
-        if (targetPaths != null && targetPaths.Count < 1)
+        if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
-            targetPaths = null;
+            // Deregister weapon with ai
+            if (currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload"))
+            {
+                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload");
+                currentWeapon.Disconnect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onPrimaryWeaponReloadStop");
+            }
         }
-
-        if (targetPaths != null)
-        {
-            targetPaths.RemoveAt(0);
-        }
-
-        //  cleanDrawing();
-        //  foreach(Vector2 point in targetPaths )
-        // {
-        //       debugDrawing(point);
-        // }
     }
+
+    protected override void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
+    {
+        if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
+        {
+            // Register weapon with AI
+            if (! currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload"))
+            {
+                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload");
+                currentWeapon.Connect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onPrimaryWeaponReloadStop");
+            }
+
+            base.ConnectWeapon(currentWeapon, weaponOrder);
+        }
+    }
+
 
     public Vector2 seekAndArrive(Vector2 targetPosition)
     {
@@ -111,109 +113,6 @@ public class AIAgent : Agent
     {
         _agentAI.Control(delta);
     }
-
-    // public override void _Control(float delta)
-    // {
-    //     Godot.Collections.Array removeIndices = new Godot.Collections.Array();
-
-    //     int index = 0;
-    //     // Check vaild members
-    //     foreach (Tank member in members)
-    //     {
-    //         if (!IsInstanceValid(member))
-    //         {
-    //             removeIndices.Add(index);
-    //         }
-    //         index++;
-    //     }
-
-    //     foreach (int removeIndex in removeIndices)
-    //     {
-    //         members.Remove(removeIndex);
-    //     }
-
-    //     // Set the accel
-    //     _acceleration = new Vector2();
-
-    //     // Validate if target is available or is freed up (maybe no longer in scene)
-    //     if (target != null && !IsInstanceValid(target))
-    //     {
-    //         target = null;
-    //     }
-
-    //     if (targetPaths != null && targetPaths.Count == 0)
-    //     {
-    //         targetPaths = null;
-    //     }
-
-
-    //     // Execute next path when target is not empty
-    //     if (targetPaths != null && target == null)
-    //     {
-    //         Vector2 targetPoint = (Vector2)targetPaths[0];
-
-    //         Vector2 targetDir = (targetPoint - GlobalPosition).Normalized();
-    //         Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-
-    //         GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
-
-    //         if (GlobalPosition.DistanceTo(targetPoint) < _PathRadius)
-    //         {
-    //             targetPaths.RemoveAt(0);
-
-    //             if (targetPaths.Count == 0)
-    //             {
-    //                 targetPaths = null;
-    //             }
-
-
-
-    //             slowDownBoostTrail();
-    //         }
-    //         else
-    //         {
-    //             Velocity = targetDir * MaxSpeed;
-
-    //             Vector2 seekVelocity = seekAndArrive(targetPoint);
-    //             //Vector2 separationVelocity = separation() * 0.5f;
-    //             //Velocity = Velocity + seekVelocity + separationVelocity;
-
-    //             MoveAndSlide(Velocity);
-
-    //             speedUpBoostTrail();
-    //         }
-    //     }
-
-    //     if (target != null)
-    //     {
-    //         Vector2 targetDir = (target.GlobalPosition - GlobalPosition).Normalized();
-    //         Vector2 currentDir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-
-    //         GlobalRotation = currentDir.LinearInterpolate(targetDir, TurretSpeed * delta).Angle();
-    //         if (targetDir.Dot(currentDir) > 0.9)
-    //         {
-    //             PrimaryWeaponFiring = true;
-    //         }
-    //         else
-    //         {
-    //             PrimaryWeaponFiring = false;
-    //             SecondaryWeaponFiring = false;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         PrimaryWeaponFiring = false;
-    //         SecondaryWeaponFiring = false;
-    //     }
-
-    //     if (target == null && targetPaths == null)
-    //     {
-    //         calculatePath();
-
-    //         setPathLine(targetPaths);
-    //     }
-
-    // }
 
     public void setPathLine(Godot.Collections.Array points)
     {

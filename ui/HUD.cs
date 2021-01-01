@@ -92,40 +92,91 @@ public class HUD : CanvasLayer
         ((Label)GetNode("lblNetworkRate")).Text = "Network Rate: " + message;
     }
 
-    public void _updateAmmoBar(int value)
+    public void UpdatePrimaryWeaponAmmo(int current, int max)
     {
-        TextureProgress ammoBar = (TextureProgress)GetNode("controlGame/Margin/Container/AmmoBar");
-        ammoBar.Value = value;
+        //TextureProgress ammoBar = (TextureProgress)GetNode("controlGame/Margin/Container/AmmoBar");
+        //ammoBar.Value = value;
+        ((Label)GetNode("controlGame/lblPrimaryWeaponAmmo")).Text = current + "/" + max;
 
+
+
+        if (Mathf.Abs((float)current/(float)max) <= 0.1f)
+        {
+            // Change color during if ammo is under 10%
+            ((Label)GetNode("controlGame/lblPrimaryWeaponAmmo")).Set("custom_colors/font_color", new Color("#ffc65b"));
+        }
+        else
+        {
+            ((Label)GetNode("controlGame/lblPrimaryWeaponAmmo")).Set("custom_colors/font_color", new Color("#96ff5b"));
+        }
+
+        // If not 0 ammo, disable the out ammo message
+        if (current == 0)
+        {
+            ((Label)GetNode("controlGame/lblPrimaryWeaponAmmoOut")).Visible = true;
+        }
+        else
+        {
+            ((Label)GetNode("controlGame/lblPrimaryWeaponAmmoOut")).Visible = false;
+        }
+    }
+    public void UpdatePrimaryWeaponAmmoOut()
+    {
+        ((Label)GetNode("controlGame/lblPrimaryWeaponAmmoOut")).Visible = true;
     }
 
-    public void _updatePrimaryWeapon(Weapon.WeaponType weaponType)
+    public void UpdatePrimaryWeaponReloadStart()
+    {
+        ((Label)GetNode("controlGame/lblPrimaryWeaponReloading")).Visible = true;
+    }
+
+    public void UpdatePrimaryWeaponReloadStop()
+    {
+        ((Label)GetNode("controlGame/lblPrimaryWeaponReloading")).Visible = false;
+    }
+
+    public void UpdateSecondaryWeaponAmmo(int current, int max)
+    {
+    }
+    
+    public void UpdateSecondaryWeaponAmmoOut()
+    {
+    }
+
+    public void UpdateSecondaryWeaponReloadStart()
+    {
+    }
+
+    public void UpdateSecondaryWeaponReloadStop()
+    {
+    }
+
+    public void UpdatePrimaryWeapon(Weapon.WeaponType weaponType)
     {
         ((Label)GetNode("controlGame/lblPrimaryWeaponLabel")).Text = "" + weaponType.ToString();
         Sprite symbol = ((Sprite)GetNode("controlGame/spPrimaryWeaponSymbol"));
 
-        if (weaponType == Weapon.WeaponType.lasergun)
+        if (weaponType == Weapon.WeaponType.LASER)
         {
             symbol.RegionRect = new Rect2(-1f, 263f, 96f, 93f);
             symbol.Scale = new Vector2(0.5f, 0.5f);
         }
-        else if (weaponType == Weapon.WeaponType.rifile)
+        else if (weaponType == Weapon.WeaponType.RIFILE)
         {
             symbol.RegionRect = new Rect2(763f, 39f, 71f, 28f);
             symbol.Scale = new Vector2(1f, 1f);
         }
-        else if (weaponType == Weapon.WeaponType.misslelauncher)
+        else if (weaponType == Weapon.WeaponType.MISSLELAUNCHER)
         {
             symbol.RegionRect = new Rect2(510f, 70f, 53f, 39f);
             symbol.Scale = new Vector2(1f, 1f);
         }
     }
-    public void _updateSecondaryWeapon(Weapon.WeaponType weaponType)
+    public void UpdateSecondaryWeapon(Weapon.WeaponType weaponType)
     {
-
     }
 
-    public void _updateHealthBar(int value)
+    public void UpdateHealth(int value)
     {
         barTexture = barGreen;
 
@@ -148,7 +199,7 @@ public class HUD : CanvasLayer
         tween.Start();
     }
 
-    public void _updateDefeatedAgentBar(int value)
+    public void UpdateDefeatedAgent(int value)
     {
         ((Label)GetNode("controlGame/lblDefeatedAgentCount")).Text = "" + value;
     }

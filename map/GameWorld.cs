@@ -124,6 +124,10 @@ public class GameWorld : Node2D
     // Use as tick to track countdown time
     private int internalTimer;
 
+    private CapaturableBaseManager _capaturableBaseManager;
+
+    private Godot.Collections.Array<TeamMapAI> _teamMapAIs;
+
     private Timer timer;
 
     public override void _Ready()
@@ -132,10 +136,12 @@ public class GameWorld : Node2D
 
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
+        
+        _capaturableBaseManager = (CapaturableBaseManager)GetNode("CapaturableBaseManager");
+
+        _initializeTeamMapAI();
 
         Input.SetCustomMouseCursor(GD.Load("res://assets/ui/blue_cross.png"), Input.CursorShape.Arrow, new Vector2(16, 16));
-        //  AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        //  audioManager.playMusic(musicClip);
 
         // After receiving and fully decoding a new snapshot, apply it to the game world
         this.Connect(nameof(SnapshotReceivedSignal), this, nameof(applySnapshot));
@@ -165,12 +171,12 @@ public class GameWorld : Node2D
         this.Connect(nameof(NeworkRateUpdateSignal), GetNode("HUD"), "_onNetworkRateUpdate");
         this.Connect(nameof(PlayerDefeatedSignal), GetNode("HUD"), "_onPlayerDefeatedMessage");
 
-        this.Connect("PlayerListChangedSignal", GetNode("HUD"), "_onPlayerDefeatedMessage");
+        this.Connect(nameof(Network.PlayerListChangedSignal), GetNode("HUD"), "onPlayerListChanged");
 
         this.Connect(nameof(WaitingPeriodSignal), GetNode("HUD"), "_onUpdateTimer");
 
         // Update playerlist
-        EmitSignal("PlayerListChangedSignal");
+        EmitSignal(nameof(Network.PlayerListChangedSignal));
 
         waitingPeriod = true;
 
@@ -186,26 +192,54 @@ public class GameWorld : Node2D
 
     }
 
-    public Vector2 getSpawnPointPosition(int spawnPointIndex)
+    private void _initializeTeamMapAI()
     {
-        if (spawnPointIndex >= GetNode("SpawnPoints").GetChildCount())
-        {
-            spawnPointIndex = GetNode("SpawnPoints").GetChildCount() - 1; ;
-        }
+        _teamMapAIs = new Godot.Collections.Array<TeamMapAI>();
 
-        return ((Node2D)GetNode("SpawnPoints/SpawnPoint_" + spawnPointIndex)).GlobalPosition;
+        // Start with neutral and above
+        for (int index = (int)(Team.TeamCode.NEUTRAL) -1; index < Enum.GetNames(typeof(Team.TeamCode)).Length; index++)
+        {
+            TeamMapAI ai = (TeamMapAI)((PackedScene)GD.Load("res://ai/TeamMapAI.tscn")).Instance();
+            ai.Name = nameof(TeamMapAI) + "_" + (Team.TeamCode)index;
+            AddChild(ai);
+            
+            ai.Initialize(_capaturableBaseManager.GetBases(), (Team.TeamCode)index);
+
+            _teamMapAIs.Add(ai);
+        }
     }
 
-    public int getNextSpawnIndex(int spawnIndex)
+    public CapturableBase getCapturableBase(Team.TeamCode teamCode)
     {
-        int nextSpawnIndex = spawnIndex + 1;
+        CapturableBase targetCaptureBase = null;
+        CapturableBase neutralCaptureBase = null;
 
-        if (nextSpawnIndex >= GetNode("SpawnPoints").GetChildCount())
+        foreach(CapturableBase captureBase in GetNode("CapaturableBaseManager").GetChildren())
         {
-            nextSpawnIndex = 0;
+            if(captureBase.GetCaptureBaseTeam() == teamCode)
+            {
+               targetCaptureBase = captureBase;
+            }
+
+            if(captureBase.GetCaptureBaseTeam() == Team.TeamCode.NEUTRAL)
+            {
+               neutralCaptureBase = captureBase;
+            }
         }
 
-        return nextSpawnIndex;
+        // If not on same team base, try get a neutral base
+        if(targetCaptureBase == null)
+        {
+            targetCaptureBase = neutralCaptureBase;
+        }
+
+        // If no neutral ground, try to use 
+        if(targetCaptureBase == null)
+        {
+            targetCaptureBase = (CapturableBase)GetNode("CapaturableBases").GetChildren()[0];
+        }
+
+        return targetCaptureBase;
     }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots
@@ -420,18 +454,7 @@ public class GameWorld : Node2D
                     // snapshot_data should contain a "players" field which must be an array
                     // of player data. Each entry in this array should be a dictionary, containing
                     // the following fields: network_id, position, rotation, col
-                    ClientData item = clientValues[index];
-
-                    encodedData = encodedData + item.Id + ";";
-                    encodedData = encodedData + item.Position.x + ";";
-                    encodedData = encodedData + item.Position.y + ";";
-                    encodedData = encodedData + item.Rotation + ";";
-                    encodedData = encodedData + item.PrimaryWeapon + ";";
-                    encodedData = encodedData + item.SecondaryWeapon + ";";
-                    encodedData = encodedData + item.Health + ";";
-                    encodedData = encodedData + item.PrimaryWeaponIndex + ";";
-                    encodedData = encodedData + item.SecondaryWeaponIndex + ";";
-
+                    encodeClientData(encodedData, botValues[index]);
                     remainAvailableSlots--;
                     clientAgentInfoSentCount++;
                 }
@@ -466,17 +489,7 @@ public class GameWorld : Node2D
                 // fields: bot_id, position, rotation
                 for (int index = botAgentInfoSentCount; index < targetCount; index++)
                 {
-                    ClientData item = botValues[index];
-                    encodedData = encodedData + item.Id + ";";
-                    encodedData = encodedData + item.Position.x + ";";
-                    encodedData = encodedData + item.Position.y + ";";
-                    encodedData = encodedData + item.Rotation + ";";
-                    encodedData = encodedData + item.PrimaryWeapon + ";";
-                    encodedData = encodedData + item.SecondaryWeapon + ";";
-                    encodedData = encodedData + item.Health + ";";
-                    encodedData = encodedData + item.PrimaryWeaponIndex + ";";
-                    encodedData = encodedData + item.SecondaryWeaponIndex + ";";
-
+                    encodeClientData(encodedData, botValues[index]);
                     remainAvailableSlots--;
                     botAgentInfoSentCount++;
                 }
@@ -562,24 +575,8 @@ public class GameWorld : Node2D
         for (int index = 0; index < clientCount; index++)
         {
             ClientData clientData = new ClientData();
-            clientData.Id = encodedData.Split(";")[parseIndex];
-            parseIndex++;
-            clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.PrimaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.SecondaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.PrimaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.SecondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
+
+            parseIndex = _parseClientData(encodedData, clientData, parseIndex);
 
             snapshot.playerData.Add(clientData.Id, clientData);
         }
@@ -592,24 +589,7 @@ public class GameWorld : Node2D
         for (int index = 0; index < clientCount; index++)
         {
             ClientData clientData = new ClientData();
-            clientData.Id = encodedData.Split(";")[parseIndex];
-            parseIndex++;
-            clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.PrimaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.SecondaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.PrimaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
-            clientData.SecondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
-            parseIndex++;
+            parseIndex = _parseClientData(encodedData, clientData, parseIndex);
 
             snapshot.botData.Add(clientData.Id, clientData);
         }
@@ -623,27 +603,51 @@ public class GameWorld : Node2D
         // Emit the signal indicating that there is a new snapshot do be applied
         EmitSignal(nameof(SnapshotReceivedSignal), snapshot);
     }
+
+    private int _parseClientData(String encodedData, ClientData clientData, int parseIndex)
+    {
+        clientData.Id = encodedData.Split(";")[parseIndex];
+        parseIndex++;
+        clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.PrimaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.SecondaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.PrimaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.SecondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+
+        return parseIndex;
+    }
+
+    private void encodeClientData(String encodedData, ClientData clientData)
+    {
+        encodedData = encodedData + clientData.Id + ";";
+        encodedData = encodedData + clientData.Position.x + ";";
+        encodedData = encodedData + clientData.Position.y + ";";
+        encodedData = encodedData + clientData.Rotation + ";";
+        encodedData = encodedData + clientData.PrimaryWeapon + ";";
+        encodedData = encodedData + clientData.SecondaryWeapon + ";";
+        encodedData = encodedData + clientData.Health + ";";
+        encodedData = encodedData + clientData.PrimaryWeaponIndex + ";";
+        encodedData = encodedData + clientData.SecondaryWeaponIndex + ";";
+    }
+
     private void applySnapshot(Snapshot snapshot)
     {
         // In here we assume the obtained snapshot is newer than the last one
         // Iterate through player data 
         foreach (ClientData item in snapshot.playerData.Values)
         {
-
-            // Depending on the synchronization mechanism, this may not be an error!
-            // For now assume the entities are spawned and kept in sync so just continue
-            // the loop
-            if (!HasNode("client_" + item.Id) || !IsInstanceValid(GetNode("client_" + item.Id)))
-            {
-                continue;
-            }
-
-            Agent client = (Agent)GetNode("client_" + item.Id);
-
-            client.changePrimaryWeapon(item.PrimaryWeaponIndex);
-            client.changeSecondaryWeapon(item.SecondaryWeaponIndex);
-            client.Sync(item.Position, item.Rotation, item.PrimaryWeapon, item.SecondaryWeapon);
-            client.setHealth(item.Health);
+            _updateAgentStateFromSnapshot("client_" + item.Id, item);
         }
 
         foreach (ClientData item in snapshot.botData.Values)
@@ -651,19 +655,28 @@ public class GameWorld : Node2D
             // Only need to do on client, as logic already perform on server through calculation
             if (!GetTree().IsNetworkServer())
             {
-                if (!HasNode(item.Id) || !IsInstanceValid(GetNode(item.Id)))
-                {
-                    continue;
-                }
-
-                Agent client = (Agent)GetNode(item.Id);
-
-                client.changePrimaryWeapon(item.PrimaryWeaponIndex);
-                client.changeSecondaryWeapon(item.SecondaryWeaponIndex);
-                client.Sync(item.Position, item.Rotation, item.PrimaryWeapon, item.SecondaryWeapon);
-                client.setHealth(item.Health);
+                _updateAgentStateFromSnapshot(item.Id, item);
             }
         }
+    }
+
+    private void _updateAgentStateFromSnapshot(String agentNodeName, ClientData item)
+    {
+        // Depending on the synchronization mechanism, this may not be an error!
+        // For now assume the entities are spawned and kept in sync so just continue
+        // the loop
+        if (!HasNode(item.Id) || !IsInstanceValid(GetNode(item.Id)))
+        {
+            return;
+        }
+
+        Agent client = (Agent)GetNode(agentNodeName);
+
+        if (client.currentPrimaryWeaponIndex != item.PrimaryWeaponIndex) { client.changePrimaryWeapon(item.PrimaryWeaponIndex); }
+        if (client.currentSecondaryWeaponIndex != item.SecondaryWeaponIndex) { client.changeSecondaryWeapon(item.SecondaryWeaponIndex); }
+
+        client.Sync(item.Position, item.Rotation, item.PrimaryWeapon, item.SecondaryWeapon);
+        client.setHealth(item.Health);
     }
 
     private void onPlayerRemoved(int id)
@@ -807,11 +820,11 @@ public class GameWorld : Node2D
 
                         Vector2 moveDir = new Vector2();
                         moveDir.y = -1 * input.Value.Up;
-                        moveDir.y += 1 * input.Value.Down; 
-                        moveDir.x = -1 * input.Value.Left; 
+                        moveDir.y += 1 * input.Value.Down;
+                        moveDir.x = -1 * input.Value.Left;
                         moveDir.x += 1 * input.Value.Right;
 
-                        playerNode.changePrimaryWeapon(input.Value.PrimaryWeaponIndex); 
+                        playerNode.changePrimaryWeapon(input.Value.PrimaryWeaponIndex);
                         playerNode.changeSecondaryWeapon(input.Value.SecondaryWeaponIndex);
 
                         // If waiting period, no fire, else use the current user setup
@@ -900,6 +913,16 @@ public class GameWorld : Node2D
 
                 // Append into the snapshot
                 snapshot.botData.Add(spawnBot.name, clientData);
+
+                // This logic is necessary to notify the AI that reload is pick up, so can continue with next state
+                if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+                {
+                    enemyNode.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                }
+                if (secondaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+                {
+                    enemyNode.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                }
             }
             else
             {
@@ -1148,9 +1171,7 @@ public class GameWorld : Node2D
         // Load the scene and create an instance
         Player client = (Player)((PackedScene)GD.Load("res://agents/Player.tscn")).Instance();
 
-        // Get spawn position, -1 as to utilize 0 spawn point
-        Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + getNextSpawnIndex(spawnIndex - 1));
-        client.Position = nodeSpawnPoint.GlobalPosition;
+        client.Position = getCapturableBase((Team.TeamCode)pininfo.team).GlobalPosition;
 
         client.Name = "client_" + pininfo.net_id;
         // If this actor does not belong to the server, change the network master accordingly
@@ -1170,13 +1191,7 @@ public class GameWorld : Node2D
             Camera2D camera2D = new Camera2D();
             camera2D.Name = "Camera2D";
             client.AddChild(camera2D);
-            client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updatePrimaryWeapon");
-            client.Connect("PrimaryWeaponChangeSignal", GetNode("HUD"), "_updateSecondaryWeapon");
-            client.Connect("HealthChangedSignal", GetNode("HUD"), "_updateHealthBar");
-            client.Connect("DefeatedAgentChangedSignal", GetNode("HUD"), "_updateDefeatedAgentBar");
-
-            // Notify HUD about weapon 2
-            client.changePrimaryWeapon(2);
+            client.SetHUD((HUD)GetNode("HUD"));
 
             _setCameraLimit();
         }
@@ -1300,23 +1315,23 @@ public class GameWorld : Node2D
 
             AIAgent bot = (AIAgent)((PackedScene)GD.Load("res://agents/AIAgent.tscn")).Instance();
 
-            // Get spawn position, -1 as to utilize 0 spawn point
-            int currentSpawnPoint = (int)botCounter % GetNode("SpawnPoints").GetChildCount();
-            Node2D nodeSpawnPoint = (Node2D)GetNode("SpawnPoints/SpawnPoint_" + currentSpawnPoint);
-
             bot.Name = botId;
-            bot.Position = new Vector2(nodeSpawnPoint.GlobalPosition.x + random.RandiRange(-5, 5), nodeSpawnPoint.GlobalPosition.y + random.RandiRange(-5, 5));
+
+            // (Team.TeamCode)(int)(botCounter % 3)
+            Team.TeamCode team = (Team.TeamCode)(int)(0);
 
             bot.SetNetworkMaster(1);
-            bot.setCurrentSpawnIndex(currentSpawnPoint);
+
+            bot.GlobalPosition = getCapturableBase(team).GlobalPosition;
 
             AddChild(bot);
 
             // Set the info afterward as some of these depend on child node to be available
-            bot.Initialize(this, botId, (Team.TeamCode)(int)(botCounter % 3));
+            bot.Initialize(this, botId, team);
 
             // Randomize weapon between 0, 1, 2
-            // bot.changePrimaryWeapon((int)botCounter % 3);
+            //bot.changePrimaryWeapon((int)botCounter % 3);
+            // Set to a default weapon for now
             bot.changePrimaryWeapon(2);
         }
     }
@@ -1363,13 +1378,13 @@ public class GameWorld : Node2D
     {
         if (target != null && IsInstanceValid(target))
         {
-            if (target.HasMethod("TakeDamage"))
+            if (target.HasMethod(nameof(Agent.TakeDamage)))
             {
                 Agent targetAgent = (Agent)(target);
                 Agent sourceAgent = (Agent)(source);
                 targetAgent.TakeDamage(damage, hitDir, sourceAgent, sourceTeam);
             }
-            else if (target.HasMethod("TakeEnvironmentDamage"))
+            else if (target.HasMethod(nameof(Obstacle.TakeEnvironmentDamage)))
             {
                 ((Obstacle)(target)).TakeEnvironmentDamage(damage);
             }

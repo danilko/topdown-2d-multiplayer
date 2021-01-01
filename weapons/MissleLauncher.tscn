@@ -7,10 +7,11 @@
 
 [node name="MissleLauncher" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
-KnockbackForce = 50.0
+CurrentWeaponAmmoType = 1
+CurrentWeaponType = 2
+KnockbackForce = 200.0
 MaxAmmo = 10
-Ammo = 10
-CooldownTime = 1.0
+CooldownTime = 2.0
 ReloadTime = 5.0
 Bullet = ExtResource( 4 )
 

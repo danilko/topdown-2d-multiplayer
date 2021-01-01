@@ -81,18 +81,7 @@ public class AI : Node2D
 
     public void Control(float delta)
     {
-
-        if (_agent.GetCurrentSecondaryWeapon() != null && _agent.GetCurrentPrimaryWeapon().IsConnected("ReloadStartSignal", this, nameof(_onPrimaryWeaponNeedReload)))
-        {
-            _agent.GetCurrentPrimaryWeapon().Connect("ReloadStartSignal", this, nameof(_onPrimaryWeaponNeedReload));
-        }
-
-        if (_agent.GetCurrentSecondaryWeapon() != null && _agent.GetCurrentSecondaryWeapon().IsConnected("ReloadStartSignal", this, nameof(_onSecondaryWeaponNeedReload)))
-        {
-            _agent.GetCurrentSecondaryWeapon().Connect("ReloadStartSignal", this, nameof(_onSecondaryWeaponNeedReload));
-        }
-
-
+        // If not reloading, then set to default
         if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
         {
             _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
@@ -153,14 +142,26 @@ public class AI : Node2D
         _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
     }
 
+    private void _onPrimaryWeaponReloadStop()
+    {
+        _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                GD.Print("AI reload complete");
+    }
+
+
     private void _onSecondaryWeaponNeedReload()
     {
         _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
     }
 
+    private void _onSecondaryWeaponReloadStop()
+    {
+        _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+    }
+
     private void _onDetectionZoneBodyEntered(Node body)
     {
-        if (body.HasMethod("GetTeam") && body != _agent)
+        if (body.HasMethod(nameof(Agent.GetTeam)) && body != _agent)
         {
             // If not same team identifier, identify as target
             if (((Agent)body).GetTeam() != _agent.GetTeam())

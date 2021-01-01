@@ -4,6 +4,8 @@ using System;
 public class Player : Agent
 {
 
+    private HUD _hud = null;
+
     [Remote]
     public void serverGetPlayerInput(String inputData)
     {
@@ -37,6 +39,52 @@ public class Player : Agent
             // Then cache the decoded data
             gameStates.cacheInput(GetTree().GetRpcSenderId(), playerInput);
 
+        }
+    }
+
+    public void SetHUD(HUD hud)
+    {
+        _hud = hud;
+
+        Connect(nameof(Agent.PrimaryWeaponChangeSignal), _hud, nameof(HUD.UpdatePrimaryWeapon));
+        Connect(nameof(Agent.HealthChangedSignal), _hud, nameof(HUD.UpdateHealth));
+        Connect(nameof(Agent.DefeatedAgentChangedSignal), _hud,nameof(HUD.UpdateDefeatedAgent));
+
+        // # notify about current weapon to HUD
+        changePrimaryWeapon(currentPrimaryWeaponIndex);
+        changeSecondaryWeapon(currentSecondaryWeaponIndex);
+    }
+
+    protected  override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
+    {
+        if (currentWeapon != null && _hud != null)
+        {
+            // Deregister weapon from UI if connected
+            if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo"))
+            {
+                currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo");
+                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _hud, "Update" + weaponOrder + "WeaponAmmoOut");
+                currentWeapon.Disconnect(nameof(Weapon.ReloadStartSignal), _hud, "Update" + weaponOrder + "WeaponReloadStart");
+                currentWeapon.Disconnect(nameof(Weapon.ReloadStopSignal), _hud, "Update" + weaponOrder + "WeaponReloadStop");
+            }
+        }
+    }
+
+    protected override void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
+    {
+        if (currentWeapon != null && _hud != null)
+        {
+
+            // Register new weapon with UI if not connect (as cannot connect again)
+            if (! currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo"))
+            {
+                currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo");
+                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _hud, "Update" + weaponOrder + "WeaponAmmoOut");
+                currentWeapon.Connect(nameof(Weapon.ReloadStartSignal), _hud, "Update" + weaponOrder + "WeaponReloadStart");
+                currentWeapon.Connect(nameof(Weapon.ReloadStopSignal), _hud, "Update" + weaponOrder + "WeaponReloadStop");
+            }
+
+            base.ConnectWeapon(currentWeapon, weaponOrder);
         }
     }
 
@@ -110,15 +158,15 @@ public class Player : Agent
 
         playerInput.MousePosition = GetGlobalMousePosition();
 
-        if(Input.IsKeyPressed((int)KeyList.Key1))
+        if (Input.IsKeyPressed((int)KeyList.Key1))
         {
             playerInput.PrimaryWeaponIndex = 0;
         }
-        else if(Input.IsKeyPressed((int)KeyList.Key2))
+        else if (Input.IsKeyPressed((int)KeyList.Key2))
         {
             playerInput.PrimaryWeaponIndex = 1;
         }
-        else if(Input.IsKeyPressed((int)KeyList.Key3))
+        else if (Input.IsKeyPressed((int)KeyList.Key3))
         {
             playerInput.PrimaryWeaponIndex = 2;
         }
@@ -127,15 +175,15 @@ public class Player : Agent
             playerInput.PrimaryWeaponIndex = currentPrimaryWeaponIndex;
         }
 
-        if(Input.IsKeyPressed((int)KeyList.Key4))
+        if (Input.IsKeyPressed((int)KeyList.Key4))
         {
             playerInput.SecondaryWeaponIndex = 0;
         }
-        else if(Input.IsKeyPressed((int)KeyList.Key5))
+        else if (Input.IsKeyPressed((int)KeyList.Key5))
         {
             playerInput.SecondaryWeaponIndex = 1;
         }
-        else if(Input.IsKeyPressed((int)KeyList.Key6))
+        else if (Input.IsKeyPressed((int)KeyList.Key6))
         {
             playerInput.SecondaryWeaponIndex = 2;
         }

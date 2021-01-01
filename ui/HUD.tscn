@@ -102,7 +102,6 @@ __meta__ = {
 }
 
 [node name="controlGame" type="Control" parent="."]
-visible = false
 margin_right = 40.0
 margin_bottom = 40.0
 __meta__ = {
@@ -143,6 +142,7 @@ texture_progress = ExtResource( 2 )
 [node name="Tween" type="Tween" parent="controlGame/Margin/Container/HealthBar"]
 
 [node name="AmmoBar" type="TextureProgress" parent="controlGame/Margin/Container"]
+visible = false
 margin_left = 234.0
 margin_right = 270.0
 margin_bottom = 49.0
@@ -209,20 +209,56 @@ __meta__ = {
 }
 
 [node name="lblPrimaryWeaponLabel" type="Label" parent="controlGame"]
-margin_left = 317.0
-margin_top = 7.0
-margin_right = 418.0
-margin_bottom = 21.0
-text = "PrimaryWeapon"
+margin_left = 420.78
+margin_top = 15.6754
+margin_right = 539.78
+margin_bottom = 29.6754
+text = "PRIMARY WEAPON"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblPrimaryWeaponAmmo" type="Label" parent="controlGame"]
+margin_left = 421.878
+margin_top = 33.2928
+margin_right = 526.878
+margin_bottom = 47.2928
+text = "000/000"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="spPrimaryWeaponSymbol" type="Sprite" parent="controlGame"]
-position = Vector2( 383.145, 45.0868 )
-scale = Vector2( 1.18019, 1.18019 )
+position = Vector2( 295.392, 17.9144 )
+scale = Vector2( 115.661, 42.1615 )
 texture = ExtResource( 5 )
 region_enabled = true
+
+[node name="lblPrimaryWeaponReloading" type="Label" parent="controlGame"]
+visible = false
+margin_left = 423.058
+margin_top = 58.6694
+margin_right = 500.058
+margin_bottom = 72.6694
+rect_pivot_offset = Vector2( 53.3791, 14 )
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "RELOADING"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblPrimaryWeaponAmmoOut" type="Label" parent="controlGame"]
+visible = false
+margin_left = 481.412
+margin_top = 32.8334
+margin_right = 558.412
+margin_bottom = 46.8334
+rect_pivot_offset = Vector2( 53.3791, 14 )
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "OUT OF AMMO"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="controlOverallMessage" type="Control" parent="."]
 visible = false

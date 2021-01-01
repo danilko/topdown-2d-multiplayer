@@ -11,7 +11,7 @@ public class UnitDisplay : Node2D
     Texture barTexture;
         public override void _Ready()
     {
-    TextureProgress healthBar = (TextureProgress)GetNode("HealthBar");  
+    TextureProgress healthBar = (TextureProgress)GetNode("UnitBar");  
     healthBar.Hide();
         
     }
@@ -20,9 +20,9 @@ public class UnitDisplay : Node2D
            GlobalRotation = 0;
        }
 
-    public void _updateHealthBar(int value){
+    public void UpdateUnitBar(int value){
         barTexture = barGreen;
-          TextureProgress healthBar = (TextureProgress)GetNode("HealthBar");  
+          TextureProgress healthBar = (TextureProgress)GetNode("UnitBar");  
         
         if(value < 100){
             healthBar.Show();
