@@ -63,7 +63,7 @@ public class CapturableBase : Area2D
         _unitDisplayLabel.Text = Name + " (" + _team.CurrentTeamCode + ")";
         _counter = _timeToCaptureBase;
 
-        EmitSignal(nameof(BaseTeamChangeSignal), Name, _team.CurrentTeamCode);
+        EmitSignal(nameof(BaseTeamChangeSignal), this);
     }
 
     private void _onCapturableBaseBodyEntered(Node2D body)

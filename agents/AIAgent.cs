@@ -16,8 +16,6 @@ public class AIAgent : Agent
 
     private int _currentSpawnPointIndex = 0;
 
-    private float _PathRadius = 5.0f;
-
     private Godot.Collections.Array members = null;
 
     // 10 px / s
@@ -62,7 +60,12 @@ public class AIAgent : Agent
         return _currentSpawnPointIndex;
     }
 
-    protected  override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
+    public AI GetAI()
+    {
+        return _agentAI;
+    }
+
+    protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
         if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
@@ -75,12 +78,14 @@ public class AIAgent : Agent
         }
     }
 
+
+
     protected override void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
         if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
             // Register weapon with AI
-            if (! currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload"))
+            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload"))
             {
                 currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload");
                 currentWeapon.Connect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onPrimaryWeaponReloadStop");
@@ -89,7 +94,6 @@ public class AIAgent : Agent
             base.ConnectWeapon(currentWeapon, weaponOrder);
         }
     }
-
 
     public Vector2 seekAndArrive(Vector2 targetPosition)
     {
@@ -111,7 +115,10 @@ public class AIAgent : Agent
 
     public override void _Control(float delta)
     {
-        _agentAI.Control(delta);
+        if (GetTree().IsNetworkServer())
+        {
+            _agentAI.Control(delta);
+        }
     }
 
     public void setPathLine(Godot.Collections.Array points)
@@ -137,7 +144,7 @@ public class AIAgent : Agent
     }
 
 
-    public override void _Process(float delta)
+    public override void _PhysicsProcess(float delta)
     {
         if (!Alive)
         {
@@ -148,10 +155,6 @@ public class AIAgent : Agent
         {
             _Control(delta);
         }
-
-
-        _pathLine.GlobalRotation = 0;
-        _pathLine.GlobalPosition = _originalPathLineLocation;
     }
 
 }

@@ -3,18 +3,14 @@ using System;
 
 public class CapaturableBaseManager : Node2D
 {
-    private Godot.Collections.Array<CapturableBase> _bases;
+    private Godot.Collections.Array _bases;
 
     public override void _Ready()
     {
-        _bases = new Godot.Collections.Array<CapturableBase>();
-        foreach(CapturableBase captureableBase in GetChildren())
-        {
-           _bases.Add(captureableBase);
-        }
+        _bases = GetChildren();
     }
 
-    public Godot.Collections.Array<CapturableBase> GetBases()
+    public Godot.Collections.Array GetBases()
     {
         return _bases;
     }

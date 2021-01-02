@@ -11,7 +11,8 @@ public class AI : Node2D
     {
         INVALID,
         PATROL,
-        ENGAGE
+        ENGAGE,
+        ADVANCE
     }
 
     private State _currentState;
@@ -30,7 +31,7 @@ public class AI : Node2D
     private Vector2 _patrolLocation;
     private bool _patrolReached;
 
-    private float _patrolReachedRadius = 5.0f;
+    private CapturableBase _nextBase;
 
     public override void _Ready()
     {
@@ -46,7 +47,7 @@ public class AI : Node2D
         _agent = agent;
         _patrolOrigin = _agent.GlobalPosition;
 
-        setState(State.PATROL);
+        SetState(State.PATROL);
 
         CollisionShape2D detectRadius = (CollisionShape2D)(_playerDetectionZone.GetNode("CollisionShape2D"));
 
@@ -57,7 +58,7 @@ public class AI : Node2D
 
     }
 
-    public void setState(State newState)
+    public void SetState(State newState)
     {
         if (newState == _currentState)
         {
@@ -70,8 +71,18 @@ public class AI : Node2D
             _patrolReached = true;
         }
 
+        if (newState == State.ADVANCE && _nextBase != null)
+        {
+            _patrolOrigin = _nextBase.GlobalPosition;
+        }
+
         _currentState = newState;
         EmitSignal(nameof(StateChangedSignal), _currentState);
+    }
+
+    public void SetNextBase(CapturableBase capturableBase)
+    {
+        _nextBase = capturableBase;
     }
 
     public State gsetState()
@@ -100,7 +111,7 @@ public class AI : Node2D
                     _agent.RotateToward(_patrolLocation, delta);
 
                     // Start the next patrol timer if reach target
-                    if (_agent.GlobalPosition.DistanceTo(_patrolLocation) < _patrolReachedRadius)
+                    if (_agent.HasReachedPosition(_patrolLocation))
                     {
                         _patrolReached = true;
                         _patrolTimer.Start();
@@ -108,6 +119,7 @@ public class AI : Node2D
                 }
 
                 break;
+
             case State.ENGAGE:
                 if (IsInstanceValid(_targetAgent))
                 {
@@ -131,6 +143,19 @@ public class AI : Node2D
                     }
                 }
                 break;
+
+            case State.ADVANCE:
+                if (_nextBase == null || _agent.HasReachedPosition(_nextBase.GlobalPosition))
+                {
+                    SetState(State.PATROL);
+                }
+                else
+                {
+                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition), delta);
+                    _agent.RotateToward(_nextBase.GlobalPosition, delta);
+                }
+                break;
+
             default:
                 break;
 
@@ -145,7 +170,6 @@ public class AI : Node2D
     private void _onPrimaryWeaponReloadStop()
     {
         _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
-                GD.Print("AI reload complete");
     }
 
 
@@ -167,7 +191,7 @@ public class AI : Node2D
             if (((Agent)body).GetTeam() != _agent.GetTeam())
             {
                 _targetAgent = (Agent)body;
-                setState(State.ENGAGE);
+                SetState(State.ENGAGE);
             }
         }
     }
@@ -176,7 +200,7 @@ public class AI : Node2D
     {
         if (body == _targetAgent)
         {
-            setState(State.PATROL);
+            SetState(State.ADVANCE);
             _targetAgent = null;
         }
     }
@@ -184,7 +208,7 @@ public class AI : Node2D
     private void _onPatrolTimerTimeout()
     {
         _patrolReached = false;
-        float patrolRange = 1000f;
+        float patrolRange = 50f;
 
         float randomX = _rng.RandfRange(-patrolRange, patrolRange);
         float randomY = _rng.RandfRange(-patrolRange, patrolRange);

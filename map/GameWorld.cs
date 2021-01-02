@@ -29,17 +29,7 @@ public class GameWorld : Node2D
     }
 
 
-    private class SpawnBot
-    {
-        public SpawnBot(String name, PackedScene packedScene)
-        {
-            this.name = name;
-            this.packedScene = packedScene;
-        }
-
-        public String name;
-        public PackedScene packedScene;
-    }
+    private int MAX_BOT_COUNT = 100;
 
     public class ClientData : Godot.Object
     {
@@ -82,13 +72,13 @@ public class GameWorld : Node2D
 
     int spawned_bots = 0;
 
-    Dictionary<String, SpawnBot> spawnBots = new Dictionary<String, SpawnBot>();
-    Dictionary<String, SpawnBot> spawnPlayers = new Dictionary<String, SpawnBot>();
+    Dictionary<String, Agent> spawnBots = new Dictionary<String, Agent>();
+    Dictionary<String, Agent> spawnPlayers = new Dictionary<String, Agent>();
+
 
     Network network;
 
     long botCounter = 0;
-    private long MAX_BOT_COUNT = 100;
 
     float currentTime;
 
@@ -136,7 +126,7 @@ public class GameWorld : Node2D
 
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
-        
+
         _capaturableBaseManager = (CapaturableBaseManager)GetNode("CapaturableBaseManager");
 
         _initializeTeamMapAI();
@@ -147,19 +137,18 @@ public class GameWorld : Node2D
         this.Connect(nameof(SnapshotReceivedSignal), this, nameof(applySnapshot));
 
         network = (Network)GetNode("/root/NETWORK");
-        network.Connect("DisconnectedSignal", this, nameof(onDisconnected));
+        network.Connect(nameof(Network.DisconnectedSignal), this, nameof(onDisconnected));
 
         if (GetTree().IsNetworkServer())
         {
-            network.Connect("PlayerRemovedSignal", this, "onPlayerRemoved");
+            network.Connect(nameof(Network.PlayerRemovedSignal), this, nameof(onPlayerRemoved));
         }
 
         // Spawn the players
         if (GetTree().IsNetworkServer())
         {
             spwanPlayer(convertToString(network.gamestateNetworkPlayer, 1));
-            // The amount doesn't matter because it will be calculated in the function body
-            syncBots(-1);
+            _syncBots();
         }
         else
         {
@@ -197,49 +186,21 @@ public class GameWorld : Node2D
         _teamMapAIs = new Godot.Collections.Array<TeamMapAI>();
 
         // Start with neutral and above
-        for (int index = (int)(Team.TeamCode.NEUTRAL) -1; index < Enum.GetNames(typeof(Team.TeamCode)).Length; index++)
+        for (int index = 0; index < (int)(Team.TeamCode.NEUTRAL); index++)
         {
             TeamMapAI ai = (TeamMapAI)((PackedScene)GD.Load("res://ai/TeamMapAI.tscn")).Instance();
             ai.Name = nameof(TeamMapAI) + "_" + (Team.TeamCode)index;
             AddChild(ai);
-            
-            ai.Initialize(_capaturableBaseManager.GetBases(), (Team.TeamCode)index);
+
+            ai.Initialize(this, _capaturableBaseManager.GetBases(), (Team.TeamCode)index);
 
             _teamMapAIs.Add(ai);
-        }
-    }
 
-    public CapturableBase getCapturableBase(Team.TeamCode teamCode)
-    {
-        CapturableBase targetCaptureBase = null;
-        CapturableBase neutralCaptureBase = null;
-
-        foreach(CapturableBase captureBase in GetNode("CapaturableBaseManager").GetChildren())
-        {
-            if(captureBase.GetCaptureBaseTeam() == teamCode)
+            foreach (CapturableBase capturable in _capaturableBaseManager.GetBases())
             {
-               targetCaptureBase = captureBase;
-            }
-
-            if(captureBase.GetCaptureBaseTeam() == Team.TeamCode.NEUTRAL)
-            {
-               neutralCaptureBase = captureBase;
+                capturable.Connect(nameof(CapturableBase.BaseTeamChangeSignal), ai, nameof(TeamMapAI.HandleCapturableBaseCaptured));
             }
         }
-
-        // If not on same team base, try get a neutral base
-        if(targetCaptureBase == null)
-        {
-            targetCaptureBase = neutralCaptureBase;
-        }
-
-        // If no neutral ground, try to use 
-        if(targetCaptureBase == null)
-        {
-            targetCaptureBase = (CapturableBase)GetNode("CapaturableBases").GetChildren()[0];
-        }
-
-        return targetCaptureBase;
     }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots
@@ -682,7 +643,7 @@ public class GameWorld : Node2D
     private void onPlayerRemoved(int id)
     {
         removeDisconnectedPlayer(id);
-        syncBots(-1);
+        _syncBots();
     }
 
     private void onDisconnected()
@@ -709,41 +670,48 @@ public class GameWorld : Node2D
             }
         }
 
-        removePlayer(id);
+        _removeUnit("client_" + id, true);
     }
 
 
-    private void removePlayer(int id)
+    private void _removeUnit(String id, bool player)
     {
-        if (!HasNode("client_" + id))
+
+        Vector2 existingPosition = Vector2.Zero;
+
+        Dictionary<String, Agent> currentSpawnCache = null;
+
+        // Assign to different cache base on team
+        if (player)
         {
-            GD.Print("Cannoot remove invalid node from tree");
-            return;
+            currentSpawnCache = spawnPlayers;
+        }
+        else
+        {
+            currentSpawnCache = spawnBots;
         }
 
-        // Try to locate the player actor
-        Agent playerNode = (Agent)GetNode("client_" + id);
-
-        if (playerNode == null || !IsInstanceValid(playerNode))
+        if (currentSpawnCache.ContainsKey(id) && _teamMapAIs[(int)currentSpawnCache[id].GetTeam()].GetUnitsContainer().HasNode(id))
         {
-            GD.Print("Cannoot remove invalid node from tree");
-            return;
+            existingPosition = currentSpawnCache[id].GlobalPosition;
+
+            _teamMapAIs[(int)currentSpawnCache[id].GetTeam()].RemoveUnit(id);
         }
 
-        if (spawnPlayers.ContainsKey(id + ""))
+        if (currentSpawnCache.ContainsKey(id))
         {
-            spawnPlayers.Remove(id + "");
+            currentSpawnCache.Remove(id);
         }
 
         // If this is the player attach to current client, respawn the client with observer
-        if (id == network.gamestateNetworkPlayer.net_id)
+        if (player && id == "client_" + network.gamestateNetworkPlayer.net_id)
         {
             // Load the scene and create an instance
             Observer client;
 
             client = (Observer)((PackedScene)GD.Load("res://agents/Observer.tscn")).Instance();
 
-            client.Position = playerNode.GlobalPosition;
+            client.Position = existingPosition;
 
             client.Name = "client_observer_" + id;
 
@@ -753,15 +721,9 @@ public class GameWorld : Node2D
             EmitSignal(nameof(PlayerDefeatedSignal));
         }
 
-        // Mark the node for deletion
-        playerNode.explode();
-
         if (GetTree().IsNetworkServer())
         {
-            if (spawnPlayers.Count == 0)
-            {
-                endGame();
-            }
+            _checkGameWinningCondition();
         }
 
     }
@@ -782,8 +744,9 @@ public class GameWorld : Node2D
 
         foreach (KeyValuePair<int, NetworkPlayer> networkPlayer in network.networkPlayers)
         {
+            String playerId = "client_" + networkPlayer.Value.net_id;
             // Node may not being created yet
-            if (!HasNode("client_" + networkPlayer.Value.net_id))
+            if (!spawnPlayers.ContainsKey(playerId))
             {
                 // Ideally should give a warning that a player node wasn't found
                 continue;
@@ -791,7 +754,7 @@ public class GameWorld : Node2D
 
             // Locate the player's node. Even if there is no input/update, it's state will be dumped
             // into the snapshot anyway
-            Agent playerNode = (Agent)GetNode("client_" + networkPlayer.Value.net_id);
+            Agent playerNode = (Agent)_teamMapAIs[(int)spawnPlayers[playerId].GetTeam()].GetUnitsContainer().GetNode(playerId);
 
             if (playerNode == null || !IsInstanceValid(playerNode))
             {
@@ -869,15 +832,24 @@ public class GameWorld : Node2D
 
         foreach (int spawnPlayerId in removeSpawnPlayers)
         {
-            removeClient(spawnPlayerId + "");
+            String unitName = "client_" + spawnPlayerId;
+            Team.TeamCode teamCode = spawnPlayers[unitName].GetTeam();
+
+            _removeUnitOnNetwork(unitName);
+
+            // Respawn if possible
+            if (_teamMapAIs[(int)teamCode].isNewUnitAllow())
+            {
+                _respawnPlayer((int)teamCode + ";" + unitName);
+            }
         }
 
         Godot.Collections.Array<String> removeSpawnBots = new Godot.Collections.Array<String>();
 
-        foreach (SpawnBot spawnBot in spawnBots.Values)
+        foreach (Agent agent in spawnBots.Values)
         {
             // Locate the bot node
-            Agent enemyNode = (Agent)GetNode(spawnBot.name);
+            Agent enemyNode = (Agent)_teamMapAIs[(int)agent.GetTeam()].GetUnitsContainer().GetNode(agent.Name);
 
             if (enemyNode == null || !IsInstanceValid(enemyNode))
             {
@@ -902,7 +874,7 @@ public class GameWorld : Node2D
             {
                 // Build bot_data entry
                 ClientData clientData = new ClientData();
-                clientData.Id = spawnBot.name;
+                clientData.Id = enemyNode.Name;
                 clientData.Position = enemyNode.GlobalPosition;
                 clientData.Rotation = enemyNode.GlobalRotation;
                 clientData.Health = enemyNode.getHealth();
@@ -912,7 +884,7 @@ public class GameWorld : Node2D
                 clientData.SecondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
 
                 // Append into the snapshot
-                snapshot.botData.Add(spawnBot.name, clientData);
+                snapshot.botData.Add(enemyNode.Name, clientData);
 
                 // This logic is necessary to notify the AI that reload is pick up, so can continue with next state
                 if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
@@ -926,18 +898,18 @@ public class GameWorld : Node2D
             }
             else
             {
-                removeSpawnBots.Insert(0, spawnBot.name);
+                removeSpawnBots.Insert(0, enemyNode.Name);
             }
         }
 
         foreach (String spawnBotId in removeSpawnBots)
         {
-            removeClient(spawnBotId);
+            _removeUnitOnNetwork(spawnBotId);
         }
 
         if (removeSpawnBots.Count > 0)
         {
-            syncBots(-1);
+            _syncBots();
         }
 
         // Encode and broadcast the snapshot - if there is at least one connected client
@@ -980,10 +952,10 @@ public class GameWorld : Node2D
             timer.Stop();
         }
 
-        Rpc(nameof(getWaitingPeriodStatus), message);
+        Rpc(nameof(_getWaitingPeriodStatus), message);
         if (GetTree().IsNetworkServer())
         {
-            getWaitingPeriodStatus(message);
+            _getWaitingPeriodStatus(message);
         }
 
         // Start to count against game time
@@ -1002,7 +974,7 @@ public class GameWorld : Node2D
     }
 
     [Remote]
-    private void getWaitingPeriodStatus(String message)
+    private void _getWaitingPeriodStatus(String message)
     {
         EmitSignal(nameof(WaitingPeriodSignal), message + " WAITING PERIOD");
         if (message == "00:00:00")
@@ -1028,13 +1000,10 @@ public class GameWorld : Node2D
         if (GetTree().IsNetworkServer())
         {
             getGamePeriodStatus(message);
+
+            _checkGameWinningCondition();
         }
 
-        if (internalTimer == 0)
-        {
-            timer.Stop();
-            endGame();
-        }
     }
 
     [Remote]
@@ -1044,32 +1013,122 @@ public class GameWorld : Node2D
 
     }
 
+    private void _checkGameWinningCondition()
+    {
+        // Only check after waiting period is over
+        if (!waitingPeriod && timer != null)
+        {
+            bool endGame = false;
+
+            if (internalTimer == 0)
+            {
+                timer.Stop();
+                endGame = true;
+            }
+
+
+            if (!endGame)
+            {
+                int currentFieldTeam = 0;
+                foreach (TeamMapAI currentAI in _teamMapAIs)
+                {
+                    if (currentAI.isNewUnitAllow())
+                    {
+                        // If current unit count is 0 and no longer can generate new unit
+                        if (currentAI.GetUnitsContainer().GetChildren().Count != 0 || currentAI.isNewUnitAllow())
+                        {
+                            currentFieldTeam++;
+                        }
+                    }
+                }
+
+                if (currentFieldTeam == 1)
+                {
+                    endGame = true;
+                }
+            }
+
+            if (endGame)
+            {
+                String message = validateGameResult();
+
+                Rpc(nameof(notifyEndGameStatus), validateGameResult());
+
+                notifyEndGameStatus(message);
+            }
+        }
+    }
+
     private String validateGameResult()
     {
         String message = "";
 
+        Team.TeamCode winTeam = Team.TeamCode.NEUTRAL;
+        int teamCounter = 0;
+
+        // If it is time, choose the winer team as 
+        if (internalTimer != 0)
+        {
+            foreach (TeamMapAI currentAI in _teamMapAIs)
+            {
+                if (currentAI.isNewUnitAllow())
+                {
+                    // If current unit count is 0 and no longer can generate new unit
+                    if (currentAI.GetUnitsContainer().GetChildren().Count != 0 || currentAI.isNewUnitAllow())
+                    {
+                        winTeam = currentAI.GetCurrentTeam();
+                        teamCounter = 1;
+                    }
+                }
+            }
+
+        }
+        else
+        {
+            int largestUnitCount = -1;
+
+            foreach (TeamMapAI currentAI in _teamMapAIs)
+            {
+                if (currentAI.isNewUnitAllow())
+                {
+                    // If current unit count is 0 and no longer can generate new unit
+                    if (currentAI.isNewUnitAllow())
+                    {
+                        if (currentAI.GetUnitsContainer().GetChildren().Count >= largestUnitCount)
+                        {
+                            largestUnitCount = currentAI.GetUnitsContainer().GetChildren().Count;
+                            winTeam = currentAI.GetCurrentTeam();
+                            teamCounter++;
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+        if (teamCounter == 1)
+        {
+            message = "Winning Team is " + winTeam;
+
+            if (network.gamestateNetworkPlayer.team == (int)winTeam)
+            {
+                message = "You Win!;" + message;
+            }
+            else
+            {
+                message = "You Lost;" + message;
+            }
+        }
+        else
+        {
+            message = "It Is a Tie; There are more than one team reach equal amount of winning condition";
+        }
+
 
         // Record elaspse time
         int elapseTime = MaxGameTime - internalTimer;
-
-        if (spawnPlayers.Count < spawnBots.Count)
-        {
-            message = "You Lost;Players Remain (" + spawnPlayers.Count + ") is less than Bots Remain(" + spawnBots.Count + ")";
-        }
-        else if (spawnPlayers.Count == spawnBots.Count)
-        {
-            message = "Tie;Players Remain (" + spawnPlayers.Count + ") is equal to Bots Remain(" + spawnBots.Count + ")";
-        }
-        else if (spawnPlayers.Count > spawnBots.Count)
-        {
-            message = "You Win; Players Remain (" + spawnPlayers.Count + ") is greater than Bots Remain(" + spawnBots.Count + ")";
-        }
-
-
-        if (elapseTime == MaxGameTime)
-        {
-            message = message + "at game period timeout";
-        }
 
         int hour = elapseTime / 3600;
 
@@ -1080,15 +1139,6 @@ public class GameWorld : Node2D
         message = message + ";" + formatTwoDigits(hour) + ":" + formatTwoDigits(minutes) + ":" + formatTwoDigits(seconds);
 
         return message;
-    }
-
-    private void endGame()
-    {
-        String message = validateGameResult();
-
-        Rpc(nameof(notifyEndGameStatus), validateGameResult());
-
-        notifyEndGameStatus(message);
     }
 
     [Remote]
@@ -1117,8 +1167,6 @@ public class GameWorld : Node2D
             spawnIndex = network.networkPlayers.Count;
         }
 
-        spawnPlayers.Add(pininfo.net_id + "", null);
-
         if (GetTree().IsNetworkServer() && pininfo.net_id != 1)
         {
             // We are on the server and the requested spawn does not belong to the server
@@ -1128,7 +1176,7 @@ public class GameWorld : Node2D
             foreach (KeyValuePair<int, NetworkPlayer> item in network.networkPlayers)
             {
                 // If it is not one of active player, then no need to sync (as the player is either observer or dead)
-                if (!spawnPlayers.ContainsKey(item.Key + ""))
+                if (!spawnPlayers.ContainsKey("client_" + item.Key))
                 {
                     continue;
                 }
@@ -1150,9 +1198,9 @@ public class GameWorld : Node2D
             }
 
             // Add current bot info to new player
-            foreach (SpawnBot spawnBot in spawnBots.Values)
+            foreach (Agent spawnAgent in spawnBots.Values)
             {
-                RpcId(pininfo.net_id, nameof(addBot), spawnBot.name);
+                RpcId(pininfo.net_id, nameof(_addBotOnNetwork), (int)spawnAgent.GetTeam() + ";" + spawnAgent.Name);
             }
 
             // Sync the destoryed obstacles
@@ -1164,43 +1212,84 @@ public class GameWorld : Node2D
             // Sync the waiting period if it is already end
             if (!waitingPeriod)
             {
-                RpcId(pininfo.net_id, nameof(getWaitingPeriodStatus), "00:00");
+                RpcId(pininfo.net_id, nameof(_getWaitingPeriodStatus), "00:00");
             }
         }
 
         // Load the scene and create an instance
-        Player client = (Player)((PackedScene)GD.Load("res://agents/Player.tscn")).Instance();
+        Player agent = (Player)(_teamMapAIs[pininfo.team].SpawnUnit("client_" + pininfo.net_id, false));
 
-        client.Position = getCapturableBase((Team.TeamCode)pininfo.team).GlobalPosition;
-
-        client.Name = "client_" + pininfo.net_id;
         // If this actor does not belong to the server, change the network master accordingly
         if (pininfo.net_id != 1)
         {
-            client.SetNetworkMaster(pininfo.net_id);
+            agent.SetNetworkMaster(pininfo.net_id);
         }
-
-        AddChild(client);
-
-        // Set other info afterward as depend on child nodes to be initialized
-        client.Initialize(this, pininfo.name, (Team.TeamCode)pininfo.team);
 
         // If this actor is the current client controlled, add camera and attach HUD
         if (pininfo.net_id == network.gamestateNetworkPlayer.net_id)
         {
             Camera2D camera2D = new Camera2D();
             camera2D.Name = "Camera2D";
-            client.AddChild(camera2D);
-            client.SetHUD((HUD)GetNode("HUD"));
+            agent.AddChild(camera2D);
+            agent.SetHUD((HUD)GetNode("HUD"));
 
-            _setCameraLimit();
+            _setCameraLimit(agent);
         }
 
-
+        spawnPlayers.Add(agent.Name, agent);
     }
 
     [Remote]
-    private void removeClient(String id)
+    private void _respawnPlayer(String unitInfo)
+    {
+        int team = int.Parse(unitInfo.Split(";")[0]);
+        String unitName = unitInfo.Split(";")[1];
+        int netId = int.Parse(unitName.Split("_")[1]);
+
+        if (GetTree().IsNetworkServer())
+        {
+            foreach (KeyValuePair<int, NetworkPlayer> item in network.networkPlayers)
+            {
+                // Spawn the new player within the currently iterated player as long it's not the server
+                // Because the server's list already contains the new player, that one will also get itself!
+                if (item.Key != 1)
+                {
+                    RpcId(item.Key, nameof(_respawnPlayer), unitInfo);
+                }
+            }
+        }
+
+        // Load the scene and create an instance
+        Player agent = (Player)(_teamMapAIs[team].SpawnUnit(unitName, false));
+
+        // If this actor does not belong to the server, change the network master accordingly
+        if (netId != 1)
+        {
+            agent.SetNetworkMaster(netId);
+        }
+
+        // If this actor is the current client controlled, add camera and attach HUD
+        if (netId == network.gamestateNetworkPlayer.net_id)
+        {
+            Camera2D camera2D = new Camera2D();
+            camera2D.Name = "Camera2D";
+            agent.AddChild(camera2D);
+            agent.SetHUD((HUD)GetNode("HUD"));
+
+            _setCameraLimit(agent);
+        }
+
+        // If observer is setup, clean it up
+        if (HasNode("client_observer_" + netId))
+        {
+            GetNode("client_observer_" + netId).QueueFree();
+        }
+
+        spawnPlayers.Add(agent.Name, agent);
+    }
+
+    [Remote]
+    private void _removeUnitOnNetwork(String id)
     {
         if (GetTree().IsNetworkServer())
         {
@@ -1213,35 +1302,34 @@ public class GameWorld : Node2D
                 }
                 // Replicate despawn into currently iterated player
 
-                RpcId(item.Key, nameof(removeClient), id);
+                RpcId(item.Key, nameof(_removeUnitOnNetwork), id);
             }
         }
 
         if (spawnBots.ContainsKey(id))
         {
-            removeBot(id);
+            _removeUnit(id, false);
         }
         else
         {
-            removePlayer(Int32.Parse(id));
+            _removeUnit(id, true);
         }
     }
 
-    [Remote]
-    private void syncBots(int bot_count)
+    private void _syncBots()
     {
         if (GetTree().IsNetworkServer())
         {
             // Calculate the target amount of spawned bots
-            bot_count = network.serverinfo.max_players - network.networkPlayers.Count;
+            int bot_count = network.serverinfo.max_players - network.networkPlayers.Count;
 
             if (spawnBots.Count > bot_count)
             {
                 while (spawnBots.Count > bot_count)
                 {
-                    foreach (SpawnBot spawnBot in spawnBots.Values)
+                    foreach (Agent spawnBot in spawnBots.Values)
                     {
-                        removeClient(spawnBot.name);
+                        _removeUnit(spawnBot.Name, false);
 
                         break;
                     }
@@ -1249,94 +1337,62 @@ public class GameWorld : Node2D
             }
             else if (spawnBots.Count < bot_count)
             {
-                // We have less bots than the target count - must add some
-                //  Since every single bot uses the exact same scene path we can cahce it's loaded scene here
-                // otherwise, we would have to move the following code into the while loop and change the dictionary
-                // key ID to point into the correct bot info. In this case we are pointing to the 1
-
+                // If bot_count
                 while (spawnBots.Count < bot_count)
                 {
-                    // Only generated if bot have not created excess MAX_BOT_COUNT
-                    if (botCounter < MAX_BOT_COUNT)
+                    TeamMapAI targetAI = null;
+                    // Set the initial to max bot count
+                    int smallestUnitCount = bot_count;
+
+                    foreach (TeamMapAI currentAI in _teamMapAIs)
                     {
-                        String botId = "bot_" + botCounter;
+                        if (currentAI.isNewUnitAllow())
+                        {
+                            if (currentAI.GetUnitsContainer().GetChildren().Count <= smallestUnitCount)
+                            {
+                                smallestUnitCount = currentAI.GetUnitsContainer().GetChildren().Count;
+                                targetAI = currentAI;
+                            }
+                        }
+                    }
+
+                    if (targetAI != null)
+                    {
+                        GD.Print("GENERATE BOT FOR " + targetAI.GetCurrentTeam() + " BOT ID bot_" + botCounter);
+
+                        String botId = (int)targetAI.GetCurrentTeam() + ";" + "bot_" + botCounter;
                         botCounter++;
 
-                        Rpc(nameof(addBot), botId);
+                        Rpc(nameof(_addBotOnNetwork), botId);
 
-                        addBot(botId);
+                        _addBotOnNetwork(botId);
                     }
                     else
                     {
-                        // Break from loop
+                        // No longer allowed to add more bot now, so exit loop
                         break;
                     }
                 }
             }
 
-            // If there is no new bots can be deployed, and there is no current bot, end game
-            if (spawnBots.Count == 0 && botCounter == MAX_BOT_COUNT)
-            {
-                endGame();
-            }
+            _checkGameWinningCondition();
         }
 
-    }
-
-    private void removeBot(String botId)
-    {
-        if (HasNode(spawnBots[botId].name))
-        {
-            Agent node = null;
-            node = (Agent)GetNode(botId);
-
-            if (!IsInstanceValid(node))
-            {
-                GD.Print("Must remove bots from game but cannot find its node");
-            }
-            else
-            {
-                node.explode();
-            }
-        }
-
-        if (spawnBots.ContainsKey(botId))
-        {
-            spawnBots.Remove(botId);
-        }
     }
 
     [Remote]
-    private void addBot(String botId)
+    private void _addBotOnNetwork(String botId)
     {
-        if (!spawnBots.ContainsKey(botId))
+        Team.TeamCode team = (Team.TeamCode)int.Parse(botId.Split(";")[0]);
+        String unitName = botId.Split(";")[1];
+
+        if (!spawnBots.ContainsKey(unitName))
         {
-            spawnBots.Add(botId, new SpawnBot(botId, (PackedScene)GD.Load("res://agents/AIAgent.tscn")));
-
-            AIAgent bot = (AIAgent)((PackedScene)GD.Load("res://agents/AIAgent.tscn")).Instance();
-
-            bot.Name = botId;
-
-            // (Team.TeamCode)(int)(botCounter % 3)
-            Team.TeamCode team = (Team.TeamCode)(int)(0);
-
-            bot.SetNetworkMaster(1);
-
-            bot.GlobalPosition = getCapturableBase(team).GlobalPosition;
-
-            AddChild(bot);
-
-            // Set the info afterward as some of these depend on child node to be available
-            bot.Initialize(this, botId, team);
-
-            // Randomize weapon between 0, 1, 2
-            //bot.changePrimaryWeapon((int)botCounter % 3);
-            // Set to a default weapon for now
-            bot.changePrimaryWeapon(2);
+            spawnBots.Add(unitName, _teamMapAIs[(int)team].SpawnUnit(unitName, true));
         }
     }
 
-    public override void _Process(float delta)
+    public override void _PhysicsProcess(float delta)
     {
         // Update the timeout counter
         currentTime += delta;
@@ -1352,13 +1408,13 @@ public class GameWorld : Node2D
         updateState();
     }
 
-    private void _setCameraLimit()
+    private void _setCameraLimit(Agent agent)
     {
         TileMap tileMap = (TileMap)GetNode("Navigation2D/Ground");
         Rect2 mapLimit = tileMap.GetUsedRect();
         Vector2 mapCellSize = tileMap.CellSize;
 
-        Camera2D playerCamera = (Camera2D)(GetNode("client_" + network.gamestateNetworkPlayer.net_id + "/Camera2D"));
+        Camera2D playerCamera = (Camera2D)(GetNode(_teamMapAIs[(int)agent.GetTeam()].Name + "/" + _teamMapAIs[(int)agent.GetTeam()].GetUnitsContainer().Name + "/" + agent.Name + "/Camera2D"));
         playerCamera.Current = true;
         playerCamera.Zoom = new Vector2(1.4f, 1.4f);
         playerCamera.LimitLeft = (int)(mapLimit.Position.x * mapCellSize.x);

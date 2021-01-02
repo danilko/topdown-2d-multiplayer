@@ -53,6 +53,10 @@ public class Agent : KinematicBody2D
     [Export]
     private int MaxSecondaryWeaponCount = 1;
 
+
+    [Export]
+    protected float PositionReachedRadius = 5.0f;
+
     [Export]
     private String unitName = "Default";
 
@@ -94,16 +98,16 @@ public class Agent : KinematicBody2D
 
     public virtual void Initialize(GameWorld gameWorld, String inputUnitName, Team.TeamCode inputTeamCode)
     {
-        _gameWorld = gameWorld;
-
         _team = (Team)GetNode("Team");
+
+        _gameWorld = gameWorld;
         SetTeam(inputTeamCode);
         SetUnitName(inputUnitName);
 
         // Temporary script to automatic load weapon
-        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
-        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
         UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
+        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
+        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
     }
 
     public virtual void changePrimaryWeapon(int weaponIndex)
@@ -166,6 +170,11 @@ public class Agent : KinematicBody2D
                 currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal));
             }
         }
+    }
+
+    public Boolean HasReachedPosition(Vector2 targetPosition)
+    {
+        return GlobalPosition.DistanceTo(targetPosition) < PositionReachedRadius;
     }
 
     public Weapon GetCurrentPrimaryWeapon()
