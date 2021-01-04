@@ -114,8 +114,8 @@ public class AI : Node2D
             case State.PATROL:
                 if (!_patrolReached)
                 {
-                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_patrolLocation), delta);
                     _agent.RotateToward(_patrolLocation, delta);
+                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_patrolLocation), delta);
 
                     // Start the next patrol timer if reach target
                     if (_agent.HasReachedPosition(_patrolLocation))
@@ -158,19 +158,9 @@ public class AI : Node2D
                 }
                 else
                 {
-               
-                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition), delta);
-                    
-                    // This is a workaround for bug
-                    if( _agent.GlobalPosition.DistanceTo(_nextBase.GlobalPosition) > 10000)
-                    {
-                        GD.Print(_agent.Name + " distance to " + _nextBase.Name + ": " + _agent.GlobalPosition.DistanceTo(_nextBase.GlobalPosition) + " WITH DIRECTION " + _agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition));
-
-                        GD.Print("reset position due to agent move too far way from map");
-                        _agent.GlobalPosition = _patrolOrigin;
-                    }
-
                     _agent.RotateToward(_nextBase.GlobalPosition, delta);
+                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition), delta);
+                    _agent.GlobalPosition = _agent.GlobalPosition;
                 }
                 break;
 

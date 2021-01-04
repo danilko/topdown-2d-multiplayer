@@ -997,14 +997,10 @@ public class GameWorld : Node2D
         {
             foreach (TeamMapAI currentAI in _teamMapAIs)
             {
-                if (currentAI.isNewUnitAllow())
+                if (currentAI.isNewUnitAllow() || currentAI.GetUnitsContainer().GetChildren().Count != 0)
                 {
-                    // If current unit count is 0 and no longer can generate new unit
-                    if (currentAI.GetUnitsContainer().GetChildren().Count != 0 || currentAI.isNewUnitAllow())
-                    {
-                        winTeam = currentAI.GetCurrentTeam();
-                        teamCounter = 1;
-                    }
+                    winTeam = currentAI.GetCurrentTeam();
+                    teamCounter = 1;
                 }
             }
 

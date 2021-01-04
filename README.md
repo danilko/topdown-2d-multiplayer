@@ -14,7 +14,9 @@ Builds for supported platforms can be downloaded below (Linux (Tested on Fedora 
 
 Code Reference
 ======
-Base on following tutorials and rebuilt in C Sharp Godot Implementation (however, there are additional tweaks, so the code is no longer like their original codes)
+Base on following tutorials and rebuilt in C Sharp Godot Implementation (however,  the code in this repo is no longer like their original codes due to different features/targets)
+
+In no particular order
 
 Kehom's Forge Tutorials on Multi-Player (the first tutorial and second one using snapshots)
 
@@ -27,6 +29,10 @@ https://www.youtube.com/watch?v=sQ1FpD0DYF8&list=PLsk-HSGFjnaFC8kEv6MaLXnnDcevGp
 autonomousagents_behaviour_flock
 
 https://bitbucket.org/gresille_siffle/godot2d_autonomousagents_behaviour_flock/src/master/
+
+How to make a Top-down Shooter in Godot
+
+https://www.youtube.com/watch?v=gXkkNSfxLRI&list=PLpwc3ughKbZexDyPexHN2MXLliKAovkpl
 
 Artifact Reference
 ======
@@ -51,7 +57,16 @@ What is working
 - Destructible Obstacles
 - Basic game flow conditions (base on exinging agent counts from bots and players)
 - Support of game time period and expire (force winning condition base on available agents on the battlefied at that point) of 15 seconds and at server control (so server will sync time against connected client)
-- Support of team concept (fridend firing vs firing from other teams)
+- Support of team concept (fridend firing vs firing from other teams), captured bases as spawn point, available spawn points + unit cost as condition whatever a team can generate new unit
+- Support of capturable bases and team will spawn from captured bases or from neutral condition
+- Try to balance AIs from each team (if team have available conditions to genrate new unit)
+
+Current Ending Game Condition
+======
+- Destroy all units from other teams (each team can be tweak to output different amounts of units + inital bases)
+- Capture all bases (so other team cannot spawn new unit)
+- Time is up (it is a tie if there are more than one team with units on the field during that time)
+
 
 Limitation
 ======
@@ -60,7 +75,5 @@ The total units on the game at once cannot exceed 20 units for workable performa
 TODO
 ======
 - The bot is equip with basic AI, but still not good with collision avoidance with each other (workaround now with no collision to save AI resource (there is basic code avoidance also in there can be enabled if need))
-- Currently only track winning condition base on player agents vs bot agents, should also do team based
-- Currently bot agents only added into one team, should try to balance
 - Better Game Play
 - Code clean up and more documentation (comments etc)

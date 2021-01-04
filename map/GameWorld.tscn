@@ -58,13 +58,15 @@ __meta__ = {
 
 [node name="BASE 1" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
 position = Vector2( 682.743, 445.932 )
-_defaultTeamCode = 1
+_defaultTeamCode = 0
 
 [node name="BASE 2" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
 position = Vector2( 1657.14, 435.74 )
+_defaultTeamCode = 0
 
 [node name="BASE 3" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
 position = Vector2( 2378.26, 2010.12 )
+_defaultTeamCode = 1
 
 [node name="BASE 4" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
 position = Vector2( 690.613, 1277.68 )

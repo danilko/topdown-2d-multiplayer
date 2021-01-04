@@ -38,6 +38,7 @@ public class Observer : Camera2D
     public void SetCameraLimit()
     {
         Current = true;   
+        Zoom = new Vector2(2.0f, 2.0f);
     }
 
     public override void _Process(float delta)

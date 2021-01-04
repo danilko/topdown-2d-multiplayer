@@ -327,8 +327,8 @@ public class Agent : KinematicBody2D
 
         Fire(primaryWeapon, secondaryWeapon);
 
-        Position = position;
-        Rotation = rotation;
+        GlobalPosition = position;
+        GlobalRotation = rotation;
     }
 
 
@@ -356,7 +356,7 @@ public class Agent : KinematicBody2D
             if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                MoveAndSlide(dir * -1 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
+                //MoveAndSlide(dir * -1 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
             }
         }
 
@@ -367,7 +367,7 @@ public class Agent : KinematicBody2D
             if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                MoveAndSlide(dir * -1 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
+                //MoveAndSlide(dir * -1 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
             }
         }
     }

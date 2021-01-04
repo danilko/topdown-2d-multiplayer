@@ -43,7 +43,9 @@ public class Player : Agent
     }
     public void SetCameraLimit()
     {
-        ((Camera2D)GetNode("Camera2D")).Current = true;   
+        Camera2D camera = (Camera2D)GetNode("Camera2D");
+        camera.Current = true;
+        camera.Zoom = new Vector2(2.0f, 2.0f);
     }
 
 
