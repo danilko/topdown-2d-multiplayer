@@ -41,6 +41,11 @@ public class Player : Agent
 
         }
     }
+    public void SetCameraLimit()
+    {
+        ((Camera2D)GetNode("Camera2D")).Current = true;   
+    }
+
 
     public void SetHUD(HUD hud)
     {

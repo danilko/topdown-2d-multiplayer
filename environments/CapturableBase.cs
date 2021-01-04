@@ -20,6 +20,7 @@ public class CapturableBase : Area2D
     private Sprite _base;
     private Sprite _boundry;
     private Timer _timer;
+    private GameWorld _gameWorld;
     private UnitDisplay _unitDisplay;
     private Label _unitDisplayLabel;
 
@@ -50,6 +51,11 @@ public class CapturableBase : Area2D
         SetCaptureBaseTeam(_team.CurrentTeamCode);
     }
 
+    public void Initialize(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld;
+    }
+
     public Team.TeamCode GetCaptureBaseTeam()
     {
         return _team.CurrentTeamCode;
@@ -68,10 +74,10 @@ public class CapturableBase : Area2D
 
     private void _onCapturableBaseBodyEntered(Node2D body)
     {
-        if (body.HasMethod(nameof(Agent.GetTeam)))
+        if (body.HasMethod(nameof(Agent.GetCurrentTeam)))
         {
             Agent agent = (Agent)body;
-            agentsEntered[(int)agent.GetTeam()] = (int)agentsEntered[(int)agent.GetTeam()] + 1;
+            agentsEntered[(int)agent.GetCurrentTeam()] = (int)agentsEntered[(int)agent.GetCurrentTeam()] + 1;
 
             checkIsBaseCaptured();
         }
@@ -79,13 +85,13 @@ public class CapturableBase : Area2D
 
     private void _onCapturableBaseBodyExited(Node2D body)
     {
-        if (body.HasMethod(nameof(Agent.GetTeam)))
+        if (body.HasMethod(nameof(Agent.GetCurrentTeam)))
         {
             Agent agent = (Agent)body;
-            agentsEntered[(int)agent.GetTeam()] = (int)agentsEntered[(int)agent.GetTeam()] - 1;
-            if ((int)agentsEntered[(int)agent.GetTeam()] < 0)
+            agentsEntered[(int)agent.GetCurrentTeam()] = (int)agentsEntered[(int)agent.GetCurrentTeam()] - 1;
+            if ((int)agentsEntered[(int)agent.GetCurrentTeam()] < 0)
             {
-                agentsEntered[(int)agent.GetTeam()] = 0;
+                agentsEntered[(int)agent.GetCurrentTeam()] = 0;
             }
 
             checkIsBaseCaptured();

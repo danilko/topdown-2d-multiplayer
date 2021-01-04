@@ -35,20 +35,9 @@ public class Observer : Camera2D
         Position = Position + new Vector2(xAxis, yAxis);
     }
 
-    public void setCameraLimit()
+    public void SetCameraLimit()
     {
-        tileMap = (TileMap)(GetParent().GetNode("Navigation2D/Ground"));
-        mapLimit = tileMap.GetUsedRect();
-        Vector2 mapCellSize = tileMap.CellSize;
-
-        Current = true;
-        Zoom = new Vector2(1.4f, 1.4f);
-        LimitLeft = (int)(mapLimit.Position.x * mapCellSize.x);
-        LimitRight = (int)(mapLimit.End.x * mapCellSize.x);
-        LimitTop = (int)(mapLimit.Position.y * mapCellSize.y);
-        LimitBottom = (int)(mapLimit.End.y * mapCellSize.y);
-
-        
+        Current = true;   
     }
 
     public override void _Process(float delta)

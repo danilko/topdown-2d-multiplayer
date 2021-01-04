@@ -202,22 +202,15 @@ __meta__ = {
 
 [node name="spritePlayerIcon" type="Sprite" parent="PanelPlayer"]
 
-[node name="txtPlayerTeam" type="LineEdit" parent="PanelPlayer"]
-margin_left = 182.0
-margin_top = 20.0
-margin_right = 342.0
-margin_bottom = 44.0
-text = "1"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="btPlayerConfirm" type="Button" parent="PanelPlayer"]
 margin_left = 184.932
 margin_top = 82.5449
 margin_right = 246.932
 margin_bottom = 102.545
 text = "Confirm"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="btPlayerCancel" type="Button" parent="PanelPlayer"]
 margin_left = 272.239
@@ -225,6 +218,16 @@ margin_top = 82.5449
 margin_right = 334.239
 margin_bottom = 102.545
 text = "Cancel"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txtPlayerTeam" type="SpinBox" parent="PanelPlayer"]
+margin_left = 180.0
+margin_top = 22.0
+margin_right = 301.0
+margin_bottom = 46.0
+max_value = 3.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -281,7 +284,7 @@ margin_left = 168.411
 margin_top = 111.168
 margin_right = 242.411
 margin_bottom = 135.168
-value = 20.0
+value = 10.0
 __meta__ = {
 "_edit_use_anchors_": false
 }

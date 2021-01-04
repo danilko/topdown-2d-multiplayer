@@ -55,7 +55,7 @@ public class TeamMapAI : Node2D
 
     public bool isUnitUsageAmountAllowed()
     {
-        if (_currentUnitUsageAmount < _unitCost)
+        if (_currentUnitUsageAmount < _unitCost || _currentUnitUsageAmount < 0)
         {
             return false;
         }
@@ -171,7 +171,7 @@ public class TeamMapAI : Node2D
         }
     }
 
-    public Agent SpawnUnit(String unitID, Boolean enableAI)
+    public Agent CreateUnit(String unitName, String displayName, Boolean enableAI)
     {
         Agent unit = null;
 
@@ -184,40 +184,34 @@ public class TeamMapAI : Node2D
             unit = (Agent)((PackedScene)GD.Load("res://agents/Player.tscn")).Instance();
         }
 
-        unit.Name = unitID;
+        unit.Name = unitName;
 
         unit.SetNetworkMaster(1);
 
         unit.GlobalPosition = GetSpawnPointFromCaptureBase().GlobalPosition;
-        
 
         _unitsContainer.AddChild(unit);
 
         // Set the info afterward as some of these depend on child node to be available
-        unit.Initialize(_gameWorld, unitID, _team.CurrentTeamCode);
+        unit.Initialize(_gameWorld, unitName, displayName, _team.CurrentTeamCode);
 
         unit.changePrimaryWeapon(0);
 
-        _maxUnitUsageAmount -= _unitCost;
+        _currentUnitUsageAmount -= _unitCost;
 
         return unit;
     }
 
     public void RemoveUnit(String unitID)
     {
-        Agent agent = null;
+        Agent agent = GetUnit(unitID);
 
-        if (_unitsContainer.HasNode(unitID))
-        {
-            agent = (Agent)_unitsContainer.GetNode(unitID);
-        }
 
         if (agent == null || !IsInstanceValid(agent))
         {
             GD.Print("Cannoot remove invalid node from tree");
             return;
         }
-
         // Mark the node for deletion
         agent.explode();
     }
@@ -250,4 +244,23 @@ public class TeamMapAI : Node2D
         return targetCaptureBase;
     }
 
+    public Agent GetUnit(String unitName)
+    {
+        if (_unitsContainer.HasNode(unitName))
+        {
+            return (Agent)_unitsContainer.GetNode(unitName);
+        }
+        else
+        {
+            foreach(Agent agent in _unitsContainer.GetChildren())
+            {
+                if(agent.GetUnitName().Equals(unitName))
+                {
+                    return agent;
+                }
+            }
+        }
+
+        return null;
+    }
 }

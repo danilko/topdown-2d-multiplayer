@@ -44,17 +44,17 @@ public class AgentAStar
         Vector2 finalCellSource = new Vector2(cellSource.x - cellSource.x % 2, cellSource.y - cellSource.y % 2);
         Vector2 finalCellTarget = new Vector2(cellTarget.x - cellTarget.x % 2, cellTarget.y - cellTarget.y % 2);
 
-        GD.Print("Source: " +finalCellSource.x +","+ finalCellSource.y);
-        GD.Print("Target: " +finalCellTarget.x +","+ finalCellTarget.y);
-        
+        GD.Print("Source: " + finalCellSource.x + "," + finalCellSource.y);
+        GD.Print("Target: " + finalCellTarget.x + "," + finalCellTarget.y);
+
 
         int sourceId = getPointID((int)finalCellSource.x, (int)finalCellSource.y);
         int targetId = getPointID((int)finalCellTarget.x, (int)finalCellTarget.y);
 
         Vector2[] cellPath = aStar.GetPointPath(sourceId, targetId);
-        if(cellPath == null || cellPath.Length == 0)
+        if (cellPath == null || cellPath.Length == 0)
         {
-     GD.Print("No path detected");
+            GD.Print("No path detected");
         }
 
 
@@ -89,7 +89,10 @@ public class AgentAStar
                 if (aStar.HasPoint(getPointID((int)nextcell.x, (int)nextcell.y)))
                 {
                     int fromId = getPointID((int)cell.x, (int)cell.y);
-                    aStar.ConnectPoints(fromId, toId, false);
+                    if (aStar.ArePointsConnected(fromId, toId))
+                    {
+                        aStar.ConnectPoints(fromId, toId, false);
+                    }
                 }
             }
         }

@@ -47,8 +47,14 @@ public class AIAgent : Agent
         _originalPathLineLocation = GlobalPosition;
 
         _agentAI = (AI)GetNode("AI");
-        _agentAI.Initialize(this, DetectRadius);
     }
+
+    public override void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode)
+    {
+        base.Initialize(gameWorld, unitName, displayName, inputTeamCode);
+        _agentAI.Initialize(_gameWorld, this, DetectRadius);
+    }
+
 
     public void setCurrentSpawnIndex(int currentSpawnPointIndex)
     {

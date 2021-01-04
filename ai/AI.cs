@@ -31,6 +31,10 @@ public class AI : Node2D
     private Vector2 _patrolLocation;
     private bool _patrolReached;
 
+    private GameWorld _gameWorld;
+
+    private Godot.Collections.Dictionary<String, Team.TeamCode> _targetAgents;
+
     private CapturableBase _nextBase;
 
     public override void _Ready()
@@ -40,10 +44,13 @@ public class AI : Node2D
         _rng = new RandomNumberGenerator();
         _rng.Randomize();
         _currentState = State.INVALID;
+
+        _targetAgents = new Godot.Collections.Dictionary<String, Team.TeamCode>();
     }
 
-    public void Initialize(Agent agent, float detectRaidus)
+    public void Initialize(GameWorld gameWorld, Agent agent, float detectRaidus)
     {
+        _gameWorld = gameWorld;
         _agent = agent;
         _patrolOrigin = _agent.GlobalPosition;
 
@@ -129,7 +136,7 @@ public class AI : Node2D
                     float angelToTargetAgent = _agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition).Angle();
 
                     // Only start fire when agent is closely faced to its target agent
-                    if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.1)
+                    if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.3)
                     {
                         // Only can fire if not in reload
                         if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
@@ -151,7 +158,18 @@ public class AI : Node2D
                 }
                 else
                 {
+               
                     _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition), delta);
+                    
+                    // This is a workaround for bug
+                    if( _agent.GlobalPosition.DistanceTo(_nextBase.GlobalPosition) > 10000)
+                    {
+                        GD.Print(_agent.Name + " distance to " + _nextBase.Name + ": " + _agent.GlobalPosition.DistanceTo(_nextBase.GlobalPosition) + " WITH DIRECTION " + _agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition));
+
+                        GD.Print("reset position due to agent move too far way from map");
+                        _agent.GlobalPosition = _patrolOrigin;
+                    }
+
                     _agent.RotateToward(_nextBase.GlobalPosition, delta);
                 }
                 break;
@@ -185,23 +203,75 @@ public class AI : Node2D
 
     private void _onDetectionZoneBodyEntered(Node body)
     {
-        if (body.HasMethod(nameof(Agent.GetTeam)) && body != _agent)
+        if (body.HasMethod(nameof(Agent.GetCurrentTeam)) && body != _agent)
         {
             // If not same team identifier, identify as target
-            if (((Agent)body).GetTeam() != _agent.GetTeam())
+            if (((Agent)body).GetCurrentTeam() != _agent.GetCurrentTeam())
             {
-                _targetAgent = (Agent)body;
-                SetState(State.ENGAGE);
+                Agent agent = (Agent)body;
+                if (_targetAgent == null)
+                {
+                    _targetAgent = agent;
+                    SetState(State.ENGAGE);
+                }
+                else
+                {
+                    // Save as list of future target
+                    if (!_targetAgents.ContainsKey(agent.GetUnitName()))
+                    {
+                        _targetAgents.Add(agent.GetUnitName(), agent.GetCurrentTeam());
+                    }
+                }
             }
         }
     }
 
     private void _onDetectionZoneBodyExited(Node body)
     {
-        if (body == _targetAgent)
+        if (body.HasMethod(nameof(Agent.GetCurrentTeam)) && body != _agent)
         {
-            SetState(State.ADVANCE);
-            _targetAgent = null;
+            Agent agent = (Agent)body;
+
+            // Clean up current target/possible target
+            if (body == _targetAgent)
+            {
+                _targetAgent = null;
+            }
+            else
+            {
+                if (_targetAgents.ContainsKey(agent.GetUnitName()))
+                {
+                    _targetAgents.Remove(agent.GetUnitName());
+                }
+            }
+
+            Godot.Collections.Array<String> removeTargetList = new Godot.Collections.Array<String>();
+
+            foreach (String targetAgentUnitName in _targetAgents.Keys)
+            {
+                Agent targetAgent = _gameWorld.GetTeamMapAIs()[(int)_targetAgents[targetAgentUnitName]].GetUnit(targetAgentUnitName);
+
+                if (targetAgent != null && IsInstanceValid(targetAgent))
+                {
+                    _targetAgent = targetAgent;
+                }
+                else
+                {
+                    // Remove this target from list as it is no longer valid
+                    removeTargetList.Add(targetAgentUnitName);
+                }
+            }
+
+            foreach (String targetAgentUnitName in removeTargetList)
+            {
+                _targetAgents.Remove(targetAgentUnitName);
+            }
+
+            // If no possible target, then set to ADVANCE
+            if (_targetAgent == null)
+            {
+                SetState(State.ADVANCE);
+            }
         }
     }
 

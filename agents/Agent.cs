@@ -9,6 +9,9 @@ public class Agent : KinematicBody2D
     public delegate void HealthChangedSignal();
 
     [Signal]
+    public delegate void EnergyChangedSignal();
+
+    [Signal]
     public delegate void DefeatedAgentChangedSignal();
 
     [Signal]
@@ -58,11 +61,14 @@ public class Agent : KinematicBody2D
     protected float PositionReachedRadius = 5.0f;
 
     [Export]
-    private String unitName = "Default";
+    private String _unitName = "Default";
 
-    private int health;
+    [Export]
+    private String _displayName = "Default";
 
-    private int energy;
+    private int _health;
+
+    private int _energy;
 
     protected AudioStream explosionMusicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
     protected AudioStream moveMusicClip = (AudioStream)GD.Load("res://assets/sounds/sci-fi_device_item_power_up_flash_01.wav");
@@ -87,22 +93,27 @@ public class Agent : KinematicBody2D
         Particles2D smoke = (Particles2D)GetNode("Smoke");
         smoke.Emitting = false;
 
-        health = MaxHealth;
-        energy = MaxEnergy;
+        _health = MaxHealth;
+        _energy = MaxEnergy;
 
         currentPrimaryWeaponIndex = -1;
         currentSecondaryWeaponIndex = -1;
 
-        EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
+        EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
+        EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
     }
 
-    public virtual void Initialize(GameWorld gameWorld, String inputUnitName, Team.TeamCode inputTeamCode)
+    public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode)
     {
         _team = (Team)GetNode("Team");
 
         _gameWorld = gameWorld;
-        SetTeam(inputTeamCode);
-        SetUnitName(inputUnitName);
+        SetCurrentTeam(inputTeamCode);
+        SetUnitName(unitName);
+        SetDisplayName(displayName);
+        
+        _health = MaxHealth;
+        _energy = MaxEnergy;
 
         // Temporary script to automatic load weapon
         UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
@@ -237,33 +248,42 @@ public class Agent : KinematicBody2D
         return false;
     }
 
-    public void SetTeam(Team.TeamCode inputTeamCode)
+    public void SetCurrentTeam(Team.TeamCode inputTeamCode)
     {
         _team.CurrentTeamCode = inputTeamCode;
-        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + _team.CurrentTeamCode + ")";
+        ((Label)(GetNode("UnitDisplay/Name"))).Text = _displayName + "(" + _team.CurrentTeamCode + ")";
     }
 
-    public Team.TeamCode GetTeam()
+    public Team.TeamCode GetCurrentTeam()
     {
         return _team.CurrentTeamCode;
     }
 
+    public String GetDisplayName()
+    {
+        return _displayName;
+    }
+
     public void SetUnitName(String unitName)
     {
-        this.unitName = unitName;
-        ((Label)(GetNode("UnitDisplay/Name"))).Text = unitName + "(" + _team.CurrentTeamCode + ")";
+        _unitName = unitName;
+    }
+
+    public void SetDisplayName(String displayName)
+    {
+        _displayName = displayName;
+        ((Label)(GetNode("UnitDisplay/Name"))).Text = _displayName + "(" + _team.CurrentTeamCode + ")";
     }
 
     public String GetUnitName()
     {
-        return unitName;
+        return _unitName;
     }
 
     public virtual void _Control(float delta) { }
 
     public virtual void MoveToward(Vector2 moveDir, float delta)
     {
-        // Need to times 100 to catch up with AI movement as there is delay in updating
         Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
         MoveAndSlide(Velocity);
     }
@@ -354,13 +374,13 @@ public class Agent : KinematicBody2D
 
     public void setHealth(int health)
     {
-        this.health = health;
+        _health = health;
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
     }
 
     public int getHealth()
     {
-        return health;
+        return _health;
     }
 
     public void IncrementDefeatedAgentCount()
@@ -376,7 +396,7 @@ public class Agent : KinematicBody2D
 
     public void TakeDamage(int amount, Vector2 dir, Agent source, Team sourceTeam)
     {
-        int originalHealth = health;
+        int originalHealth = _health;
         bool trackDamage = true;
         bool sourceAlive = true;
 
@@ -385,25 +405,25 @@ public class Agent : KinematicBody2D
             sourceAlive = false;
         }
 
-        if (sourceTeam.CurrentTeamCode == GetTeam())
+        if (sourceTeam.CurrentTeamCode == GetCurrentTeam())
         {
             trackDamage = false;
         }
 
         if (trackDamage)
         {
-            health -= amount;
+            _health -= amount;
 
-            EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
+            EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
 
-            if (health < MaxHealth / 2)
+            if (_health < MaxHealth / 2)
             {
                 Particles2D smoke = (Particles2D)GetNode("Smoke");
                 smoke.Emitting = true;
             }
 
             // Only the one that actually damage agent to 0 will be count as the one defeated
-            if (originalHealth > 0 && health <= 0)
+            if (originalHealth > 0 && _health <= 0)
             {
                 if (sourceAlive)
                 {
@@ -435,14 +455,14 @@ public class Agent : KinematicBody2D
 
     public void Heal(int amount)
     {
-        health = +amount;
+        _health = +amount;
 
-        if (health > MaxHealth)
+        if (_health > MaxHealth)
         {
-            health = MaxHealth;
+            _health = MaxHealth;
         }
 
-        if (health >= MaxHealth / 2)
+        if (_health >= MaxHealth / 2)
         {
             Particles2D smoke = (Particles2D)GetNode("Smoke");
             smoke.Emitting = false;
@@ -466,11 +486,11 @@ public class Agent : KinematicBody2D
         }
         else
         {
-            energy = +amount;
+            _energy = +amount;
 
-            if (energy > MaxEnergy)
+            if (_energy > MaxEnergy)
             {
-                energy = MaxEnergy;
+                _energy = MaxEnergy;
             }
         }
 
