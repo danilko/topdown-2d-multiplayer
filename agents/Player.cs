@@ -41,13 +41,6 @@ public class Player : Agent
 
         }
     }
-    public void SetCameraLimit()
-    {
-        Camera2D camera = (Camera2D)GetNode("Camera2D");
-        camera.Current = true;
-        camera.Zoom = new Vector2(2.0f, 2.0f);
-    }
-
 
     public void SetHUD(HUD hud)
     {
@@ -222,7 +215,7 @@ public class Player : Agent
         }
     }
 
-    public override void _Process(float delta)
+    public override void _PhysicsProcess(float delta)
     {
         if (!Alive)
         {

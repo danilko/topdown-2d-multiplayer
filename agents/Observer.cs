@@ -1,11 +1,13 @@
 using Godot;
 
-public class Observer : Camera2D
+public class Observer : Node2D
 {
+    private RemoteTransform2D _remoteTransform2D;
 
-    TileMap tileMap;
-    Rect2 mapLimit;
-    Vector2 mapCellSize;
+    public override void _Ready()
+    {
+        _remoteTransform2D = (RemoteTransform2D)GetNode("CameraRemoteTransform");
+    }
 
     public void gatherInput(float delta)
     {
@@ -35,13 +37,12 @@ public class Observer : Camera2D
         Position = Position + new Vector2(xAxis, yAxis);
     }
 
-    public void SetCameraLimit()
+    public void SetCameraRemotePath(Camera2D camera)
     {
-        Current = true;   
-        Zoom = new Vector2(2.0f, 2.0f);
+        _remoteTransform2D.RemotePath = _remoteTransform2D.GetPathTo(camera);
     }
 
-    public override void _Process(float delta)
+    public override void _PhysicsProcess(float delta)
     {
         gatherInput(delta);
     }

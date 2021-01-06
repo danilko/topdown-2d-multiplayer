@@ -68,7 +68,7 @@ public class Projectile : Area2D
         return steer;
     }
 
-    public override void _Process(float delta)
+    public override void _PhysicsProcess(float delta)
     {
         // Validate if target is available or is freed up (maybe no longer in scene)
         if (target != null && IsInstanceValid(target))

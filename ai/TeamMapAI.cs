@@ -25,9 +25,15 @@ public class TeamMapAI : Node2D
     [Export]
     private int _maxConcurrentUnit = 10;
 
+    [Export]
+    private int _advancedWaitInterval = 20;
+
     private int _currentUnitUsageAmount;
 
     private int _unitCost = 100;
+
+    
+    private Timer _advancedTimer;
 
     public override void _Ready()
     {
@@ -35,6 +41,9 @@ public class TeamMapAI : Node2D
         _unitsContainer = GetNode("UnitsContainer");
 
         _currentUnitUsageAmount = _maxUnitUsageAmount;
+
+        _advancedTimer = (Timer)GetNode("AdvancedTimer");
+        _advancedTimer.WaitTime = _advancedWaitInterval;
     }
 
     public Team.TeamCode GetCurrentTeam()
@@ -108,6 +117,7 @@ public class TeamMapAI : Node2D
         _bases = bases;
         _team.CurrentTeamCode = team;
         _gameWorld = gameWorld;
+        _advancedTimer.Start();
 
         CheckForCapturableBase();
     }

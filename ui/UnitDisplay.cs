@@ -15,7 +15,7 @@ public class UnitDisplay : Node2D
     healthBar.Hide();
         
     }
-       public override void _Process(float delta)
+       public override void _PhysicsProcess(float delta)
        {
            GlobalRotation = 0;
        }

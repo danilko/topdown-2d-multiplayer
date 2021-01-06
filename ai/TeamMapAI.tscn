@@ -9,3 +9,7 @@ script = ExtResource( 1 )
 [node name="Team" parent="." instance=ExtResource( 2 )]
 
 [node name="UnitsContainer" type="Node" parent="."]
+
+[node name="AdvancedTimer" type="Timer" parent="."]
+wait_time = 15.0
+[connection signal="timeout" from="AdvancedTimer" to="." method="CheckForCapturableBase"]

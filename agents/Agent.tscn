@@ -62,5 +62,7 @@ process_material = SubResource( 5 )
 texture = ExtResource( 6 )
 
 [node name="Team" parent="." instance=ExtResource( 4 )]
+
+[node name="CameraRemoteTransform" type="RemoteTransform2D" parent="."]
 [connection signal="HealthChangedSignal" from="." to="UnitDisplay" method="UpdateUnitBar"]
 [connection signal="animation_finished" from="Explosion" to="." method="_OnExplosionAnimationFinished"]

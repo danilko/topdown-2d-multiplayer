@@ -204,13 +204,20 @@ public class HUD : CanvasLayer
         ((Label)GetNode("controlGame/lblDefeatedAgentCount")).Text = "" + value;
     }
 
-    private void _onPlayerDefeatedMessage()
+    public void OnPlayerDefeated()
     {
         ((Control)GetNode("controlGame")).Visible = false;
         ((Control)GetNode("controlOverallMessage")).Visible = true;
 
         ((AnimationPlayer)GetNode("AnimationPlayer")).Play("MessageAnnounce");
     }
+
+    public void OnPlayerCreated()
+    {
+        ((Control)GetNode("controlOverallMessage")).Visible = false;
+        lblMessage = false;
+    }
+
 
     private void _onAnimationPlayerFinished(String animationName)
     {
@@ -236,7 +243,7 @@ public class HUD : CanvasLayer
         ((Label)GetNode("lblTimerStatus")).Text = message;
     }
 
-    public override void _Process(float delta)
+    public override void _PhysicsProcess(float delta)
     {
         if (lblMessage && Input.IsKeyPressed((int)Godot.KeyList.Space))
         {

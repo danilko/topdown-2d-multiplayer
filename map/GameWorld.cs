@@ -19,6 +19,9 @@ public class GameWorld : Node2D
     private delegate void PlayerDefeatedSignal();
 
     [Signal]
+    private delegate void PlayerCreateSignal();
+
+    [Signal]
     private delegate void WaitingPeriodSignal();
 
     private String _agentPrefix = "agent_";
@@ -130,11 +133,17 @@ public class GameWorld : Node2D
 
     private TileMap _tileMap;
 
+    private Camera2D _camera2D;
+
+    private HUD _hud;
+
     public override void _Ready()
     {
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
+        _hud = (HUD)GetNode("HUD");
 
+        _initializeCamera();
         _initializeTileMap();
         _initializeObjectManager();
         _initializeCapaturableBaseManager();
@@ -150,6 +159,12 @@ public class GameWorld : Node2D
     public Godot.Collections.Array<TeamMapAI> GetTeamMapAIs()
     {
         return _teamMapAIs;
+    }
+
+    private void _initializeCamera()
+    {
+        _camera2D = (Camera2D)GetNode("Camera");
+        _camera2D.Current = true;
     }
 
     private void _initializeNetwork()
@@ -176,11 +191,13 @@ public class GameWorld : Node2D
             RpcId(1, nameof(_initializeNewPlayer), network.gamestateNetworkPlayer.ToString());
         }
 
+       
         // Update network flow
-        this.Connect(nameof(NeworkRateUpdateSignal), GetNode("HUD"), "_onNetworkRateUpdate");
-        this.Connect(nameof(PlayerDefeatedSignal), GetNode("HUD"), "_onPlayerDefeatedMessage");
-        this.Connect(nameof(Network.PlayerListChangedSignal), GetNode("HUD"), "onPlayerListChanged");
-        this.Connect(nameof(WaitingPeriodSignal), GetNode("HUD"), "_onUpdateTimer");
+        this.Connect(nameof(NeworkRateUpdateSignal), _hud, "_onNetworkRateUpdate");
+        this.Connect(nameof(PlayerDefeatedSignal), _hud, nameof(HUD.OnPlayerDefeated));
+        this.Connect(nameof(Network.PlayerListChangedSignal), _hud, "onPlayerListChanged");
+        this.Connect(nameof(WaitingPeriodSignal), _hud, "_onUpdateTimer");
+        this.Connect(nameof(PlayerCreateSignal), _hud, nameof(HUD.OnPlayerCreated));
 
         // Update playerlist
         EmitSignal(nameof(Network.PlayerListChangedSignal));
@@ -651,12 +668,11 @@ public class GameWorld : Node2D
         client = (Observer)((PackedScene)GD.Load("res://agents/Observer.tscn")).Instance();
 
         client.Position = position;
-
         client.Name = _agentObserverPrefix + observerCounter;
 
         AddChild(client);
 
-        client.SetCameraLimit();
+        client.SetCameraRemotePath(_camera2D);
     }
 
     [Remote]
@@ -1178,15 +1194,12 @@ public class GameWorld : Node2D
         if (netId == network.gamestateNetworkPlayer.net_id)
         {
             // Attach camera
-            Camera2D camera2D = new Camera2D();
-            camera2D.Name = "Camera2D";
-            agent.AddChild(camera2D);
-            agent.SetHUD((HUD)GetNode("HUD"));
-            agent.SetCameraLimit();
+            agent.SetHUD(_hud);
+            agent.SetCameraRemotePath(_camera2D);
         }
 
         spawnPlayers.Add(playerId, agent);
-
+        EmitSignal(nameof(PlayerCreateSignal));
     }
 
     [Remote]

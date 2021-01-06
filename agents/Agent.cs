@@ -82,6 +82,8 @@ public class Agent : KinematicBody2D
 
     private int defeatedAgentCount = 0;
 
+    private RemoteTransform2D _remoteTransform2D;
+
     private Team _team;
 
     // Called when the node enters the scene tree for the first time.
@@ -89,6 +91,8 @@ public class Agent : KinematicBody2D
     {
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
         network = (Network)GetNode("/root/NETWORK");
+
+        _remoteTransform2D = (RemoteTransform2D)GetNode("CameraRemoteTransform");
 
         Particles2D smoke = (Particles2D)GetNode("Smoke");
         smoke.Emitting = false;
@@ -111,7 +115,7 @@ public class Agent : KinematicBody2D
         SetCurrentTeam(inputTeamCode);
         SetUnitName(unitName);
         SetDisplayName(displayName);
-        
+
         _health = MaxHealth;
         _energy = MaxEnergy;
 
@@ -125,22 +129,31 @@ public class Agent : KinematicBody2D
     {
         if (currentPrimaryWeaponIndex != -1)
         {
-            DisconnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Primary);
             Weapon currentWeapon = ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]);
+
+            // Change of weapon, disable reloading
+            if (currentPrimaryWeaponIndex != weaponIndex)
+            {
+                // Emit singal to disable any previous relad signal
+                currentWeapon.EmitSignal(nameof(Weapon.ReloadStopSignal));
+            }
+
+            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Primary);
 
             currentWeapon.Hide();
             currentPrimaryWeaponIndex = weaponIndex % primaryWeapons.Count;
             if (currentPrimaryWeaponIndex < 0) { currentPrimaryWeaponIndex = currentPrimaryWeaponIndex * -1; }
 
             currentWeapon = ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]);
-            
+
             currentWeapon.Show();
             EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).CurrentWeaponType);
+
+            ConnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Primary);
 
             // Emit bullet to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo());
 
-            ConnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Primary);
         }
     }
 
@@ -148,8 +161,18 @@ public class Agent : KinematicBody2D
     {
         if (currentSecondaryWeaponIndex != -1)
         {
-            DisconnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Secondary);
             Weapon currentWeapon = ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]);
+
+            // Change of weapon, disable reloading
+            if (currentSecondaryWeaponIndex != weaponIndex)
+            {
+                // Emit singal to disable any previous relad signal
+                currentWeapon.EmitSignal(nameof(Weapon.ReloadStopSignal));
+            }
+
+            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Primary);
+
+            DisconnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Secondary);
 
             currentWeapon.Hide();
             currentSecondaryWeaponIndex = weaponIndex % secondaryWeapons.Count;
@@ -160,10 +183,10 @@ public class Agent : KinematicBody2D
             currentWeapon.Show();
             EmitSignal(nameof(SecondaryWeaponChangeSignal), currentWeapon.CurrentWeaponType);
 
+            ConnectWeapon(currentWeapon, Weapon.WeaponOrder.Secondary);
+
             // Emit bullet to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo());
-
-            ConnectWeapon(currentWeapon, Weapon.WeaponOrder.Secondary);
         }
     }
 
@@ -251,6 +274,11 @@ public class Agent : KinematicBody2D
     public void SetCurrentTeam(Team.TeamCode inputTeamCode)
     {
         _team.CurrentTeamCode = inputTeamCode;
+        _setUnitDisplay();
+    }
+
+    private void _setUnitDisplay()
+    {
         ((Label)(GetNode("UnitDisplay/Name"))).Text = _displayName + "(" + _team.CurrentTeamCode + ")";
     }
 
@@ -272,7 +300,7 @@ public class Agent : KinematicBody2D
     public void SetDisplayName(String displayName)
     {
         _displayName = displayName;
-        ((Label)(GetNode("UnitDisplay/Name"))).Text = _displayName + "(" + _team.CurrentTeamCode + ")";
+        _setUnitDisplay();
     }
 
     public String GetUnitName()
@@ -440,6 +468,10 @@ public class Agent : KinematicBody2D
         }
     }
 
+    public void SetCameraRemotePath(Camera2D camera)
+    {
+        _remoteTransform2D.RemotePath = camera.GetPath();
+    }
 
     public void ReloadPrimaryWeapon()
     {

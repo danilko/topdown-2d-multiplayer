@@ -70,6 +70,9 @@ public class Network : Node
 
     public void createServer(String serverName, int port, int max_players)
     {
+        // Clear out any previous states remain
+        closeServer();
+
         hostType = "Server";
         serverinfo.name = serverName;
         serverinfo.used_port = port;
