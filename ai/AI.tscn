@@ -16,6 +16,10 @@ shape = SubResource( 1 )
 [node name="PatrolTimer" type="Timer" parent="."]
 wait_time = 5.0
 one_shot = true
+
+[node name="PathLine" type="Line2D" parent="."]
+width = 2.0
+default_color = Color( 1, 0.4, 0.498039, 1 )
 [connection signal="body_entered" from="DetectionZone" to="." method="_onDetectionZoneBodyEntered"]
 [connection signal="body_exited" from="DetectionZone" to="." method="_onDetectionZoneBodyExited"]
 [connection signal="timeout" from="PatrolTimer" to="." method="_onPatrolTimerTimeout"]

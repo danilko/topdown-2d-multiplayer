@@ -19,6 +19,8 @@ public class TeamMapAI : Node2D
 
     private GameWorld _gameWorld;
 
+    private PathFinding _pathFinding;
+
     [Export]
     private int _maxUnitUsageAmount = 1000;
 
@@ -32,7 +34,7 @@ public class TeamMapAI : Node2D
 
     private int _unitCost = 100;
 
-    
+
     private Timer _advancedTimer;
 
     public override void _Ready()
@@ -112,11 +114,12 @@ public class TeamMapAI : Node2D
         return true;
     }
 
-    public void Initialize(GameWorld gameWorld, Godot.Collections.Array bases, Team.TeamCode team)
+    public void Initialize(GameWorld gameWorld, Godot.Collections.Array bases, Team.TeamCode team, PathFinding pathFinding)
     {
         _bases = bases;
         _team.CurrentTeamCode = team;
         _gameWorld = gameWorld;
+        _pathFinding = pathFinding;
         _advancedTimer.Start();
 
         CheckForCapturableBase();
@@ -198,12 +201,12 @@ public class TeamMapAI : Node2D
 
         unit.SetNetworkMaster(1);
 
-        unit.GlobalPosition = GetSpawnPointFromCaptureBase().GlobalPosition;
+        unit.GlobalPosition = GetSpawnPointFromCaptureBase().GetRandomPositionWithinCaptureRadius();
 
         _unitsContainer.AddChild(unit);
 
         // Set the info afterward as some of these depend on child node to be available
-        unit.Initialize(_gameWorld, unitName, displayName, _team.CurrentTeamCode);
+        unit.Initialize(_gameWorld, unitName, displayName, _team.CurrentTeamCode, _pathFinding);
 
         unit.changePrimaryWeapon(0);
 
@@ -223,7 +226,7 @@ public class TeamMapAI : Node2D
             return;
         }
         // Mark the node for deletion
-        agent.explode();
+        agent.Explode();
     }
 
     public CapturableBase GetSpawnPointFromCaptureBase()
@@ -262,9 +265,9 @@ public class TeamMapAI : Node2D
         }
         else
         {
-            foreach(Agent agent in _unitsContainer.GetChildren())
+            foreach (Agent agent in _unitsContainer.GetChildren())
             {
-                if(agent.GetUnitName().Equals(unitName))
+                if (agent.GetUnitName().Equals(unitName))
                 {
                     return agent;
                 }

@@ -6,7 +6,7 @@
 [ext_resource path="res://ui/UnitDisplay.tscn" type="PackedScene" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 194, 194 )
+extents = Vector2( 250, 250 )
 
 [node name="CapturableBase" type="Area2D"]
 script = ExtResource( 3 )
@@ -25,7 +25,7 @@ region_enabled = true
 region_rect = Rect2( 934, 65, 47, 48 )
 
 [node name="Boundry" type="Sprite" parent="."]
-scale = Vector2( 200, 200 )
+scale = Vector2( 250, 250 )
 texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 265, 172, 2, 2 )

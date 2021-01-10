@@ -35,24 +35,32 @@ public class AI : Node2D
 
     private Godot.Collections.Dictionary<String, Team.TeamCode> _targetAgents;
 
-    private CapturableBase _nextBase;
+    private Vector2 _nextBasePosition = Vector2.Zero;
+
+    private PathFinding _pathFinding;
+
+    private Line2D _pathLine;
 
     public override void _Ready()
     {
         _playerDetectionZone = (Area2D)GetNode("DetectionZone");
         _patrolTimer = (Timer)GetNode("PatrolTimer");
+        _pathLine = (Line2D)GetNode("PathLine");
+
         _rng = new RandomNumberGenerator();
         _rng.Randomize();
+
         _currentState = State.INVALID;
 
         _targetAgents = new Godot.Collections.Dictionary<String, Team.TeamCode>();
     }
 
-    public void Initialize(GameWorld gameWorld, Agent agent, float detectRaidus)
+    public void Initialize(GameWorld gameWorld, Agent agent, PathFinding pathFinding, float detectRaidus)
     {
         _gameWorld = gameWorld;
         _agent = agent;
         _patrolOrigin = _agent.GlobalPosition;
+        _pathFinding = pathFinding;
 
         SetState(State.PATROL);
 
@@ -62,7 +70,27 @@ public class AI : Node2D
 
         shape.Radius = detectRaidus;
         detectRadius.Shape = shape;
+    }
 
+    private void _setPathLine(Godot.Collections.Array points)
+    {
+        Vector2[] localPoints = new Vector2[points.Count];
+
+        for (int index = 0; index < points.Count; index++)
+        {
+            if (index == 0)
+            {
+                localPoints[index] = Vector2.Zero;
+            }
+            else
+            {
+                localPoints[index] = ((Vector2)points[index]) - GlobalPosition;
+            }
+
+
+        }
+
+        _pathLine.Points = localPoints;
     }
 
     public void SetState(State newState)
@@ -78,9 +106,9 @@ public class AI : Node2D
             _patrolReached = true;
         }
 
-        if (newState == State.ADVANCE && _nextBase != null)
+        if (newState == State.ADVANCE)
         {
-            _patrolOrigin = _nextBase.GlobalPosition;
+            _patrolOrigin = _nextBasePosition;
         }
 
         _currentState = newState;
@@ -89,16 +117,18 @@ public class AI : Node2D
 
     public void SetNextBase(CapturableBase capturableBase)
     {
-        _nextBase = capturableBase;
+        _nextBasePosition = capturableBase.GetRandomPositionWithinCaptureRadius();
     }
 
-    public State gsetState()
+    public State getState()
     {
         return _currentState;
     }
 
     public void Control(float delta)
     {
+        _pathLine.GlobalRotation = 0;
+
         // If not reloading, then set to default
         if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
         {
@@ -109,19 +139,27 @@ public class AI : Node2D
             _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
         }
 
+        Godot.Collections.Array pathPoints = null;
+
         switch (_currentState)
         {
             case State.PATROL:
                 if (!_patrolReached)
                 {
-                    _agent.RotateToward(_patrolLocation, delta);
-                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_patrolLocation), delta);
+                    pathPoints = _pathFinding.GetPath(GlobalPosition, _patrolLocation);
 
-                    // Start the next patrol timer if reach target
-                    if (_agent.HasReachedPosition(_patrolLocation))
+                    if (pathPoints.Count > 1)
+                    {
+                        Vector2 nextPoint = (Vector2)pathPoints[1];
+                        _agent.RotateToward(nextPoint, delta);
+                        _agent.MoveToward(_agent.GlobalPosition.DirectionTo(nextPoint), delta);
+                        _setPathLine(pathPoints);
+                    }
+                    else
                     {
                         _patrolReached = true;
                         _patrolTimer.Start();
+                        _pathLine.ClearPoints();
                     }
                 }
 
@@ -152,15 +190,20 @@ public class AI : Node2D
                 break;
 
             case State.ADVANCE:
-                if (_nextBase == null || _agent.HasReachedPosition(_nextBase.GlobalPosition))
+
+                pathPoints = _pathFinding.GetPath(GlobalPosition, _nextBasePosition);
+
+                if (pathPoints.Count > 1)
                 {
-                    SetState(State.PATROL);
+                    Vector2 nextPoint = (Vector2)pathPoints[1];
+                    _agent.RotateToward(nextPoint, delta);
+                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(nextPoint), delta);
+                    _setPathLine(pathPoints);
                 }
                 else
                 {
-                    _agent.RotateToward(_nextBase.GlobalPosition, delta);
-                    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_nextBase.GlobalPosition), delta);
-                    _agent.GlobalPosition = _agent.GlobalPosition;
+                    SetState(State.PATROL);
+                    _pathLine.ClearPoints();
                 }
                 break;
 
@@ -193,6 +236,7 @@ public class AI : Node2D
 
     private void _onDetectionZoneBodyEntered(Node body)
     {
+
         if (body.HasMethod(nameof(Agent.GetCurrentTeam)) && body != _agent)
         {
             // If not same team identifier, identify as target
@@ -260,7 +304,15 @@ public class AI : Node2D
             // If no possible target, then set to ADVANCE
             if (_targetAgent == null)
             {
-                SetState(State.ADVANCE);
+                // Set advance if next target is available
+                if (_nextBasePosition != Vector2.Zero)
+                {
+                    SetState(State.ADVANCE);
+                }
+                else
+                {
+                    SetState(State.PATROL);
+                }
             }
         }
     }
@@ -268,7 +320,7 @@ public class AI : Node2D
     private void _onPatrolTimerTimeout()
     {
         _patrolReached = false;
-        float patrolRange = 50f;
+        float patrolRange = 100f;
 
         float randomX = _rng.RandfRange(-patrolRange, patrolRange);
         float randomY = _rng.RandfRange(-patrolRange, patrolRange);

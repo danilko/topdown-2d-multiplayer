@@ -102,7 +102,7 @@ public class GameWorld : Node2D
     // The signature of the last snapshot received
     int lastSnapshotSignature = 0;
 
-    private AgentAStar _aStar;
+    private PathFinding _pathFinding;
 
     private Godot.RandomNumberGenerator random;
 
@@ -115,7 +115,7 @@ public class GameWorld : Node2D
     private bool _waitingPeriod = true;
 
     [Export]
-    private int MaxWaitingTime = 15;
+    private int MaxWaitingTime = 5;
 
     [Export]
     private int MaxGameTime = 3600;
@@ -145,7 +145,7 @@ public class GameWorld : Node2D
 
         _initializeCamera();
         _initializeTileMap();
-        _initializeObjectManager();
+        _initializeObsctacleManager();
         _initializeCapaturableBaseManager();
         _initializeTeamMapAI();
 
@@ -224,16 +224,17 @@ public class GameWorld : Node2D
         _tileMap = (TileMap)GetNode("Ground");
     }
 
-    private void _initializeObjectManager()
+    private void _initializeObsctacleManager()
     {
+        _obstacleManager = (ObstacleManager)GetNode("ObstacleManager");
+        _obstacleManager.Initialize(_tileMap);
 
         if (GetTree().IsNetworkServer())
         {
-            _aStar = new AgentAStar(_tileMap);
+            _pathFinding = (PathFinding)((PackedScene)GD.Load("res://ai/PathFinding.tscn")).Instance();;
+            this.AddChild(_pathFinding);
+            _pathFinding.Initialize(_tileMap, _obstacleManager);
         }
-
-        _obstacleManager = (ObstacleManager)GetNode("ObstacleManager");
-        _obstacleManager.Initialize(_aStar, _tileMap);
     }
 
     private void _initializeCapaturableBaseManager()
@@ -253,7 +254,7 @@ public class GameWorld : Node2D
             ai.Name = nameof(TeamMapAI) + "_" + (Team.TeamCode)index;
             AddChild(ai);
 
-            ai.Initialize(this, _capaturableBaseManager.GetBases(), (Team.TeamCode)index);
+            ai.Initialize(this, _capaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
 
             _teamMapAIs.Add(ai);
 
@@ -277,12 +278,6 @@ public class GameWorld : Node2D
         currentNetworkBytes = 0;
         currentNetworkSnapshots = 0;
         currentAppliedNetworkSnapshots = 0;
-    }
-
-    public Godot.Collections.Array GetPaths(Vector2 start, Vector2 end, World2D space_state, Godot.Collections.Array excludes)
-    {
-        //return aStarSolver.path(start, end, space_state, excludes, this);
-        return _aStar.getPath(start, end);
     }
 
 
@@ -610,7 +605,7 @@ public class GameWorld : Node2D
                     continue;
                 }
                 // Replicate despawn into currently iterated player
-                RpcId(item.Key, "removeDisconnectedPlayer", id);
+                RpcId(item.Key, nameof(removeDisconnectedPlayer), id);
             }
         }
 
@@ -956,7 +951,6 @@ public class GameWorld : Node2D
     private void getGamePeriodStatus(String message)
     {
         EmitSignal(nameof(WaitingPeriodSignal), message + " GAME PERIOD");
-
     }
 
     private void _checkGameWinningCondition()
@@ -1084,11 +1078,6 @@ public class GameWorld : Node2D
     {
         gameStates.setMessagesForNextScene(message);
         gameStates.endGameScreen();
-    }
-
-    private String convertToString(NetworkPlayer networkPlayer, long spawn_index)
-    {
-        return networkPlayer.ToString() + ";" + spawn_index;
     }
 
     public bool IsWaitingPeriod()
@@ -1299,7 +1288,14 @@ public class GameWorld : Node2D
 
         if (!spawnBots.ContainsKey(unitName))
         {
-            spawnBots.Add(unitName, _teamMapAIs[(int)team].CreateUnit(unitName, unitName, true));
+            bool enableAI = false;
+
+            if(GetTree().IsNetworkServer())
+            {
+                enableAI = true;
+            }
+            
+            spawnBots.Add(unitName, _teamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI));
         }
     }
 

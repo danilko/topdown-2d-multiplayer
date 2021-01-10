@@ -14,22 +14,12 @@ public class AIAgent : Agent
 
     private Godot.Collections.Array targetPaths = null;
 
-    private int _currentSpawnPointIndex = 0;
-
     private Godot.Collections.Array members = null;
 
-    // 10 px / s
-    private float maxForces = 500;
-
-    private int _slowingDistance = 10;
-
-    private Vector2 _acceleration;
-
-    private Line2D _pathLine;
     private Vector2 _originalPathLineLocation;
 
     private AI _agentAI;
-
+    private PathFinding _pathFinding;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -43,27 +33,18 @@ public class AIAgent : Agent
 
         members = new Godot.Collections.Array();
 
-        _pathLine = (Line2D)GetNode("PathLine");
         _originalPathLineLocation = GlobalPosition;
 
         _agentAI = (AI)GetNode("AI");
     }
 
-    public override void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode)
+    public override void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode, PathFinding pathFinding)
     {
-        base.Initialize(gameWorld, unitName, displayName, inputTeamCode);
-        _agentAI.Initialize(_gameWorld, this, DetectRadius);
-    }
-
-
-    public void setCurrentSpawnIndex(int currentSpawnPointIndex)
-    {
-        _currentSpawnPointIndex = currentSpawnPointIndex;
-    }
-
-    public int getCurrentSpawnIndex()
-    {
-        return _currentSpawnPointIndex;
+        base.Initialize(gameWorld, unitName, displayName, inputTeamCode, pathFinding);
+        if (GetTree().IsNetworkServer())
+        {
+            _agentAI.Initialize(_gameWorld, this, pathFinding, DetectRadius);
+        }
     }
 
     public AI GetAI()
@@ -101,52 +82,14 @@ public class AIAgent : Agent
         }
     }
 
-    public Vector2 seekAndArrive(Vector2 targetPosition)
-    {
-        // Return the force that needs to be added to the current velocity to seek and slowly approch the target position
-        Vector2 desiredVelocity = (targetPosition - Position);
-        float targetDistance = desiredVelocity.Length();
-
-        return (approachTarget(_slowingDistance, targetDistance, desiredVelocity.Normalized() * MaxSpeed) - Velocity).Clamped(maxForces);
-    }
-
-    public Vector2 approachTarget(int slowingDistance, float distanceToTarget, Vector2 desiredVelocity)
-    {
-        if (distanceToTarget < slowingDistance)
-        {
-            desiredVelocity *= distanceToTarget / slowingDistance;
-        }
-        return desiredVelocity;
-    }
-
     public override void _Control(float delta)
     {
         if (GetTree().IsNetworkServer())
         {
             _agentAI.Control(delta);
+            ((Label)(GetNode("UnitDisplay/Name"))).Text = GetDisplayName() + "(" + GetCurrentTeam() + ")" + " - " + _agentAI.getState();
+
         }
-    }
-
-    public void setPathLine(Godot.Collections.Array points)
-    {
-        _pathLine.ClearPoints();
-
-        _originalPathLineLocation = GlobalPosition;
-        _pathLine.GlobalPosition = _originalPathLineLocation;
-
-        if (points != null)
-        {
-
-            Vector2[] localPoints = new Vector2[points.Count];
-
-            for (int index = 0; index < points.Count; index++)
-            {
-                localPoints[index] = (Vector2)points[index] - Position;
-            }
-
-            _pathLine.Points = localPoints;
-        }
-
     }
 
 

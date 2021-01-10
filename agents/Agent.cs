@@ -107,7 +107,7 @@ public class Agent : KinematicBody2D
         EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
     }
 
-    public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode)
+    public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode, PathFinding pathFinding)
     {
         _team = (Team)GetNode("Team");
 
@@ -384,7 +384,7 @@ public class Agent : KinematicBody2D
             if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                //MoveAndSlide(dir * -1 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
+                MoveAndSlide(dir * -10 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
             }
         }
 
@@ -395,7 +395,7 @@ public class Agent : KinematicBody2D
             if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                //MoveAndSlide(dir * -1 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
+                MoveAndSlide(dir * -10 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
             }
         }
     }
@@ -464,7 +464,7 @@ public class Agent : KinematicBody2D
         // knock back effect
         if (MaxSpeed != 0)
         {
-            MoveAndSlide(dir * 100 * amount);
+            MoveAndSlide(dir * 10 * amount);
         }
     }
 
@@ -529,7 +529,7 @@ public class Agent : KinematicBody2D
         return consume;
     }
 
-    public void explode()
+    public void Explode()
     {
         CollisionShape2D collisionShape2D = (CollisionShape2D)GetNode("CollisionShape2D");
         collisionShape2D.Disabled = true;

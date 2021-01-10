@@ -4,7 +4,7 @@ using System;
 public class Obstacle : StaticBody2D
 {
     [Signal]
-    public delegate void ObstacleDestroy();
+    public delegate void ObstacleDestroySignal();
 
     public enum Items
     {
@@ -50,9 +50,10 @@ public class Obstacle : StaticBody2D
     public void TakeEnvironmentDamage(int amount)
     {
         health -= amount;
+
         if (health < 0)
         {
-            EmitSignal(nameof(ObstacleDestroy), Name);
+            EmitSignal(nameof(Obstacle.ObstacleDestroySignal), Name);
         }
     }
 

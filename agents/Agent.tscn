@@ -33,7 +33,9 @@ orbit_velocity_random = 0.0
 scale_curve = SubResource( 4 )
 color_ramp = SubResource( 2 )
 
-[node name="Agent" type="KinematicBody2D"]
+[node name="Agent" type="KinematicBody2D" groups=[
+"Obstacles",
+]]
 collision_layer = 15
 script = ExtResource( 1 )
 

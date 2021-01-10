@@ -3,15 +3,21 @@ using System;
 
 public class ObstacleManager : Node2D
 {
-    AgentAStar _aStar;
     TileMap _tileMap;
 
     private Godot.Collections.Dictionary<String, Vector2> _obstacles = new Godot.Collections.Dictionary<String, Vector2>();
     private Godot.Collections.Array _obstaclesDestroyed = new Godot.Collections.Array();
 
+    private Vector2 _halfCellSize;
+
+    private Godot.Collections.Array _traverableTiles;
+
+    private String _obstaclePrefix = "obstacle_";
+    private String _obstacleIndexSeparator = "_";
+
     public override void _Ready()
     {
-
+        _traverableTiles = new Godot.Collections.Array();
     }
 
     public Godot.Collections.Array GetObstaclesDestroyed()
@@ -26,19 +32,21 @@ public class ObstacleManager : Node2D
 
     // Build obstacles base on tile map
     // Will not build obstacles on the road automatically
-    public void Initialize(AgentAStar aStar, TileMap tileMap)
+    public void Initialize(TileMap tileMap)
     {
-        _aStar = aStar;
         _tileMap = tileMap;
+        _halfCellSize = _tileMap.CellSize / 2;
+        buildObstacles();
 
-        // buildObstacles();
+    }
 
+    public Godot.Collections.Array GetTraversableTiles()
+    {
+        return _traverableTiles;
     }
 
     private void buildObstacles()
     {
-
-        Vector2 cellSize = _tileMap.CellSize;
         Rect2 usedRect = _tileMap.GetUsedRect();
 
         int startPointX = (int)usedRect.Position.x;
@@ -52,45 +60,24 @@ public class ObstacleManager : Node2D
         if (GetTree().IsNetworkServer())
         {
             // Add pre - added obstacles
-            foreach (Node2D obstacle in GetNode("Obstacles").GetChildren())
+            foreach (Node2D obstacle in GetChildren())
             {
                 Vector2 pos = _tileMap.WorldToMap(obstacle.Position);
-                prebuildObstacles.Add(pos.x + "+" + pos.y, pos);
+                prebuildObstacles.Add(pos.x + _obstacleIndexSeparator + pos.y, pos);
 
-                float x = pos.x - 2;
-                float y = pos.y - 2;
-                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
-
-                x = pos.x;
-                y = pos.y - 2;
-                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
-
-                x = pos.x - 2;
-                y = pos.y;
-                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
-
-                x = pos.x + 2;
-                y = pos.y + 2;
-                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
-
-                x = pos.x;
-                y = pos.y + 2;
-                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
-
-                x = pos.x + 2;
-                y = pos.y;
-                prebuildObstacles.Add(x + "+" + y, new Vector2(x, y));
+                float x = pos.x;
+                float y = pos.y;
+                prebuildObstacles.Add(x + _obstacleIndexSeparator + y, new Vector2(x, y));
             }
         }
 
-        // As the grid use in this game is 2 x 2 of a normal godot grid, so need to increment by 2
-        for (int xIndex = startPointX; xIndex < maxLengthX; xIndex = xIndex + 2)
+        for (int xIndex = startPointX; xIndex < maxLengthX; xIndex++)
         {
-            for (int yIndex = startPointY; yIndex < maxLengthY; yIndex = yIndex + 2)
+            for (int yIndex = startPointY; yIndex < maxLengthY; yIndex++)
             {
 
                 // if there is already obstacle on it, then ignore this tile, this is also not workable tile, so skip entire logic to next tile
-                if (prebuildObstacles.Contains(xIndex + "+" + yIndex))
+                if (prebuildObstacles.Contains(xIndex + _obstacleIndexSeparator + yIndex))
                 {
                     continue;
                 }
@@ -111,9 +98,9 @@ public class ObstacleManager : Node2D
                     item = Obstacle.Items.roadblock_red;
                 }
 
-                Label mapLabel = (Label)GetNode("MapCoordinate").Duplicate();
+                Label mapLabel = (Label)GetNode("../MapCoordinate").Duplicate();
                 mapLabel.Text = ("(" + xIndex + "," + yIndex + ")");
-                mapLabel.Name = "maplabel_" + xIndex + "_" + yIndex;
+                mapLabel.Name = "maplabel_" + xIndex + _obstacleIndexSeparator + yIndex;
 
                 position = _tileMap.MapToWorld(new Vector2(xIndex, yIndex));
 
@@ -123,11 +110,11 @@ public class ObstacleManager : Node2D
                     Obstacle obstacle = (Obstacle)((PackedScene)GD.Load("res://environments/Obstacle.tscn")).Instance();
                     obstacle.type = item;
 
-                    obstacle.Name = "obstacle_" + xIndex + "_" + yIndex;
+                    obstacle.Name = _obstaclePrefix + xIndex + _obstacleIndexSeparator + yIndex;
 
-                    GetNode("Obstacles").AddChild(obstacle);
+                    AddChild(obstacle);
 
-                    obstacle.GlobalPosition = position + cellSize;
+                    obstacle.GlobalPosition = position + _halfCellSize;
 
                     mapLabel.Set("custom_colors/font_color", new Color("#ff0000"));
                 }
@@ -136,48 +123,46 @@ public class ObstacleManager : Node2D
                     if (GetTree().IsNetworkServer())
                     {
                         // As there is no obstacle, this cell is a workable path
-                        _aStar.addCell(new Vector2(xIndex, yIndex));
+                        _traverableTiles.Add(new Vector2(xIndex, yIndex));
                     }
 
                     mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
                 }
 
-                mapLabel.SetGlobalPosition(position + cellSize);
+                mapLabel.SetGlobalPosition(position + _halfCellSize);
 
-                this.AddChild(mapLabel);
+                AddChild(mapLabel);
             }
         }
 
         if (GetTree().IsNetworkServer())
         {
-            _aStar.connectPoints();
             _buildObstaclesCache();
         }
     }
 
     private void _buildObstaclesCache()
     {
-        TileMap tilemap = (TileMap)GetNode("Ground");
-        foreach (Node node in GetNode("Obstacles").GetChildren())
+        foreach (Node node in GetChildren())
         {
+            if(! node.HasMethod(nameof(Obstacle.TakeEnvironmentDamage)))
+            {
+                continue;
+            }
+
             Obstacle obstacle = (Obstacle)node;
 
-            Vector2 tileMapPosition = tilemap.WorldToMap(obstacle.Position);
+            Vector2 tileMapPosition = _tileMap.WorldToMap(obstacle.Position);
 
             float xIndex = tileMapPosition.x;
             float yIndex = tileMapPosition.y;
 
-            // Align to the cell deployment (2 x 2 index size)
-            // Need to do (xIndex / 2) to get how many 2 x 2 does it cross
-            // Then add up
-            xIndex = (xIndex / 2) * 2;
-            yIndex = (yIndex / 2) * 2;
-
-            if (!obstacle.IsConnected("ObstacleDestroy", this, nameof(_onObstacleDestroy)))
+            if (!obstacle.IsConnected(nameof(Obstacle.ObstacleDestroySignal), this, nameof(_onObstacleDestroy)))
             {
-                obstacle.Connect("ObstacleDestroy", this, nameof(_onObstacleDestroy));
+                obstacle.Connect(nameof(Obstacle.ObstacleDestroySignal), this, nameof(_onObstacleDestroy));
             }
-            _obstacles.Add("obstacle_" + xIndex + "_" + yIndex, obstacle.Position);
+
+            _obstacles.Add(_obstaclePrefix + xIndex + _obstacleIndexSeparator + yIndex, obstacle.Position);
         }
     }
     private void _onObstacleDestroy(String obstacleName)
@@ -205,14 +190,7 @@ public class ObstacleManager : Node2D
         float xIndex = tileMapPosition.x;
         float yIndex = tileMapPosition.y;
 
-        // Align to the cell deployment (2 x 2 index size)
-        // Need to do (xIndex / 2) to get how many 2 x 2 does it cross
-        // Then add up
-
-        xIndex = (xIndex / 2) * 2;
-        yIndex = (yIndex / 2) * 2;
-
-        return _obstacles.ContainsKey("obstacle_" + xIndex + "_" + yIndex);
+        return _obstacles.ContainsKey(_obstaclePrefix + xIndex + _obstacleIndexSeparator + yIndex);
     }
 
     public void syncObstacles(int netId)
@@ -234,12 +212,11 @@ public class ObstacleManager : Node2D
             {
                 obstacle.explode();
 
-                // Restablish aStar
-                //if (GetTree().IsNetworkServer())
-                //{
-                //    _aStar.addCell(new Vector2(float.Parse(obstacleName.Split("_")[1]), float.Parse(obstacleName.Split("_")[2])));
-                //    _aStar.connectPoints();
-                //}
+                if (GetTree().IsNetworkServer())
+                {
+                    // As there is no obstacle now, this cell is a workable path
+                    _traverableTiles.Add(new Vector2(float.Parse(obstacleName.Split(_obstacleIndexSeparator)[1]), float.Parse(obstacleName.Split(_obstacleIndexSeparator)[2])));
+                }
             }
         }
     }

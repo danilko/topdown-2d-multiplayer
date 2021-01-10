@@ -16,12 +16,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ai\AgentAStar.cs" />
+    <Compile Include="ai\PathFinding.cs" />
     <Compile Include="ai\AI.cs" />
     <Compile Include="ai\TeamMapAI.cs" />
     <Compile Include="environments\CapaturableBaseManager.cs" />
     <Compile Include="environments\CapturableBase.cs" />
-    <Compile Include="map\ObstacleManager.cs" />
+    <Compile Include="environments\ObstacleManager.cs" />
     <Compile Include="projectiles\Projectile.cs" />
     <Compile Include="projectiles\LaserRay.cs" />
     <Compile Include="projectiles\Missle.cs" />

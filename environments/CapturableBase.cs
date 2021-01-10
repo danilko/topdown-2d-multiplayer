@@ -24,6 +24,9 @@ public class CapturableBase : Area2D
     private UnitDisplay _unitDisplay;
     private Label _unitDisplayLabel;
 
+    private CollisionShape2D _collisionShape;
+    private RandomNumberGenerator _rng;
+
     private int _counter = 0;
 
     public override void _Ready()
@@ -35,6 +38,11 @@ public class CapturableBase : Area2D
         _unitDisplayLabel = ((Label)(GetNode("UnitDisplay/Name")));
         _unitDisplay = (UnitDisplay)GetNode("UnitDisplay");
 
+        _collisionShape = (CollisionShape2D)GetNode("CollisionShape2D");
+
+        _rng = new RandomNumberGenerator();
+        _rng.Randomize();
+        
         _base = (Sprite)GetNode("Base");
         _boundry = (Sprite)GetNode("Boundry");
 
@@ -70,6 +78,16 @@ public class CapturableBase : Area2D
         _counter = _timeToCaptureBase;
 
         EmitSignal(nameof(BaseTeamChangeSignal), this);
+    }
+
+    public Vector2 GetRandomPositionWithinCaptureRadius()
+    {
+        Vector2 extents = (Vector2)_collisionShape.Shape.Get("extents");
+        Vector2 topLeftCorner =  _collisionShape.GlobalPosition - extents;
+        float randX = _rng.RandfRange(topLeftCorner.x, topLeftCorner.x + extents.x);
+        float randY = _rng.RandfRange(topLeftCorner.y, topLeftCorner.y + extents.y);
+
+        return new Vector2(randX, randY);
     }
 
     private void _onCapturableBaseBodyEntered(Node2D body)
