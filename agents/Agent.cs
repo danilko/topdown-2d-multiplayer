@@ -18,10 +18,10 @@ public class Agent : KinematicBody2D
     public delegate void DeadSignal();
 
     [Signal]
-    public delegate void PrimaryWeaponChangeSignal();
+    public delegate void RightWeaponChangeSignal();
 
     [Signal]
-    public delegate void SecondaryWeaponChangeSignal();
+    public delegate void LeftWeaponChangeSignal();
 
     [Export]
     public int MaxSpeed { get; set; }
@@ -40,21 +40,21 @@ public class Agent : KinematicBody2D
 
     public float currentTime = 0;
 
-    public int currentPrimaryWeaponIndex { get; set; }
-    public int currentSecondaryWeaponIndex { get; set; }
-    public int PrimaryWeaponAction { set; get; }
-    public int SecondaryWeaponAction { set; get; }
-    public bool PrimaryWeaponReloading { set; get; }
-    public bool SecondaryWeaponReloading { set; get; }
+    public int currentRightWeaponIndex { get; set; }
+    public int currentLeftWeaponIndex { get; set; }
+    public int RightWeaponAction { set; get; }
+    public int LeftWeaponAction { set; get; }
+    public bool RightWeaponReloading { set; get; }
+    public bool LeftWeaponReloading { set; get; }
 
-    protected Godot.Collections.Array primaryWeapons = new Godot.Collections.Array();
-    protected Godot.Collections.Array secondaryWeapons = new Godot.Collections.Array();
-
-    [Export]
-    private int MaxPrimaryWeaponCount = 3;
+    protected Godot.Collections.Array RightWeapons = new Godot.Collections.Array();
+    protected Godot.Collections.Array LeftWeapons = new Godot.Collections.Array();
 
     [Export]
-    private int MaxSecondaryWeaponCount = 1;
+    private int MaxRightWeaponCount = 3;
+
+    [Export]
+    private int MaxLeftWeaponCount = 3;
 
 
     [Export]
@@ -100,8 +100,8 @@ public class Agent : KinematicBody2D
         _health = MaxHealth;
         _energy = MaxEnergy;
 
-        currentPrimaryWeaponIndex = -1;
-        currentSecondaryWeaponIndex = -1;
+        currentRightWeaponIndex = -1;
+        currentLeftWeaponIndex = -1;
 
         EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
         EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
@@ -120,73 +120,92 @@ public class Agent : KinematicBody2D
         _energy = MaxEnergy;
 
         // Temporary script to automatic load weapon
-        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
-        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
-        UpdatePrimaryWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
+        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
+        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
+        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
+
+        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/Shield.tscn"));
+        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/LightSaber.tscn"));
+        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
     }
 
-    public virtual void changePrimaryWeapon(int weaponIndex)
+    public virtual void changeRightWeapon(int weaponIndex)
     {
-        if (currentPrimaryWeaponIndex != -1)
+        weaponIndex = Mathf.Abs(weaponIndex);
+
+        if (RightWeapons.Count != 0)
         {
-            Weapon currentWeapon = ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]);
+            // No need to change weapon if index is same
+            if (weaponIndex % RightWeapons.Count == currentRightWeaponIndex)
+            {
+                return;
+            }
+
+            Weapon currentWeapon = ((Weapon)RightWeapons[currentRightWeaponIndex]);
 
             // Change of weapon, disable reloading
-            if (currentPrimaryWeaponIndex != weaponIndex)
+            if (currentRightWeaponIndex != weaponIndex)
             {
                 // Emit singal to disable any previous relad signal
                 currentWeapon.EmitSignal(nameof(Weapon.ReloadStopSignal));
             }
 
-            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Primary);
+            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Right);
 
             currentWeapon.Hide();
-            currentPrimaryWeaponIndex = weaponIndex % primaryWeapons.Count;
-            if (currentPrimaryWeaponIndex < 0) { currentPrimaryWeaponIndex = currentPrimaryWeaponIndex * -1; }
+            currentRightWeaponIndex = weaponIndex % RightWeapons.Count;
 
-            currentWeapon = ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]);
+            currentWeapon = ((Weapon)RightWeapons[currentRightWeaponIndex]);
 
             currentWeapon.Show();
-            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).CurrentWeaponType);
+            EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
 
-            ConnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Primary);
+            ConnectWeapon((Weapon)RightWeapons[currentRightWeaponIndex], Weapon.WeaponOrder.Right);
 
-            // Emit bullet to update info
+            // Emit signal to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo());
 
         }
     }
 
-    public virtual void changeSecondaryWeapon(int weaponIndex)
+    public virtual void changeLeftWeapon(int weaponIndex)
     {
-        if (currentSecondaryWeaponIndex != -1)
+        weaponIndex = Mathf.Abs(weaponIndex);
+
+        if (LeftWeapons.Count != 0)
         {
-            Weapon currentWeapon = ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]);
+            // No need to change weapon if index is same
+            if (weaponIndex % LeftWeapons.Count == currentLeftWeaponIndex)
+            {
+                return;
+            }
+
+            Weapon currentWeapon = ((Weapon)LeftWeapons[currentLeftWeaponIndex]);
 
             // Change of weapon, disable reloading
-            if (currentSecondaryWeaponIndex != weaponIndex)
+            if (currentLeftWeaponIndex != weaponIndex)
             {
                 // Emit singal to disable any previous relad signal
                 currentWeapon.EmitSignal(nameof(Weapon.ReloadStopSignal));
             }
 
-            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Primary);
-
-            DisconnectWeapon((Weapon)primaryWeapons[currentPrimaryWeaponIndex], Weapon.WeaponOrder.Secondary);
+            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Left);
+            DisconnectWeapon((Weapon)RightWeapons[currentRightWeaponIndex], Weapon.WeaponOrder.Left);
 
             currentWeapon.Hide();
-            currentSecondaryWeaponIndex = weaponIndex % secondaryWeapons.Count;
-            if (currentSecondaryWeaponIndex < 0) { currentSecondaryWeaponIndex = currentSecondaryWeaponIndex * -1; }
+            currentLeftWeaponIndex = weaponIndex % LeftWeapons.Count;
 
-            currentWeapon = ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]);
+            currentWeapon = ((Weapon)LeftWeapons[currentLeftWeaponIndex]);
 
             currentWeapon.Show();
-            EmitSignal(nameof(SecondaryWeaponChangeSignal), currentWeapon.CurrentWeaponType);
 
-            ConnectWeapon(currentWeapon, Weapon.WeaponOrder.Secondary);
+            EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentRightWeaponIndex]).CurrentWeaponType);
 
-            // Emit bullet to update info
+            ConnectWeapon(currentWeapon, Weapon.WeaponOrder.Left);
+
+            // Emit signal to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo());
+
         }
     }
 
@@ -211,59 +230,61 @@ public class Agent : KinematicBody2D
         return GlobalPosition.DistanceTo(targetPosition) < PositionReachedRadius;
     }
 
-    public Weapon GetCurrentPrimaryWeapon()
+    public Weapon GetCurrentRightWeapon()
     {
-        return (Weapon)primaryWeapons[currentPrimaryWeaponIndex];
+        return (Weapon)RightWeapons[currentRightWeaponIndex];
     }
 
-    public Weapon GetCurrentSecondaryWeapon()
+    public Weapon GetCurrentLeftWeapon()
     {
-        return (Weapon)primaryWeapons[currentPrimaryWeaponIndex];
+        return (Weapon)RightWeapons[currentRightWeaponIndex];
     }
 
-    public bool UpdatePrimaryWeapon(PackedScene weapon)
+    public bool UpdateRightWeapon(PackedScene weapon)
     {
-        if (primaryWeapons.Count < MaxPrimaryWeaponCount)
+        if (RightWeapons.Count < MaxRightWeaponCount)
         {
             // Hide existing weapon if exist
-            if (currentPrimaryWeaponIndex != -1)
+            if (currentRightWeaponIndex != -1)
             {
-                ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Hide();
+                ((Weapon)RightWeapons[currentRightWeaponIndex]).Hide();
             }
 
-            Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
+            Position2D weaponHolder = ((Position2D)GetNode("RightWeaponHolder"));
             Weapon currentWeapon = (Weapon)(weapon.Instance());
             currentWeapon.Initialize(_gameWorld, this);
-            primaryWeapons.Add(currentWeapon);
+            RightWeapons.Add(currentWeapon);
 
             // Update to use this weapon as primary
-            currentPrimaryWeaponIndex = primaryWeapons.Count - 1;
+            currentRightWeaponIndex = RightWeapons.Count - 1;
             weaponHolder.AddChild(currentWeapon);
-            EmitSignal(nameof(PrimaryWeaponChangeSignal), ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).CurrentWeaponType);
+            EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
             return true;
         }
 
         return false;
     }
 
-    public bool UpdateSecondaryWeapon(PackedScene weapon)
+    public bool UpdateLeftWeapon(PackedScene weapon)
     {
-        if (secondaryWeapons.Count < MaxSecondaryWeaponCount)
+        if (LeftWeapons.Count < MaxLeftWeaponCount)
         {
             // Hide existing weapon if exist
-            if (currentSecondaryWeaponIndex != -1)
+            if (currentLeftWeaponIndex != -1)
             {
-                ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Hide();
+                ((Weapon)LeftWeapons[currentLeftWeaponIndex]).Hide();
             }
 
-            Position2D weaponHolder = ((Position2D)GetNode("Weapon"));
+            Position2D weaponHolder = ((Position2D)GetNode("LeftWeaponHolder"));
             Weapon currentWeapon = (Weapon)(weapon.Instance());
             currentWeapon.Initialize(_gameWorld, this);
-            secondaryWeapons.Add(currentWeapon);
+            LeftWeapons.Add(currentWeapon);
+
             // Update to use this weapon as secondary
-            currentSecondaryWeaponIndex = secondaryWeapons.Count - 1;
+            currentLeftWeaponIndex = LeftWeapons.Count - 1;
             weaponHolder.AddChild(currentWeapon);
-            EmitSignal(nameof(SecondaryWeaponChangeSignal), ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).CurrentWeaponType);
+
+            EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
 
             return true;
         }
@@ -365,37 +386,36 @@ public class Agent : KinematicBody2D
         GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
     }
 
-    public void Fire(int primaryWeapon, int secondaryWeapon)
+    public void Fire(int rightWeapon, int leftWeapon)
     {
 
-        if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (rightWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
         {
-            ReloadPrimaryWeapon();
+            ReloadRightWeapon();
         }
 
-        if (secondaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (leftWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
         {
-            ReloadSecondaryWeapon();
+            ReloadLeftWeapon();
         }
 
-        if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentPrimaryWeaponIndex != -1)
+        if (rightWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentRightWeaponIndex != -1)
         {
             // knock back effect
-            if (((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
+            if (((Weapon)RightWeapons[currentRightWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                MoveAndSlide(dir * -10 * ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).KnockbackForce);
+                MoveAndSlide(dir * -10 * ((Weapon)RightWeapons[currentRightWeaponIndex]).KnockbackForce);
             }
         }
 
-        // Secondary can only be invoked if primary is not invoked
-        if (primaryWeapon != (int)GameStates.PlayerInput.InputAction.TRIGGER && secondaryWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentSecondaryWeaponIndex != -1)
+        if (leftWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentLeftWeaponIndex != -1)
         {
             // knock back effect
-            if (((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).Fire(target) && MaxSpeed != 0)
+            if (((Weapon)LeftWeapons[currentLeftWeaponIndex]).Fire(target) && MaxSpeed != 0)
             {
                 Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                MoveAndSlide(dir * -10 * ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).KnockbackForce);
+                MoveAndSlide(dir * -10 * ((Weapon)LeftWeapons[currentLeftWeaponIndex]).KnockbackForce);
             }
         }
     }
@@ -473,16 +493,16 @@ public class Agent : KinematicBody2D
         _remoteTransform2D.RemotePath = camera.GetPath();
     }
 
-    public void ReloadPrimaryWeapon()
+    public void ReloadRightWeapon()
     {
-        ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).StartReload();
-        PrimaryWeaponReloading = false;
+        ((Weapon)RightWeapons[currentRightWeaponIndex]).StartReload();
+        RightWeaponReloading = false;
     }
 
-    public void ReloadSecondaryWeapon()
+    public void ReloadLeftWeapon()
     {
-        ((Weapon)secondaryWeapons[currentSecondaryWeaponIndex]).StartReload();
-        SecondaryWeaponReloading = false;
+        ((Weapon)LeftWeapons[currentLeftWeaponIndex]).StartReload();
+        LeftWeaponReloading = false;
     }
 
     public void Heal(int amount)
@@ -507,12 +527,12 @@ public class Agent : KinematicBody2D
 
         if (weaponAmmoType != Weapon.WeaponAmmoType.ENERGY)
         {
-            foreach (Weapon currentWeapon in primaryWeapons)
+            foreach (Weapon currentWeapon in RightWeapons)
             {
                 if (weaponAmmoType == currentWeapon.CurrentWeaponAmmoType)
                 {
                     consume = true;
-                    ((Weapon)primaryWeapons[currentPrimaryWeaponIndex]).AmmoIncrease(amount);
+                    ((Weapon)RightWeapons[currentRightWeaponIndex]).AmmoIncrease(amount);
                 }
             }
         }
@@ -537,9 +557,13 @@ public class Agent : KinematicBody2D
         Sprite body = (Sprite)GetNode("Body");
         body.Hide();
 
-        AnimatedSprite animatedSprite = (AnimatedSprite)GetNode("Explosion");
-        animatedSprite.Show();
-        animatedSprite.Play("fire");
+        RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
+        remainParticles.GlobalPosition = this.GlobalPosition;
+        _gameWorld.GetNode("RemainEffectManager").AddChild(remainParticles);
+
+        AgentExplosionParticle agentExplosionParticle = (AgentExplosionParticle)GetNode("AgentExplosionParticle");
+        agentExplosionParticle.Connect(nameof(AgentExplosionParticle.EffectCompleteSignal), this, nameof(_OnExplosionAnimationFinished));
+        agentExplosionParticle.SetTrigger(true);
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);
@@ -549,6 +573,10 @@ public class Agent : KinematicBody2D
     {
         QueueFree();
         EmitSignal(nameof(DeadSignal));
+    }
+
+    public override void _Process(float delta)
+    {
     }
 
 }

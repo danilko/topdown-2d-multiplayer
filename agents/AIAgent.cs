@@ -26,8 +26,8 @@ public class AIAgent : Agent
     {
         base._Ready();
 
-        PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
-        SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
 
         _speed = MaxSpeed;
 
@@ -60,7 +60,7 @@ public class AIAgent : Agent
             if (currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload"))
             {
                 currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload");
-                currentWeapon.Disconnect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onPrimaryWeaponReloadStop");
+                currentWeapon.Disconnect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onRightWeaponReloadStop");
             }
         }
     }
@@ -75,7 +75,7 @@ public class AIAgent : Agent
             if (!currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload"))
             {
                 currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _agentAI, "_on" + weaponOrder + "WeaponNeedReload");
-                currentWeapon.Connect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onPrimaryWeaponReloadStop");
+                currentWeapon.Connect(nameof(Weapon.ReloadStopSignal), _agentAI, "_onRightWeaponReloadStop");
             }
 
             base.ConnectWeapon(currentWeapon, weaponOrder);

@@ -5,7 +5,6 @@
 [ext_resource path="res://assets/spr_smoke_strip24.png" type="Texture" id=3]
 [ext_resource path="res://projectiles/Missle.cs" type="Script" id=4]
 
-
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 27.0382, 9.10533 )
 

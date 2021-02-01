@@ -10,7 +10,7 @@ public class Weapon : Node2D
 
     public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER }
 
-    public enum WeaponOrder{ Primary, Secondary}
+    public enum WeaponOrder { Right, Left }
 
     [Export]
     public WeaponType CurrentWeaponType { get; set; }
@@ -68,7 +68,7 @@ public class Weapon : Node2D
 
     public override void _Ready()
     {
-        if(MaxAmmo == 0)
+        if (MaxAmmo == 0)
         {
             MaxAmmo = -1;
         }
@@ -129,6 +129,9 @@ public class Weapon : Node2D
         if (Ammo == 0)
         {
             EmitSignal(nameof(AmmoOutSignal));
+
+            // Auto reload
+            StartReload();
         }
 
         return false;
@@ -148,9 +151,13 @@ public class Weapon : Node2D
 
     public void StartReload()
     {
-        Ammo = 0;
-        ReloadTimer.Start();
-        EmitSignal(nameof(ReloadStartSignal));
+        // Only allow reload if there is no reload in process
+        if (ReloadTimer.IsStopped())
+        {
+            Ammo = 0;
+            ReloadTimer.Start();
+            EmitSignal(nameof(ReloadStartSignal));
+        }
     }
 
     private void _stopReload()
@@ -162,7 +169,7 @@ public class Weapon : Node2D
     public void AmmoIncrease(int amount)
     {
         // -1 Indicate no ammo
-        if(Ammo == -1)
+        if (Ammo == -1)
         {
             return;
         }

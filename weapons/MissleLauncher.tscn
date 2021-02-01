@@ -11,8 +11,8 @@ CurrentWeaponAmmoType = 1
 CurrentWeaponType = 2
 KnockbackForce = 200.0
 MaxAmmo = 10
-CooldownTime = 2.0
-ReloadTime = 5.0
+CooldownTime = 0.5
+ReloadTime = 3.0
 Bullet = ExtResource( 4 )
 
 [node name="TriggerPoint" parent="." index="1"]

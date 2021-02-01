@@ -4,7 +4,6 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://projectiles/RifileBullet.cs" type="Script" id=3]
 
-
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 16.3409, 12.763 )
 
@@ -35,16 +34,13 @@ scale_curve = SubResource( 5 )
 color_ramp = SubResource( 3 )
 
 [node name="RifileBullet" instance=ExtResource( 1 )]
-modulate = Color( 1, 1, 1, 1 )
+modulate = Color( 77.46, 1, 1, 1 )
 script = ExtResource( 3 )
-Speed = 2000
+Speed = 3000
 Damage = 10
 Lifetime = 5.0
 
 [node name="Sprite" parent="." index="0"]
-modulate = Color( 20, 1, 1, 1 )
-self_modulate = Color( 20, 1, 1, 1 )
-light_mask = -2147483647
 rotation = 3.14159
 texture = ExtResource( 2 )
 region_enabled = true

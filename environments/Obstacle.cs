@@ -38,22 +38,30 @@ public class Obstacle : StaticBody2D
 
     protected AudioStream explosionMusicClip = (AudioStream)GD.Load("res://assets/sounds/explosion_large_07.wav");
 
-    private int health;
+    private int _health;
+    private int _maxHealth;
 
     public override void _Ready()
     {
         Sprite icon = (Sprite)GetNode("Icon");
         icon.RegionRect = itemRegions[(int)type];
-        health = itemHealth[(int)type];
+        _maxHealth = itemHealth[(int)type];
+        _health = itemHealth[(int)type];
     }
 
     public void TakeEnvironmentDamage(int amount)
     {
-        health -= amount;
+        _health -= amount;
 
-        if (health < 0)
+        if (_health < 0)
         {
             EmitSignal(nameof(Obstacle.ObstacleDestroySignal), Name);
+        }
+
+        if (_health <= _maxHealth / 2)
+        {
+            Particles2D smoke = (Particles2D)GetNode("Smoke");
+            smoke.Emitting = true;
         }
     }
 
@@ -69,19 +77,16 @@ public class Obstacle : StaticBody2D
         animatedSprite.Show();
         animatedSprite.Play("smoke");
 
+        RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
+        remainParticles.GlobalPosition = this.GlobalPosition;
+        GetParent().GetParent().GetNode("RemainEffectManager").AddChild(remainParticles);
+
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);
     }
 
     private void _OnExplosionAnimationFinished()
     {
-        Sprite newIcon = (Sprite)GetNode("Icon").Duplicate();
-        newIcon.Name = this.Name + "_remained";
-        newIcon.RegionRect = itemRegions[itemRegions.Length - 1];
-        newIcon.Position = Position;
-        GetParent().AddChild(newIcon);
-        newIcon.Show();
-
         QueueFree();
     }
 }

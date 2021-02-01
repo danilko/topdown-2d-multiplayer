@@ -35,10 +35,10 @@ public class GameStates : Node
 
         public Vector2 MousePosition;
 
-        public int PrimaryWeaponAction;
-        public int SecondaryWeaponAction;
-        public int PrimaryWeaponIndex;
-        public int SecondaryWeaponIndex;
+        public int RightWeaponAction;
+        public int LeftWeaponAction;
+        public int RightWeaponIndex;
+        public int LeftWeaponIndex;
     }
 
     // Holds player input data (including the local one) which will be used to update the game state

@@ -23,6 +23,3 @@ region_rect = Rect2( 1031, 168, 79, 82 )
 [node name="CollisionShape2D" parent="." index="1"]
 scale = Vector2( 1, 3.99872 )
 shape = SubResource( 1 )
-
-[node name="Weapon" parent="." index="5"]
-position = Vector2( 70, 0 )

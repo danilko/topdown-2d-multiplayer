@@ -1,0 +1,80 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/ui/grey_button00.png" type="Texture" id=2]
+[ext_resource path="res://weapons/LightSaber.cs" type="Script" id=3]
+
+[sub_resource type="CanvasItemMaterial" id=3]
+blend_mode = 1
+
+[sub_resource type="Animation" id=2]
+resource_name = "Attack"
+length = 0.25
+step = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.24, 0.25 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, -100.0, 30.0, 0.0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.02, 0.1, 0.24, 0.25 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0.5, 0.3 ), Vector2( 1.5, 0.5 ), Vector2( 1.8, 0.3 ), Vector2( 1.8, 0.3 ), Vector2( 0.5, 0.3 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Area2D/CollisionShape2D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.08, 0.23 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
+}
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 221.998, 125.843 )
+
+[node name="LightSaber" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+CurrentWeaponType = 1
+MaxAmmo = 0
+CooldownTime = 1.0
+ReloadTime = 1.0
+
+[node name="Sprite" type="Sprite" parent="." index="3"]
+self_modulate = Color( 0, 45.93, 95.95, 1 )
+material = SubResource( 3 )
+position = Vector2( -22.6497, 0 )
+scale = Vector2( 0.5, 0.3 )
+texture = ExtResource( 2 )
+offset = Vector2( 80, 0 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="4"]
+anims/Attack = SubResource( 2 )
+
+[node name="Area2D" type="Area2D" parent="." index="5"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" index="0"]
+position = Vector2( 96.5422, -61.416 )
+shape = SubResource( 1 )
+disabled = true
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationFinished"]
+[connection signal="area_exited" from="Area2D" to="." method="_onCollisionEntered"]
+[connection signal="body_entered" from="Area2D" to="." method="_onCollisionEntered"]

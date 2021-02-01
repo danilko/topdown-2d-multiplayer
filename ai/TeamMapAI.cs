@@ -208,7 +208,9 @@ public class TeamMapAI : Node2D
         // Set the info afterward as some of these depend on child node to be available
         unit.Initialize(_gameWorld, unitName, displayName, _team.CurrentTeamCode, _pathFinding);
 
-        unit.changePrimaryWeapon(0);
+        // Trigger reload of UI
+        unit.changeRightWeapon(0);
+        unit.changeLeftWeapon(0);
 
         _currentUnitUsageAmount -= _unitCost;
 

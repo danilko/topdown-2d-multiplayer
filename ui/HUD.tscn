@@ -208,38 +208,57 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblPrimaryWeaponLabel" type="Label" parent="controlGame"]
-margin_left = 420.78
-margin_top = 15.6754
-margin_right = 539.78
-margin_bottom = 29.6754
-text = "PRIMARY WEAPON"
+[node name="LeftWeaponControl" type="Control" parent="controlGame"]
+margin_left = 272.0
+margin_top = 9.0
+margin_right = 590.0
+margin_bottom = 122.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblPrimaryWeaponAmmo" type="Label" parent="controlGame"]
-margin_left = 421.878
-margin_top = 33.2928
-margin_right = 526.878
-margin_bottom = 47.2928
+[node name="lblWeaponLabel" type="Label" parent="controlGame/LeftWeaponControl"]
+margin_left = 150.597
+margin_top = 3.43382
+margin_right = 269.597
+margin_bottom = 17.4338
+text = "LEFT WEAPON"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblWeaponName" type="Label" parent="controlGame/LeftWeaponControl"]
+margin_left = 150.597
+margin_top = 32.1329
+margin_right = 269.597
+margin_bottom = 46.1329
+text = "LEFT WEAPON"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblWeaponAmmo" type="Label" parent="controlGame/LeftWeaponControl"]
+margin_left = 151.695
+margin_top = 49.7503
+margin_right = 256.695
+margin_bottom = 63.7503
 text = "000/000"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="spPrimaryWeaponSymbol" type="Sprite" parent="controlGame"]
-position = Vector2( 295.392, 17.9144 )
+[node name="spWeaponSymbol" type="Sprite" parent="controlGame/LeftWeaponControl"]
+position = Vector2( 9.85846, 13.0144 )
 scale = Vector2( 115.661, 42.1615 )
 texture = ExtResource( 5 )
 region_enabled = true
 
-[node name="lblPrimaryWeaponReloading" type="Label" parent="controlGame"]
+[node name="lblWeaponReloading" type="Label" parent="controlGame/LeftWeaponControl"]
 visible = false
-margin_left = 423.058
-margin_top = 58.6694
-margin_right = 500.058
-margin_bottom = 72.6694
+margin_left = 150.523
+margin_top = 89.5728
+margin_right = 227.523
+margin_bottom = 103.573
 rect_pivot_offset = Vector2( 53.3791, 14 )
 custom_colors/font_color = Color( 1, 0, 0, 1 )
 text = "RELOADING"
@@ -247,12 +266,83 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblPrimaryWeaponAmmoOut" type="Label" parent="controlGame"]
+[node name="lblWeaponAmmoOut" type="Label" parent="controlGame/LeftWeaponControl"]
 visible = false
-margin_left = 481.412
-margin_top = 32.8334
-margin_right = 558.412
-margin_bottom = 46.8334
+margin_left = 150.072
+margin_top = 70.9775
+margin_right = 248.072
+margin_bottom = 84.9775
+rect_pivot_offset = Vector2( 53.3791, 14 )
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "OUT OF AMMO"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RightWeaponControl" type="Control" parent="controlGame"]
+margin_left = 657.101
+margin_top = 9.0
+margin_right = 975.101
+margin_bottom = 122.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblWeaponLabel" type="Label" parent="controlGame/RightWeaponControl"]
+margin_left = 150.597
+margin_top = 3.43382
+margin_right = 269.597
+margin_bottom = 17.4338
+text = "RIGHT WEAPON"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblWeaponName" type="Label" parent="controlGame/RightWeaponControl"]
+margin_left = 150.597
+margin_top = 32.1329
+margin_right = 269.597
+margin_bottom = 46.1329
+text = "RIGHT WEAPON"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblWeaponAmmo" type="Label" parent="controlGame/RightWeaponControl"]
+margin_left = 151.695
+margin_top = 49.7503
+margin_right = 256.695
+margin_bottom = 63.7503
+text = "000/000"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="spWeaponSymbol" type="Sprite" parent="controlGame/RightWeaponControl"]
+position = Vector2( 9.85846, 13.0144 )
+scale = Vector2( 115.661, 42.1615 )
+texture = ExtResource( 5 )
+region_enabled = true
+
+[node name="lblWeaponReloading" type="Label" parent="controlGame/RightWeaponControl"]
+visible = false
+margin_left = 150.523
+margin_top = 89.5728
+margin_right = 227.523
+margin_bottom = 103.573
+rect_pivot_offset = Vector2( 53.3791, 14 )
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "RELOADING"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblWeaponAmmoOut" type="Label" parent="controlGame/RightWeaponControl"]
+visible = false
+margin_left = 150.072
+margin_top = 70.9775
+margin_right = 248.072
+margin_bottom = 84.9775
 rect_pivot_offset = Vector2( 53.3791, 14 )
 custom_colors/font_color = Color( 1, 0, 0, 1 )
 text = "OUT OF AMMO"

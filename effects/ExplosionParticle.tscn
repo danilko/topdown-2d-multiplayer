@@ -1,0 +1,167 @@
+[gd_scene load_steps=23 format=2]
+
+[ext_resource path="res://effects/ExplosionParticle.cs" type="Script" id=1]
+
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 1
+
+[sub_resource type="Gradient" id=2]
+offsets = PoolRealArray( 0, 0.0707786, 0.389744, 0.725641, 1 )
+colors = PoolColorArray( 0.96875, 0.951189, 0.764404, 1, 0.988281, 0.921598, 0.212326, 1, 0.99449, 0.433309, 0.0998297, 1, 0.997523, 0.194807, 0.0448814, 1, 1, 0, 0, 1 )
+
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
+
+[sub_resource type="Curve" id=4]
+min_value = -400.0
+max_value = 500.0
+_data = [ Vector2( 0, 500 ), 0.0, 3052.93, 0, 0, Vector2( 0.200106, -101.818 ), -1248.93, -1248.93, 0, 0, Vector2( 1, -261.818 ), 103.19, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=5]
+curve = SubResource( 4 )
+
+[sub_resource type="Curve" id=6]
+max_value = 2.5
+_data = [ Vector2( 0, 2.5 ), 0.0, -5.06131, 0, 0, Vector2( 1, 0.977273 ), -0.151136, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=7]
+curve = SubResource( 6 )
+
+[sub_resource type="ParticlesMaterial" id=8]
+emission_shape = 1
+emission_sphere_radius = 2.0
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 100.0
+initial_velocity_random = 0.5
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = 100.0
+linear_accel_random = 0.2
+linear_accel_curve = SubResource( 5 )
+scale = 2.0
+scale_curve = SubResource( 7 )
+color_ramp = SubResource( 3 )
+
+[sub_resource type="CanvasItemMaterial" id=9]
+blend_mode = 1
+
+[sub_resource type="Curve" id=10]
+max_value = 300.0
+_data = [ Vector2( 0, 300 ), 0.0, 1920.85, 0, 0, Vector2( 0.159806, 0 ), 62.1158, 62.1158, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=11]
+curve = SubResource( 10 )
+
+[sub_resource type="Curve" id=12]
+max_value = 3.0
+_data = [ Vector2( 0, 2.68636 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=13]
+curve = SubResource( 12 )
+
+[sub_resource type="ParticlesMaterial" id=14]
+emission_shape = 1
+emission_sphere_radius = 2.0
+flag_disable_z = true
+direction = Vector3( 1, 140, 0 )
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 100.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = 100.0
+linear_accel_random = 0.4
+linear_accel_curve = SubResource( 11 )
+scale = 2.5
+scale_random = 1.0
+scale_curve = SubResource( 13 )
+color_ramp = SubResource( 3 )
+
+[sub_resource type="Gradient" id=15]
+offsets = PoolRealArray( 0, 0.715385, 1 )
+colors = PoolColorArray( 0.266667, 0.266667, 0.266667, 0.815686, 0.286133, 0.221306, 0.221306, 0.913725, 0.204102, 0.18519, 0.176197, 0.929412 )
+
+[sub_resource type="GradientTexture" id=16]
+gradient = SubResource( 15 )
+
+[sub_resource type="Curve" id=17]
+min_value = -200.0
+max_value = 200.0
+_data = [ Vector2( 0, 200 ), 0.0, 1274.27, 0, 0, Vector2( 0.150121, 0.454559 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=18]
+curve = SubResource( 17 )
+
+[sub_resource type="Curve" id=19]
+min_value = 0.99
+max_value = 5.0
+_data = [ Vector2( 0, 2.42084 ), 0.0, 0.0, 0, 0, Vector2( 1, 5 ), 4.75196, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=20]
+curve = SubResource( 19 )
+
+[sub_resource type="ParticlesMaterial" id=21]
+emission_shape = 1
+emission_sphere_radius = 2.0
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 80.0
+initial_velocity_random = 0.5
+orbit_velocity = 0.15
+orbit_velocity_random = 1.0
+linear_accel = 100.0
+linear_accel_random = 0.5
+linear_accel_curve = SubResource( 18 )
+scale = 2.0
+scale_random = 1.0
+scale_curve = SubResource( 20 )
+color_ramp = SubResource( 16 )
+
+[node name="ExplosionParticle" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="Spark1" type="Particles2D" parent="."]
+modulate = Color( 69.37, 1, 1, 1 )
+material = SubResource( 1 )
+emitting = false
+amount = 200
+lifetime = 0.8
+one_shot = true
+speed_scale = 0.8
+explosiveness = 0.5
+process_material = SubResource( 8 )
+
+[node name="Spark2" type="Particles2D" parent="."]
+modulate = Color( 68.21, 1, 1, 1 )
+material = SubResource( 9 )
+emitting = false
+amount = 10
+lifetime = 0.8
+one_shot = true
+speed_scale = 0.8
+explosiveness = 0.8
+process_material = SubResource( 14 )
+
+[node name="Smoke1" type="Particles2D" parent="."]
+show_behind_parent = true
+emitting = false
+amount = 500
+lifetime = 0.5
+one_shot = true
+speed_scale = 0.8
+explosiveness = 0.6
+process_material = SubResource( 21 )
+
+[node name="Smoke2" type="Particles2D" parent="."]
+self_modulate = Color( 1, 1, 1, 0.784314 )
+show_behind_parent = true
+emitting = false
+amount = 500
+lifetime = 0.6
+one_shot = true
+speed_scale = 0.5
+explosiveness = 0.8
+process_material = SubResource( 21 )

@@ -15,7 +15,7 @@ MaxSpeed = 250
 RotationSpeed = 5.0
 MaxHealth = 100
 TurretSpeed = 10
-DetectRadius = 500.0
+DetectRadius = 1000.0
 
 [node name="Body" parent="." index="0"]
 texture = ExtResource( 1 )
@@ -24,9 +24,6 @@ region_rect = Rect2( 288, 103, 73, 79 )
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource( 1 )
-
-[node name="Weapon" parent="." index="5"]
-position = Vector2( 70, 0 )
 
 [node name="PathLine" type="Line2D" parent="." index="7"]
 default_color = Color( 0.952941, 0.235294, 0.0156863, 1 )

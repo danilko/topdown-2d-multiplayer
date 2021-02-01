@@ -45,11 +45,11 @@ public class GameWorld : Node2D
         public String Id;
         public Vector2 Position;
         public float Rotation;
-        public int PrimaryWeapon;
-        public int SecondaryWeapon;
+        public int RightWeapon;
+        public int LeftWeapon;
         public int Health;
-        public int PrimaryWeaponIndex;
-        public int SecondaryWeaponIndex;
+        public int RightWeaponIndex;
+        public int LeftWeaponIndex;
     }
 
     public class Snapshot : Godot.Object
@@ -68,7 +68,7 @@ public class GameWorld : Node2D
         public Vector2 ToPosition;
         public float ToRotation;
         public int primaryWeapon;
-        public int SecondaryWeapon;
+        public int LeftWeapon;
         public int Health;
         public float Time;
         public Node2D Node;
@@ -133,7 +133,7 @@ public class GameWorld : Node2D
 
     private TileMap _tileMap;
 
-    private Camera2D _camera2D;
+    private GameCamera _camera2D;
 
     private HUD _hud;
 
@@ -163,7 +163,7 @@ public class GameWorld : Node2D
 
     private void _initializeCamera()
     {
-        _camera2D = (Camera2D)GetNode("Camera");
+        _camera2D = (GameCamera)GetNode("GameCamera");
         _camera2D.Current = true;
     }
 
@@ -191,7 +191,7 @@ public class GameWorld : Node2D
             RpcId(1, nameof(_initializeNewPlayer), network.gamestateNetworkPlayer.ToString());
         }
 
-       
+
         // Update network flow
         this.Connect(nameof(NeworkRateUpdateSignal), _hud, "_onNetworkRateUpdate");
         this.Connect(nameof(PlayerDefeatedSignal), _hud, nameof(HUD.OnPlayerDefeated));
@@ -231,7 +231,7 @@ public class GameWorld : Node2D
 
         if (GetTree().IsNetworkServer())
         {
-            _pathFinding = (PathFinding)((PackedScene)GD.Load("res://ai/PathFinding.tscn")).Instance();;
+            _pathFinding = (PathFinding)((PackedScene)GD.Load("res://ai/PathFinding.tscn")).Instance(); ;
             this.AddChild(_pathFinding);
             _pathFinding.Initialize(_tileMap, _obstacleManager);
         }
@@ -501,15 +501,15 @@ public class GameWorld : Node2D
         parseIndex++;
         clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
-        clientData.PrimaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.RightWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
-        clientData.SecondaryWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.LeftWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
         clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
-        clientData.PrimaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.RightWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
-        clientData.SecondaryWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.LeftWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
 
         return parseIndex;
@@ -521,11 +521,11 @@ public class GameWorld : Node2D
         encodedData = encodedData + clientData.Position.x + ";";
         encodedData = encodedData + clientData.Position.y + ";";
         encodedData = encodedData + clientData.Rotation + ";";
-        encodedData = encodedData + clientData.PrimaryWeapon + ";";
-        encodedData = encodedData + clientData.SecondaryWeapon + ";";
+        encodedData = encodedData + clientData.RightWeapon + ";";
+        encodedData = encodedData + clientData.LeftWeapon + ";";
         encodedData = encodedData + clientData.Health + ";";
-        encodedData = encodedData + clientData.PrimaryWeaponIndex + ";";
-        encodedData = encodedData + clientData.SecondaryWeaponIndex + ";";
+        encodedData = encodedData + clientData.RightWeaponIndex + ";";
+        encodedData = encodedData + clientData.LeftWeaponIndex + ";";
 
         return encodedData;
     }
@@ -572,10 +572,10 @@ public class GameWorld : Node2D
             return;
         }
 
-        if (agent.currentPrimaryWeaponIndex != item.PrimaryWeaponIndex) { agent.changePrimaryWeapon(item.PrimaryWeaponIndex); }
-        if (agent.currentSecondaryWeaponIndex != item.SecondaryWeaponIndex) { agent.changeSecondaryWeapon(item.SecondaryWeaponIndex); }
+        agent.changeRightWeapon(item.RightWeaponIndex);
+        agent.changeLeftWeapon(item.LeftWeaponIndex);
 
-        agent.Sync(item.Position, item.Rotation, item.PrimaryWeapon, item.SecondaryWeapon);
+        agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.LeftWeapon);
         agent.setHealth(item.Health);
     }
 
@@ -648,6 +648,14 @@ public class GameWorld : Node2D
             createObserver(existingPosition);
             EmitSignal(nameof(PlayerDefeatedSignal));
         }
+
+        // Shake camera
+        if (Mathf.Abs(existingPosition.x - _camera2D.GlobalPosition.y) < GetViewport().Size.x &&
+         Mathf.Abs(existingPosition.y - _camera2D.GlobalPosition.y) < GetViewport().Size.y)
+        {
+            _camera2D.StartScreenShake();
+        }
+
 
         if (GetTree().IsNetworkServer())
         {
@@ -722,8 +730,8 @@ public class GameWorld : Node2D
                 if (gameStates.playerInputs.ContainsKey(networkPlayer.Key) && gameStates.playerInputs[networkPlayer.Key].Count > 0)
                 {
 
-                    int primaryWeapon = 0;
-                    int secondaryWeapon = 0;
+                    int rightWeapon = 0;
+                    int leftWeapon = 0;
 
                     // Calculate the delta
                     float delta = gameStates.updateDelta / (float)(gameStates.playerInputs[networkPlayer.Key].Count);
@@ -736,15 +744,15 @@ public class GameWorld : Node2D
                         moveDir.x = -1 * input.Value.Left;
                         moveDir.x += 1 * input.Value.Right;
 
-                        playerNode.changePrimaryWeapon(input.Value.PrimaryWeaponIndex);
-                        playerNode.changeSecondaryWeapon(input.Value.SecondaryWeaponIndex);
+                        playerNode.changeRightWeapon(input.Value.RightWeaponIndex);
+                        playerNode.changeLeftWeapon(input.Value.LeftWeaponIndex);
 
                         if (!_waitingPeriod)
                         {
-                            primaryWeapon = input.Value.PrimaryWeaponAction;
-                            secondaryWeapon = input.Value.SecondaryWeaponAction;
+                            rightWeapon = input.Value.RightWeaponAction;
+                            leftWeapon = input.Value.LeftWeaponAction;
                         }
-                        playerNode.Fire(primaryWeapon, secondaryWeapon);
+                        playerNode.Fire(rightWeapon, leftWeapon);
 
                         playerNode.MoveToward(moveDir, delta);
                         playerNode.RotateToward(input.Value.MousePosition, delta);
@@ -759,10 +767,10 @@ public class GameWorld : Node2D
                     clientData.Id = networkPlayer.Key + "";
                     clientData.Position = playerNode.Position;
                     clientData.Rotation = playerNode.Rotation;
-                    clientData.PrimaryWeapon = primaryWeapon;
-                    clientData.SecondaryWeapon = secondaryWeapon;
-                    clientData.PrimaryWeaponIndex = playerNode.currentPrimaryWeaponIndex;
-                    clientData.SecondaryWeaponIndex = playerNode.currentSecondaryWeaponIndex;
+                    clientData.RightWeapon = rightWeapon;
+                    clientData.LeftWeapon = leftWeapon;
+                    clientData.RightWeaponIndex = playerNode.currentRightWeaponIndex;
+                    clientData.LeftWeaponIndex = playerNode.currentLeftWeaponIndex;
                     clientData.Health = playerNode.getHealth();
 
                     snapshot.playerData.Add(networkPlayer.Key, clientData);
@@ -811,8 +819,8 @@ public class GameWorld : Node2D
 
             if (!_waitingPeriod)
             {
-                primaryWeapon = enemyNode.PrimaryWeaponAction;
-                secondaryWeapon = enemyNode.SecondaryWeaponAction;
+                primaryWeapon = enemyNode.RightWeaponAction;
+                secondaryWeapon = enemyNode.LeftWeaponAction;
             }
 
             enemyNode.Fire(primaryWeapon, secondaryWeapon);
@@ -825,10 +833,10 @@ public class GameWorld : Node2D
                 clientData.Position = enemyNode.GlobalPosition;
                 clientData.Rotation = enemyNode.GlobalRotation;
                 clientData.Health = enemyNode.getHealth();
-                clientData.PrimaryWeapon = primaryWeapon;
-                clientData.SecondaryWeapon = secondaryWeapon;
-                clientData.PrimaryWeaponIndex = enemyNode.currentPrimaryWeaponIndex;
-                clientData.SecondaryWeaponIndex = enemyNode.currentSecondaryWeaponIndex;
+                clientData.RightWeapon = primaryWeapon;
+                clientData.LeftWeapon = secondaryWeapon;
+                clientData.RightWeaponIndex = enemyNode.currentRightWeaponIndex;
+                clientData.LeftWeaponIndex = enemyNode.currentLeftWeaponIndex;
 
                 // Append into the snapshot
                 snapshot.botData.Add(enemyNode.Name, clientData);
@@ -836,11 +844,11 @@ public class GameWorld : Node2D
                 // This logic is necessary to notify the AI that reload is pick up, so can continue with next state
                 if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
                 {
-                    enemyNode.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                    enemyNode.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
                 }
                 if (secondaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
                 {
-                    enemyNode.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                    enemyNode.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
                 }
             }
             else
@@ -1290,11 +1298,11 @@ public class GameWorld : Node2D
         {
             bool enableAI = false;
 
-            if(GetTree().IsNetworkServer())
+            if (GetTree().IsNetworkServer())
             {
                 enableAI = true;
             }
-            
+
             spawnBots.Add(unitName, _teamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI));
         }
     }

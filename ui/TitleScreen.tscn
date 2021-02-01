@@ -65,10 +65,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -366.683
-margin_top = -121.751
-margin_right = 396.317
-margin_bottom = -23.7504
+margin_left = -365.683
+margin_top = -128.751
+margin_right = 397.317
+margin_bottom = -30.7504
 custom_fonts/font = SubResource( 1 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
@@ -105,10 +105,10 @@ autoplay = "start"
 anims/start = SubResource( 3 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="."]
-margin_left = 55.2363
-margin_top = 352.546
-margin_right = 427.236
-margin_bottom = 621.546
+margin_left = 35.0
+margin_top = 355.0
+margin_right = 791.0
+margin_bottom = 641.0
 text = "CONTROL INSTRUCTIONS:
 
 W - UP
@@ -116,16 +116,17 @@ A - RIGHT
 S - DOWN
 D - LEFT
 R - RELOAD
-1/2/3 - SWITCH PRIMARY WEAPON
-
+1/2/3 - SWITCH LEFT WEAPON
+4/5/6 - SWITCH RIGHT WEAPON
 MOUSE - AIM
-MOUSE LEFT CLICK - PRIMARY WEAPON
+MOUSE LEFT CLICK - LEFT WEAPON
+MOUSE RIGHT CLICK - RIGHT WEAPON
 
 TAB - PLAYER LIST
 
 CURRENT WINNING/LOSING CONDITION:
-ALL ENEMY BOTS DEFEATED (AROUND WAVE OF 100 BOTS TOTAL)
-ALL PLAYERS DEFEATED"
+1. ALL ENEMY UNITS DEFEATED (AROUND 100  FROM EACH TEAM)
+2. ALL BASE CAPTURED + NO MORE CURRENT ENEMY UNITS (AS IT RESULT NO MORE ENEMY UNITS CAN BE SPAWNED)"
 __meta__ = {
 "_edit_use_anchors_": false
 }

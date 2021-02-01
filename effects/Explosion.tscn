@@ -13,14 +13,14 @@
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
-"frames": [ ExtResource( 7 ), ExtResource( 2 ), ExtResource( 9 ), ExtResource( 1 ), ExtResource( 10 ) ],
-"loop": true,
-"name": "fire",
-"speed": 15.0
-}, {
 "frames": [ ExtResource( 8 ), ExtResource( 5 ), ExtResource( 3 ), ExtResource( 6 ), ExtResource( 4 ) ],
 "loop": true,
 "name": "smoke",
+"speed": 15.0
+}, {
+"frames": [ ExtResource( 7 ), ExtResource( 2 ), ExtResource( 9 ), ExtResource( 1 ), ExtResource( 10 ) ],
+"loop": true,
+"name": "fire",
 "speed": 15.0
 } ]
 

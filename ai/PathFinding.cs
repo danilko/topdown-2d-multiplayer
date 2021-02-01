@@ -111,7 +111,7 @@ public class PathFinding : Node2D
                 colorRect.MouseFilter = Control.MouseFilterEnum.Ignore;
 
                 colorRect.SetSize(_tileMap.CellSize);
-                colorRect.RectPosition = _tileMap.MapToWorld(tile);
+                colorRect.RectPosition = _tileMap.MapToWorld(tile) + _tileMap.CellSize;
 
             }
         }

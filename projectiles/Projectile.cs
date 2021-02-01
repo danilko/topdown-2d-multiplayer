@@ -95,8 +95,6 @@ public class Projectile : Area2D
         AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
         explosion.Show();
         explosion.Play("smoke");
-
-
     }
 
     private void _onProjectileBodyEntered(Node2D body)

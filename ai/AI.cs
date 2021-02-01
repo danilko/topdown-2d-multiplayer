@@ -130,13 +130,13 @@ public class AI : Node2D
         _pathLine.GlobalRotation = 0;
 
         // If not reloading, then set to default
-        if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (_agent.RightWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
         {
-            _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
         }
-        if (_agent.SecondaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (_agent.LeftWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
         {
-            _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
         }
 
         Godot.Collections.Array pathPoints = null;
@@ -177,13 +177,13 @@ public class AI : Node2D
                     if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.3)
                     {
                         // Only can fire if not in reload
-                        if (_agent.PrimaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+                        if (_agent.RightWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
                         {
-                            _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
+                            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
                         }
-                        if (_agent.SecondaryWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+                        if (_agent.LeftWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
                         {
-                            _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
+                            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
                         }
                     }
                 }
@@ -213,25 +213,25 @@ public class AI : Node2D
         }
     }
 
-    private void _onPrimaryWeaponNeedReload()
+    private void _onRightWeaponNeedReload()
     {
-        _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+        _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
     }
 
-    private void _onPrimaryWeaponReloadStop()
+    private void _onRightWeaponReloadStop()
     {
-        _agent.PrimaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
     }
 
 
-    private void _onSecondaryWeaponNeedReload()
+    private void _onLeftWeaponNeedReload()
     {
-        _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+        _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
     }
 
-    private void _onSecondaryWeaponReloadStop()
+    private void _onLeftWeaponReloadStop()
     {
-        _agent.SecondaryWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
     }
 
     private void _onDetectionZoneBodyEntered(Node body)

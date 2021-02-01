@@ -1,12 +1,14 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://weapons/Rifile.cs" type="Script" id=2]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
 [ext_resource path="res://projectiles/RifileBullet.tscn" type="PackedScene" id=4]
 
-[sub_resource type="Animation" id=1]
-resource_name = "Init"
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 1
+
+[sub_resource type="Animation" id=2]
 tracks/0/type = "value"
 tracks/0/path = NodePath("Flash:modulate")
 tracks/0/interp = 1
@@ -20,8 +22,7 @@ tracks/0/keys = {
 "values": [ Color( 1, 1, 1, 0 ) ]
 }
 
-[sub_resource type="Animation" id=2]
-resource_name = "MuzzleFlash"
+[sub_resource type="Animation" id=3]
 length = 0.1
 step = 0.01
 tracks/0/type = "value"
@@ -67,8 +68,8 @@ region_rect = Rect2( 764, 39, 71, 26 )
 position = Vector2( 80, 0 )
 
 [node name="Flash" type="Sprite" parent="." index="3"]
-modulate = Color( 1, 1, 1, 0 )
-self_modulate = Color( 20, 1, 1, 1 )
+modulate = Color( 0, 0, 0, 0 )
+material = SubResource( 1 )
 position = Vector2( 82.9465, 0 )
 texture = ExtResource( 3 )
 region_enabled = true
@@ -76,5 +77,5 @@ region_rect = Rect2( 213, 62, 57, 30 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="4"]
 autoplay = "Init"
-anims/Init = SubResource( 1 )
-anims/MuzzleFlash = SubResource( 2 )
+anims/Init = SubResource( 2 )
+anims/MuzzleFlash = SubResource( 3 )
