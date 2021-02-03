@@ -136,12 +136,14 @@ public class GameWorld : Node2D
     private GameCamera _camera2D;
 
     private HUD _hud;
+    private MiniMap _miniMap;
 
     public override void _Ready()
     {
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
         _hud = (HUD)GetNode("HUD");
+        _miniMap = (MiniMap)_hud.GetNode("MiniMap");
 
         _initializeCamera();
         _initializeTileMap();
@@ -634,6 +636,18 @@ public class GameWorld : Node2D
         {
             existingPosition = currentSpawnCache[id].GlobalPosition;
 
+
+            // Clean up the agent marker on minimap if not the agent of the player of this machine
+            if (!(player && id == _agentPlayerPrefix + network.gamestateNetworkPlayer.net_id))
+            {
+                _miniMap.RemoveAgent(currentSpawnCache[id]);
+            }
+            else
+            {
+                // Remove the player agent marker
+                _miniMap.RemovePlayer();
+            }
+
             _teamMapAIs[(int)currentSpawnCache[id].GetCurrentTeam()].RemoveUnit(currentSpawnCache[id].Name);
         }
 
@@ -645,6 +659,7 @@ public class GameWorld : Node2D
         // If this is the player attach to current client, respawn the client with observer
         if (player && id == _agentPlayerPrefix + network.gamestateNetworkPlayer.net_id)
         {
+
             createObserver(existingPosition);
             EmitSignal(nameof(PlayerDefeatedSignal));
         }
@@ -1187,12 +1202,22 @@ public class GameWorld : Node2D
             agent.SetNetworkMaster(netId);
         }
 
+
+
         // If this actor is the current client controlled, add camera and attach HUD
         if (netId == network.gamestateNetworkPlayer.net_id)
         {
             // Attach camera
             agent.SetHUD(_hud);
             agent.SetCameraRemotePath(_camera2D);
+
+            // Set player marker
+            _miniMap.SetPlayer(agent);
+        }
+        else
+        {
+            // Add as normal agent marker
+            _miniMap.AddAgent(agent);
         }
 
         spawnPlayers.Add(playerId, agent);
@@ -1303,7 +1328,11 @@ public class GameWorld : Node2D
                 enableAI = true;
             }
 
-            spawnBots.Add(unitName, _teamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI));
+            Agent agent =  _teamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI);
+            spawnBots.Add(unitName, agent);
+
+             // Add agent marker to minimap
+            _miniMap.AddAgent(agent);
         }
     }
 

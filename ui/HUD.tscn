@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=5]
 [ext_resource path="res://assets/fonts/Kenney Pixel Square.ttf" type="DynamicFontData" id=6]
 [ext_resource path="res://assets/fonts/Kenney Rocket Square.ttf" type="DynamicFontData" id=7]
+[ext_resource path="res://ui/MiniMap.tscn" type="PackedScene" id=8]
 
 [sub_resource type="DynamicFont" id=1]
 size = 20
@@ -153,20 +154,20 @@ radial_initial_angle = 270.0
 radial_fill_degrees = 180.0
 
 [node name="lblDefeatedAgentCountLabel" type="Label" parent="controlGame"]
-margin_left = 716.39
-margin_top = 471.819
-margin_right = 825.39
-margin_bottom = 487.819
+margin_left = 738.439
+margin_top = 442.841
+margin_right = 847.439
+margin_bottom = 458.841
 text = "Defeated Agent"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="lblDefeatedAgentCount" type="Label" parent="controlGame"]
-margin_left = 875.407
-margin_top = 470.405
-margin_right = 984.407
-margin_bottom = 486.405
+margin_left = 897.456
+margin_top = 441.427
+margin_right = 1006.46
+margin_bottom = 457.427
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -209,10 +210,10 @@ __meta__ = {
 }
 
 [node name="LeftWeaponControl" type="Control" parent="controlGame"]
-margin_left = 272.0
-margin_top = 9.0
-margin_right = 590.0
-margin_bottom = 122.0
+margin_left = 313.577
+margin_top = 480.84
+margin_right = 631.577
+margin_bottom = 593.84
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -280,10 +281,10 @@ __meta__ = {
 }
 
 [node name="RightWeaponControl" type="Control" parent="controlGame"]
-margin_left = 657.101
-margin_top = 9.0
-margin_right = 975.101
-margin_bottom = 122.0
+margin_left = 698.678
+margin_top = 480.84
+margin_right = 1016.68
+margin_bottom = 593.84
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -393,4 +394,10 @@ __meta__ = {
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/MessageAnnounce = SubResource( 3 )
+
+[node name="MiniMap" parent="." instance=ExtResource( 8 )]
+margin_left = 809.499
+margin_top = 10.0794
+margin_right = 1009.5
+margin_bottom = 210.079
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationPlayerFinished"]

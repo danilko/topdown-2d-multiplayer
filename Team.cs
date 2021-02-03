@@ -11,7 +11,7 @@ public class Team : Node2D
         NEUTRAL
     }
 
-    private Color [] _teamColor = {
+    public static Color [] TeamColor = {
         new Color("00ffff"), 
         new Color("ff2400"), 
         new Color("00ff40"),
@@ -30,6 +30,6 @@ public class Team : Node2D
 
     public Color getTeamColor(TeamCode teamCode)
     {
-        return _teamColor[(int)teamCode];
+        return TeamColor[(int)teamCode];
     }
 }
