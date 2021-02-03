@@ -20,6 +20,11 @@ public class PathFinding : Node2D
 
     private Godot.Collections.Dictionary<int, ColorRect> _gridRects;
 
+    private Timer _updateTraversableTilesTimer;
+
+    [Export]
+    private int UpdateTRaversableTilesTime = 10;
+
     public override void _Ready()
     {
         _aStar = new AStar2D();
@@ -27,6 +32,9 @@ public class PathFinding : Node2D
 
         _tilestoWorld = new Godot.Collections.Dictionary();
         _gridRects = new Godot.Collections.Dictionary<int, ColorRect>();
+
+        _updateTraversableTilesTimer = (Timer)GetNode("UpdateTraversableTilesTimer");
+        _updateTraversableTilesTimer.WaitTime = UpdateTRaversableTilesTime;
     }
 
     public void Initialize(TileMap tileMap, ObstacleManager obstacleManager)
@@ -36,7 +44,7 @@ public class PathFinding : Node2D
 
         _obstacleManager = obstacleManager;
 
-        _updateTraversableTiles(obstacleManager.GetTraversableTiles());
+        UpdateTraversableTiles();
     }
 
     public void UpdateNavigationMap()
@@ -77,6 +85,13 @@ public class PathFinding : Node2D
         }
     }
 
+    public void UpdateTraversableTiles()
+    {
+        _updateTraversableTiles(_obstacleManager.GetTraversableTiles());
+
+        _updateTraversableTilesTimer.Start();
+    }
+
     private void _updateTraversableTiles(Godot.Collections.Array tiles)
     {
         // No need to update as tiles not change
@@ -111,7 +126,8 @@ public class PathFinding : Node2D
                 colorRect.MouseFilter = Control.MouseFilterEnum.Ignore;
 
                 colorRect.SetSize(_tileMap.CellSize);
-                colorRect.RectPosition = _tileMap.MapToWorld(tile) + _tileMap.CellSize;
+                // Color Rect's x calculation is lightly different, so need to add 1.5f to position correctly
+                colorRect.RectPosition = new Vector2(_tileMap.MapToWorld(tile).x + (_tileMap.CellSize.x * 1.5f), _tileMap.MapToWorld(tile).y);
 
             }
         }
@@ -160,8 +176,6 @@ public class PathFinding : Node2D
     public override void _PhysicsProcess(float delta)
     {
         UpdateNavigationMap();
-
-
     }
 
     private void _connectTraversableTiles(Godot.Collections.Array tiles)
