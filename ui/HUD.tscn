@@ -129,14 +129,15 @@ margin_right = 290.0
 margin_bottom = 69.0
 
 [node name="TextureRect" type="TextureRect" parent="controlGame/Margin/Container"]
+visible = false
 margin_right = 36.0
 margin_bottom = 49.0
 texture = ExtResource( 3 )
 
 [node name="HealthBar" type="TextureProgress" parent="controlGame/Margin/Container"]
-margin_left = 40.0
-margin_right = 230.0
+margin_right = 190.0
 margin_bottom = 49.0
+rect_scale = Vector2( 1, 0.5 )
 value = 75.0
 texture_progress = ExtResource( 2 )
 
@@ -154,6 +155,7 @@ radial_initial_angle = 270.0
 radial_fill_degrees = 180.0
 
 [node name="lblDefeatedAgentCountLabel" type="Label" parent="controlGame"]
+visible = false
 margin_left = 738.439
 margin_top = 442.841
 margin_right = 847.439
@@ -164,6 +166,7 @@ __meta__ = {
 }
 
 [node name="lblDefeatedAgentCount" type="Label" parent="controlGame"]
+visible = false
 margin_left = 897.456
 margin_top = 441.427
 margin_right = 1006.46
@@ -210,10 +213,10 @@ __meta__ = {
 }
 
 [node name="LeftWeaponControl" type="Control" parent="controlGame"]
-margin_left = 313.577
-margin_top = 480.84
-margin_right = 631.577
-margin_bottom = 593.84
+margin_left = 697.853
+margin_top = 352.958
+margin_right = 1015.85
+margin_bottom = 465.958
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -249,10 +252,11 @@ __meta__ = {
 }
 
 [node name="spWeaponSymbol" type="Sprite" parent="controlGame/LeftWeaponControl"]
-position = Vector2( 9.85846, 13.0144 )
-scale = Vector2( 115.661, 42.1615 )
+position = Vector2( 90, 30 )
+scale = Vector2( 0.5, 0.5 )
 texture = ExtResource( 5 )
 region_enabled = true
+region_rect = Rect2( 411, 3, 77, 18 )
 
 [node name="lblWeaponReloading" type="Label" parent="controlGame/LeftWeaponControl"]
 visible = false
@@ -282,9 +286,9 @@ __meta__ = {
 
 [node name="RightWeaponControl" type="Control" parent="controlGame"]
 margin_left = 698.678
-margin_top = 480.84
+margin_top = 470.131
 margin_right = 1016.68
-margin_bottom = 593.84
+margin_bottom = 583.131
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -320,10 +324,11 @@ __meta__ = {
 }
 
 [node name="spWeaponSymbol" type="Sprite" parent="controlGame/RightWeaponControl"]
-position = Vector2( 9.85846, 13.0144 )
-scale = Vector2( 115.661, 42.1615 )
+position = Vector2( 90, 30 )
+scale = Vector2( 0.5, 0.5 )
 texture = ExtResource( 5 )
 region_enabled = true
+region_rect = Rect2( -1, 261, 93, 97 )
 
 [node name="lblWeaponReloading" type="Label" parent="controlGame/RightWeaponControl"]
 visible = false
@@ -396,8 +401,8 @@ __meta__ = {
 anims/MessageAnnounce = SubResource( 3 )
 
 [node name="MiniMap" parent="." instance=ExtResource( 8 )]
-margin_left = 809.499
-margin_top = 10.0794
-margin_right = 1009.5
-margin_bottom = 210.079
+margin_left = 755.649
+margin_top = 57.7568
+margin_right = 1010.65
+margin_bottom = 312.757
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationPlayerFinished"]

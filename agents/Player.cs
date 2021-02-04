@@ -58,6 +58,7 @@ public class Player : Agent
         EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
         // Emit signal to update info
         ((Weapon)RightWeapons[currentRightWeaponIndex]).EmitSignal(nameof(Weapon.AmmoChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).getAmmo(), ((Weapon)RightWeapons[currentRightWeaponIndex]).getMaxAmmo());
+        
         EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
         // Emit signal to update info
         ((Weapon)LeftWeapons[currentLeftWeaponIndex]).EmitSignal(nameof(Weapon.AmmoChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).getAmmo(), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).getMaxAmmo());

@@ -121,12 +121,13 @@ public class Agent : KinematicBody2D
 
         // Temporary script to automatic load weapon
         UpdateRightWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
-        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
+        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LightSaber.tscn"));
         UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
-
+        
         UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/Shield.tscn"));
-        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/LightSaber.tscn"));
+        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
         UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
+ 
     }
 
     public virtual void changeRightWeapon(int weaponIndex)
@@ -190,7 +191,7 @@ public class Agent : KinematicBody2D
             }
 
             DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Left);
-            DisconnectWeapon((Weapon)RightWeapons[currentRightWeaponIndex], Weapon.WeaponOrder.Left);
+            DisconnectWeapon((Weapon)LeftWeapons[currentLeftWeaponIndex], Weapon.WeaponOrder.Left);
 
             currentWeapon.Hide();
             currentLeftWeaponIndex = weaponIndex % LeftWeapons.Count;
@@ -199,7 +200,7 @@ public class Agent : KinematicBody2D
 
             currentWeapon.Show();
 
-            EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentRightWeaponIndex]).CurrentWeaponType);
+            EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
 
             ConnectWeapon(currentWeapon, Weapon.WeaponOrder.Left);
 

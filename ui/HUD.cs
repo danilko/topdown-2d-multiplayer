@@ -186,17 +186,27 @@ public class HUD : CanvasLayer
         if (weaponType == Weapon.WeaponType.LASER)
         {
             symbol.RegionRect = new Rect2(-1f, 263f, 96f, 93f);
-            symbol.Scale = new Vector2(0.5f, 0.5f);
+            symbol.Scale = new Vector2(0.5f, 0.25f) * 0.75f;
         }
         else if (weaponType == Weapon.WeaponType.RIFILE)
         {
             symbol.RegionRect = new Rect2(763f, 39f, 71f, 28f);
-            symbol.Scale = new Vector2(1f, 1f);
+            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
         }
         else if (weaponType == Weapon.WeaponType.MISSLELAUNCHER)
         {
             symbol.RegionRect = new Rect2(510f, 70f, 53f, 39f);
-            symbol.Scale = new Vector2(1f, 1f);
+            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
+        }
+        else if (weaponType == Weapon.WeaponType.SHIELD)
+        {
+            symbol.RegionRect = new Rect2(183f, 295f, 45f, 62f);
+            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
+        }
+        else if (weaponType == Weapon.WeaponType.LIGHTSABER)
+        {
+            symbol.RegionRect = new Rect2(411f, 3f, 77f, 18f);
+            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
         }
     }
 

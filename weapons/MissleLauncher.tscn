@@ -14,6 +14,7 @@ MaxAmmo = 10
 CooldownTime = 0.5
 ReloadTime = 3.0
 Bullet = ExtResource( 4 )
+WeaponName = "SYC-300 MISSLE LAUNCHER"
 
 [node name="TriggerPoint" parent="." index="1"]
 position = Vector2( 50, 0 )

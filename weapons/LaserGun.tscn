@@ -8,19 +8,21 @@
 [node name="Weapon" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
 CurrentWeaponType = 1
-MaxAmmo = 0
-CooldownTime = 0.5
-ReloadTime = 0.0
-WeaponName = "Laser Saber"
+KnockbackForce = 10.0
+MaxAmmo = 5
+CooldownTime = 2.0
+ReloadTime = 10.0
+WeaponName = "SYC-100  STATIC LASER RIFILE"
 
 [node name="TriggerPoint" parent="." index="1"]
 position = Vector2( 80, 0 )
 
 [node name="Body" type="Sprite" parent="." index="2"]
-scale = Vector2( 0.75, 0.75 )
+scale = Vector2( 0.75, 0.25 )
 texture = ExtResource( 3 )
 region_enabled = true
 region_rect = Rect2( -1, 263, 96, 93 )
 
 [node name="LaserRay" parent="." index="3" instance=ExtResource( 5 )]
 position = Vector2( 80, 0 )
+Damage = 30

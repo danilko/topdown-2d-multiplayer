@@ -57,7 +57,7 @@ MaxAmmo = 50
 CooldownTime = 0.1
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )
-WeaponName = "Rifle"
+WeaponName = "SYC-500 LASER BEAM RIFLE"
 
 [node name="Body" type="Sprite" parent="." index="1"]
 texture = ExtResource( 3 )

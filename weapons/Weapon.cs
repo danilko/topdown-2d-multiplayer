@@ -8,7 +8,7 @@ public class Weapon : Node2D
     [Export]
     public WeaponAmmoType CurrentWeaponAmmoType { get; set; }
 
-    public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER }
+    public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER, SHIELD, LIGHTSABER }
 
     public enum WeaponOrder { Right, Left }
 

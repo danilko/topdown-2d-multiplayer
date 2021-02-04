@@ -243,6 +243,8 @@ public class GameWorld : Node2D
     {
         _capaturableBaseManager = (CapaturableBaseManager)GetNode("CapaturableBaseManager");
         _capaturableBaseManager.Initailize(this);
+
+        _miniMap.Iniitialize(_capaturableBaseManager);
     }
 
     private void _initializeTeamMapAI()

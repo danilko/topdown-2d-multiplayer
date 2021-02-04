@@ -4,9 +4,7 @@ using System;
 public class LaserGun : Weapon
 {
 
-    [Export]
-
-    private LaserRay laserRay;
+    private LaserRay _laserRay;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -18,16 +16,16 @@ public class LaserGun : Weapon
     {
         base.Initialize(gameWorld, agent);
 
-        laserRay = ((LaserRay)GetNode("LaserRay"));
-        laserRay.Initialize(gameWorld, _agent, _team);
+        _laserRay = ((LaserRay)GetNode("LaserRay"));
+        _laserRay.Initialize(gameWorld, _agent, _team);
     }
 
     public override void onWeaponTimerTimeout()
     {
         base.onWeaponTimerTimeout();
-        if (laserRay.getIsCasting())
+        if (_laserRay.getIsCasting())
         {
-            laserRay.setIsCasting(false);
+            _laserRay.setIsCasting(false);
         }
     }
 
@@ -38,11 +36,16 @@ public class LaserGun : Weapon
             Cooldown = false;
             Ammo -= 1;
             EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
-            laserRay.setIsCasting(true);
+            _laserRay.setIsCasting(true);
 
             CooldownTimer.Start();
 
             return true;
+        }
+
+        if(Ammo == 0)
+        {
+            StartReload();
         }
 
         return false;

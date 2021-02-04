@@ -51,7 +51,7 @@ public class AgentExplosionParticle : Node2D
         }
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _Process(float delta)
     {
         _checkEmitting();
     }
