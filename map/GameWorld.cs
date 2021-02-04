@@ -136,15 +136,15 @@ public class GameWorld : Node2D
     private GameCamera _camera2D;
 
     private HUD _hud;
+    private PopUpMessage _popUpMessage;
     private MiniMap _miniMap;
 
     public override void _Ready()
     {
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
-        _hud = (HUD)GetNode("HUD");
-        _miniMap = (MiniMap)_hud.GetNode("MiniMap");
 
+        _initializeHUD();
         _initializeCamera();
         _initializeTileMap();
         _initializeObsctacleManager();
@@ -167,6 +167,13 @@ public class GameWorld : Node2D
     {
         _camera2D = (GameCamera)GetNode("GameCamera");
         _camera2D.Current = true;
+    }
+
+    private void _initializeHUD()
+    {
+        _hud = (HUD)GetNode("HUD");
+        _miniMap = (MiniMap)_hud.GetNode("controlGame/MiniMap");
+        _popUpMessage = (PopUpMessage)_hud.GetNode("PopUpMessage");
     }
 
     private void _initializeNetwork()
@@ -650,6 +657,9 @@ public class GameWorld : Node2D
                 _miniMap.RemovePlayer();
             }
 
+
+            _popUpMessage.NotifyMessage("NOTIFICATION", currentSpawnCache[id].GetUnitName() + " (" + currentSpawnCache[id].GetCurrentTeam().ToString() + ") IS ELIMINATED");
+
             _teamMapAIs[(int)currentSpawnCache[id].GetCurrentTeam()].RemoveUnit(currentSpawnCache[id].Name);
         }
 
@@ -944,8 +954,9 @@ public class GameWorld : Node2D
         EmitSignal(nameof(WaitingPeriodSignal), message + " WAITING PERIOD");
         if (message == "00:00:00")
         {
-            GD.Print("Waiting period time up");
             _waitingPeriod = false;
+            _popUpMessage.NotifyMessage("OBJECTIVE", "CAPTURE ALL BASES AND ELIMIATED ALL ENEMIES", 10);
+
         }
     }
 

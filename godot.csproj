@@ -37,6 +37,7 @@
     <Compile Include="network\NetworkPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ui\MiniMap.cs" />
+    <Compile Include="ui\PopUpMessage.cs" />
     <Compile Include="weapons\Shield.cs" />
     <Compile Include="singletons\audios\AudioManager.cs" />
     <Compile Include="agents\AIAgent.cs" />

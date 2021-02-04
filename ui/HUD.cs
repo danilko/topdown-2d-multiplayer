@@ -241,6 +241,10 @@ public class HUD : CanvasLayer
     public void OnPlayerDefeated()
     {
         ((Control)GetNode("controlGame")).Visible = false;
+        ((MiniMap)GetNode("controlGame/MiniMap")).Visible = false;
+        ((Control)GetNode("controlGame/LeftWeaponControl")).Visible = false;
+        ((Control)GetNode("controlGame/RightWeaponControl")).Visible = false;
+        
         ((Control)GetNode("controlOverallMessage")).Visible = true;
 
         ((AnimationPlayer)GetNode("AnimationPlayer")).Play("MessageAnnounce");
@@ -249,6 +253,11 @@ public class HUD : CanvasLayer
     public void OnPlayerCreated()
     {
         ((Control)GetNode("controlOverallMessage")).Visible = false;
+
+        ((Control)GetNode("controlGame")).Visible = true;
+        ((MiniMap)GetNode("controlGame/MiniMap")).Visible = true;
+        ((Control)GetNode("controlGame/LeftWeaponControl")).Visible = true;
+        ((Control)GetNode("controlGame/RightWeaponControl")).Visible = true;
         lblMessage = false;
     }
 

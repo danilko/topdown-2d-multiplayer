@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://assets/fonts/Kenney Pixel Square.ttf" type="DynamicFontData" id=6]
 [ext_resource path="res://assets/fonts/Kenney Rocket Square.ttf" type="DynamicFontData" id=7]
 [ext_resource path="res://ui/MiniMap.tscn" type="PackedScene" id=8]
+[ext_resource path="res://ui/PopUpMessage.tscn" type="PackedScene" id=9]
 
 [sub_resource type="DynamicFont" id=1]
 size = 20
@@ -137,7 +138,6 @@ texture = ExtResource( 3 )
 [node name="HealthBar" type="TextureProgress" parent="controlGame/Margin/Container"]
 margin_right = 190.0
 margin_bottom = 49.0
-rect_scale = Vector2( 1, 0.5 )
 value = 75.0
 texture_progress = ExtResource( 2 )
 
@@ -213,10 +213,10 @@ __meta__ = {
 }
 
 [node name="LeftWeaponControl" type="Control" parent="controlGame"]
-margin_left = 697.853
-margin_top = 352.958
-margin_right = 1015.85
-margin_bottom = 465.958
+margin_left = 704.81
+margin_top = 352.0
+margin_right = 991.81
+margin_bottom = 465.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -285,10 +285,10 @@ __meta__ = {
 }
 
 [node name="RightWeaponControl" type="Control" parent="controlGame"]
-margin_left = 698.678
-margin_top = 470.131
-margin_right = 1016.68
-margin_bottom = 583.131
+margin_left = 704.81
+margin_top = 470.0
+margin_right = 992.81
+margin_bottom = 583.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -356,6 +356,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="MiniMap" parent="controlGame" instance=ExtResource( 8 )]
+margin_left = 729.324
+margin_top = 96.4272
+margin_right = 984.325
+margin_bottom = 351.427
+
 [node name="controlOverallMessage" type="Control" parent="."]
 visible = false
 margin_right = 62.0
@@ -397,12 +403,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="PopUpMessage" parent="." instance=ExtResource( 9 )]
+margin_left = 705.794
+margin_top = 16.6489
+margin_right = 745.794
+margin_bottom = 56.6489
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/MessageAnnounce = SubResource( 3 )
-
-[node name="MiniMap" parent="." instance=ExtResource( 8 )]
-margin_left = 755.649
-margin_top = 57.7568
-margin_right = 1010.65
-margin_bottom = 312.757
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationPlayerFinished"]

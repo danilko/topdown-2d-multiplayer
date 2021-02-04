@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://ui/PopUpMessage.cs" type="Script" id=1]
+[ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+size = 14
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 12
+font_data = ExtResource( 2 )
+
+[node name="PopUpMessage" type="Popup"]
+pause_mode = 2
+margin_right = 40.0
+margin_bottom = 40.0
+popup_exclusive = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 300.0
+margin_bottom = 80.0
+color = Color( 1, 1, 1, 0.670588 )
+
+[node name="MessageName" type="RichTextLabel" parent="ColorRect"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 295.0
+margin_bottom = 25.0
+custom_fonts/normal_font = SubResource( 1 )
+custom_colors/default_color = Color( 0, 0, 0, 1 )
+bbcode_enabled = true
+bbcode_text = "MESSAGE TITLE"
+text = "MESSAGE TITLE"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MessageBody" type="RichTextLabel" parent="ColorRect"]
+margin_left = 5.0
+margin_top = 30.0
+margin_right = 295.0
+margin_bottom = 75.0
+custom_fonts/normal_font = SubResource( 2 )
+custom_colors/default_color = Color( 0, 0, 0, 1 )
+bbcode_enabled = true
+bbcode_text = "MESSAGE BODY"
+text = "MESSAGE BODY"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PopUpMessageTimer" type="Timer" parent="ColorRect"]
+one_shot = true
+[connection signal="timeout" from="ColorRect/PopUpMessageTimer" to="." method="MessageTimerTimeout"]
