@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/ui/grey_sliderUp.png" type="Texture" id=1]
+[ext_resource path="res://ui/ScreenIndicator.cs" type="Script" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 1500.0
+
+[node name="ScreenIndicator" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="AgentMarker" type="Node2D" parent="."]
+visible = false
+
+[node name="Indicator" type="TextureRect" parent="AgentMarker"]
+margin_left = 300.0
+margin_right = 340.0
+margin_bottom = 42.0
+rect_rotation = 90.0
+rect_pivot_offset = Vector2( 10, 0 )
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Text" type="Label" parent="AgentMarker"]
+margin_left = 522.0
+margin_top = -4.0
+margin_right = 861.0
+margin_bottom = 10.0
+text = "500"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DetectionZone" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionZone"]
+shape = SubResource( 1 )
+[connection signal="body_entered" from="DetectionZone" to="." method="_onDetectionZoneBodyEntered"]
+[connection signal="body_exited" from="DetectionZone" to="." method="_onDetectionZoneBodyExited"]

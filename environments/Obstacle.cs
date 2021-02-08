@@ -75,7 +75,7 @@ public class Obstacle : StaticBody2D
 
         AnimatedSprite animatedSprite = (AnimatedSprite)GetNode("Explosion");
         animatedSprite.Show();
-        animatedSprite.Play("smoke");
+        animatedSprite.Play("fire");
 
         RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
         remainParticles.GlobalPosition = this.GlobalPosition;

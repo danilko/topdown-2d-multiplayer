@@ -186,6 +186,12 @@ public class AI : Node2D
                             _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
                         }
                     }
+
+                    // Chanse engaged agent closer if possible
+                    if(_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 200.0f)
+                    {
+                        _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition), delta);
+                    }
                 }
                 break;
 

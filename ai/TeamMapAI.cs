@@ -179,7 +179,10 @@ public class TeamMapAI : Node2D
             {
                 AI agentAI = ((AIAgent)node).GetAI();
                 agentAI.SetNextBase(capturableBase);
-                agentAI.SetState(AI.State.ADVANCE);
+                if (agentAI.getState() != AI.State.ENGAGE)
+                {
+                    agentAI.SetState(AI.State.ADVANCE);
+                }
             }
         }
     }

@@ -563,8 +563,11 @@ public class Agent : KinematicBody2D
         _gameWorld.GetNode("RemainEffectManager").AddChild(remainParticles);
 
         AgentExplosionParticle agentExplosionParticle = (AgentExplosionParticle)GetNode("AgentExplosionParticle");
-        agentExplosionParticle.Connect(nameof(AgentExplosionParticle.EffectCompleteSignal), this, nameof(_OnExplosionAnimationFinished));
         agentExplosionParticle.SetTrigger(true);
+
+        AnimatedSprite animatedSprite = (AnimatedSprite)GetNode("Explosion");
+        animatedSprite.Show();
+        animatedSprite.Play("fire");
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);

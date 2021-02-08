@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://assets/fonts/Kenney Rocket Square.ttf" type="DynamicFontData" id=7]
 [ext_resource path="res://ui/MiniMap.tscn" type="PackedScene" id=8]
 [ext_resource path="res://ui/PopUpMessage.tscn" type="PackedScene" id=9]
+[ext_resource path="res://assets/ui/grey_panel.png" type="Texture" id=10]
 
 [sub_resource type="DynamicFont" id=1]
 size = 20
@@ -221,6 +222,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="Background" type="TextureRect" parent="controlGame/LeftWeaponControl"]
+self_modulate = Color( 0.254902, 0.254902, 0.254902, 0.254902 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 44.0
+texture = ExtResource( 10 )
+expand = true
+stretch_mode = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="lblWeaponLabel" type="Label" parent="controlGame/LeftWeaponControl"]
 margin_left = 150.597
 margin_top = 3.43382
@@ -293,6 +306,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="Background" type="TextureRect" parent="controlGame/RightWeaponControl"]
+self_modulate = Color( 0.254902, 0.254902, 0.254902, 0.254902 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 44.0
+texture = ExtResource( 10 )
+expand = true
+stretch_mode = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="lblWeaponLabel" type="Label" parent="controlGame/RightWeaponControl"]
 margin_left = 150.597
 margin_top = 3.43382
@@ -357,9 +382,9 @@ __meta__ = {
 }
 
 [node name="MiniMap" parent="controlGame" instance=ExtResource( 8 )]
-margin_left = 729.324
+margin_left = 744.189
 margin_top = 96.4272
-margin_right = 984.325
+margin_right = 999.19
 margin_bottom = 351.427
 
 [node name="controlOverallMessage" type="Control" parent="."]

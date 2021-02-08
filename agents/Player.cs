@@ -51,18 +51,22 @@ public class Player : Agent
         Connect(nameof(Agent.HealthChangedSignal), _hud, nameof(HUD.UpdateHealth));
         Connect(nameof(Agent.DefeatedAgentChangedSignal), _hud, nameof(HUD.UpdateDefeatedAgent));
 
-        ConnectWeapon( ((Weapon)RightWeapons[currentRightWeaponIndex]), Weapon.WeaponOrder.Right);
-        ConnectWeapon( ((Weapon)LeftWeapons[currentLeftWeaponIndex]), Weapon.WeaponOrder.Left);
+        ConnectWeapon(((Weapon)RightWeapons[currentRightWeaponIndex]), Weapon.WeaponOrder.Right);
+        ConnectWeapon(((Weapon)LeftWeapons[currentLeftWeaponIndex]), Weapon.WeaponOrder.Left);
 
         // # notify about current weapon to HUD
         EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
         // Emit signal to update info
         ((Weapon)RightWeapons[currentRightWeaponIndex]).EmitSignal(nameof(Weapon.AmmoChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).getAmmo(), ((Weapon)RightWeapons[currentRightWeaponIndex]).getMaxAmmo());
-        
+
         EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
         // Emit signal to update info
         ((Weapon)LeftWeapons[currentLeftWeaponIndex]).EmitSignal(nameof(Weapon.AmmoChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).getAmmo(), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).getMaxAmmo());
-    
+
+        // Set up the player indicator screen
+        ScreenIndicator screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
+        AddChild(screenIndicator);
+        screenIndicator.Initialize(this);
     }
 
     protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
