@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=5 format=2]
+
+[ext_resource path="res://items/ItemResource.cs" type="Script" id=1]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
+[ext_resource path="res://weapons/Rifile.tscn" type="PackedScene" id=3]
+
+[sub_resource type="AtlasTexture" id=1]
+flags = 4
+atlas = ExtResource( 2 )
+region = Rect2( 510, 70, 53, 39 )
+
+[resource]
+script = ExtResource( 1 )
+Name = "SYC-300 MISSLE LAUNCHER"
+Description = "Missle Launcher (ATTACK = 30)"
+Price = 20
+Stackable = false
+MaxStackable = 1
+ReferenceTexture = SubResource( 1 )
+ReferencePackedScene = ExtResource( 3 )

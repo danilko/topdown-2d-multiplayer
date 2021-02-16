@@ -185,7 +185,7 @@ public class HUD : CanvasLayer
 
         if (weaponType == Weapon.WeaponType.LASER)
         {
-            symbol.RegionRect = new Rect2(-1f, 263f, 96f, 93f);
+            symbol.RegionRect = new Rect2(0f, 263f, 96f, 93f);
             symbol.Scale = new Vector2(0.5f, 0.25f) * 0.75f;
         }
         else if (weaponType == Weapon.WeaponType.RIFILE)

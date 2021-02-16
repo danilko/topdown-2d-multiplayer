@@ -37,9 +37,6 @@ public class GameWorld : Node2D
         public NetworkPlayer networkPlayer { get; set; }
     }
 
-
-    private int MAX_BOT_COUNT = 100;
-
     public class ClientData : Godot.Object
     {
         public String Id;

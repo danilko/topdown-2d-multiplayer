@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://items/ItemResource.cs" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+Name = ""
+Description = ""
+Price = 0
+Stackable = false
+MaxStackable = 1

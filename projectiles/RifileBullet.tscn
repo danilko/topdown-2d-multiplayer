@@ -1,53 +1,60 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://projectiles/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://projectiles/RifileBullet.cs" type="Script" id=3]
 
+[sub_resource type="CanvasItemMaterial" id=10]
+blend_mode = 1
+
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 16.3409, 12.763 )
+extents = Vector2( 25.1463, 9.0589 )
 
-[sub_resource type="Gradient" id=2]
-offsets = PoolRealArray( 0, 0.648961, 1 )
-colors = PoolColorArray( 1, 0.576831, 0.527344, 1, 100, 0.78, 0.75, 1, 1, 1, 1, 0 )
+[sub_resource type="Gradient" id=7]
+colors = PoolColorArray( 1, 0.964706, 0.784314, 0.501961, 1, 1, 1, 0.45098 )
 
-[sub_resource type="GradientTexture" id=3]
-gradient = SubResource( 2 )
+[sub_resource type="GradientTexture" id=8]
+gradient = SubResource( 7 )
 
-[sub_resource type="Curve" id=4]
-_data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.5, 1 ), -0.072095, -0.072095, 0, 0, Vector2( 1, 0 ), 0.0, 0.0, 0, 0 ]
+[sub_resource type="Curve" id=11]
+max_value = 100.0
+_data = [ Vector2( 0, 100 ), 0.0, -97.2727, 0, 1, Vector2( 1, 2.72727 ), 50.7263, 0.0, 0, 0 ]
 
-[sub_resource type="CurveTexture" id=5]
-curve = SubResource( 4 )
+[sub_resource type="CurveTexture" id=12]
+curve = SubResource( 11 )
 
-[sub_resource type="ParticlesMaterial" id=6]
-emission_shape = 2
-emission_box_extents = Vector3( 20, 20, 1 )
+[sub_resource type="ParticlesMaterial" id=9]
 flag_disable_z = true
+direction = Vector3( 0, 0, 0 )
+spread = 0.0
 gravity = Vector3( 0, 0, 0 )
-initial_velocity = 20.0
+initial_velocity = -100.0
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
-linear_accel = 20.0
-scale = 2.0
-scale_curve = SubResource( 5 )
-color_ramp = SubResource( 3 )
+linear_accel = 100.0
+linear_accel_curve = SubResource( 12 )
+scale = 15.0
+color_ramp = SubResource( 8 )
 
 [node name="RifileBullet" instance=ExtResource( 1 )]
-modulate = Color( 77.46, 1, 1, 1 )
 script = ExtResource( 3 )
 Speed = 3000
 Damage = 10
 Lifetime = 5.0
 
 [node name="Sprite" parent="." index="0"]
+self_modulate = Color( 73.99, 1, 1, 1 )
+material = SubResource( 10 )
 rotation = 3.14159
 texture = ExtResource( 2 )
 region_enabled = true
-region_rect = Rect2( 653, 41, 32, 24 )
+region_rect = Rect2( 600, 46, 50, 15 )
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource( 1 )
 
 [node name="Particles2D" type="Particles2D" parent="." index="4"]
-process_material = SubResource( 6 )
+amount = 5
+lifetime = 2.0
+speed_scale = 5.0
+process_material = SubResource( 9 )

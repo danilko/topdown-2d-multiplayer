@@ -25,6 +25,9 @@
     <Compile Include="environments\CapaturableBaseManager.cs" />
     <Compile Include="environments\CapturableBase.cs" />
     <Compile Include="environments\ObstacleManager.cs" />
+    <Compile Include="inventory\Inventory.cs" />
+    <Compile Include="items\ItemResource.cs" />
+    <Compile Include="map\SimulateGameWorld.cs" />
     <Compile Include="projectiles\Projectile.cs" />
     <Compile Include="projectiles\LaserRay.cs" />
     <Compile Include="projectiles\Missle.cs" />
@@ -36,6 +39,9 @@
     <Compile Include="network\Network.cs" />
     <Compile Include="network\NetworkPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="inventory\InventoryDatabase.cs" />
+    <Compile Include="ui\InventoryUI.cs" />
+    <Compile Include="ui\ItemPanel.cs" />
     <Compile Include="ui\MiniMap.cs" />
     <Compile Include="ui\PopUpMessage.cs" />
     <Compile Include="ui\ScreenIndicator.cs" />

@@ -12,14 +12,11 @@ public class AIAgent : Agent
 
     private int _speed;
 
-    private Godot.Collections.Array targetPaths = null;
-
     private Godot.Collections.Array members = null;
 
     private Vector2 _originalPathLineLocation;
 
     private AI _agentAI;
-    private PathFinding _pathFinding;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()

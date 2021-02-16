@@ -4,7 +4,7 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://weapons/LightSaber.cs" type="Script" id=3]
 
-[sub_resource type="CanvasItemMaterial" id=4]
+[sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 1
 
 [sub_resource type="Animation" id=2]
@@ -54,7 +54,7 @@ region_rect = Rect2( 410, 3, 28, 17 )
 
 [node name="Laser" type="Sprite" parent="Handler" index="0"]
 self_modulate = Color( 68.21, 1, 1, 1 )
-material = SubResource( 4 )
+material = SubResource( 1 )
 position = Vector2( 90, 0 )
 scale = Vector2( 3, 1 )
 texture = ExtResource( 2 )

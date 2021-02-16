@@ -14,7 +14,6 @@ public class ScreenIndicator : Node2D
     private Node2D _agentMarker;
 
     private Godot.Collections.Dictionary<String, Team.TeamCode> _targetAgents;
-    private Agent _targetAgent = null;
     private Agent _agent = null;
 
     public override void _Ready()

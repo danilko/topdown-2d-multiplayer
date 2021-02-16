@@ -12,7 +12,7 @@ KnockbackForce = 10.0
 MaxAmmo = 5
 CooldownTime = 2.0
 ReloadTime = 10.0
-WeaponName = "SYC-100  STATIC LASER RIFILE"
+WeaponName = "SYC-100  VARIBLE OUTPUT LASER RIFILE"
 
 [node name="TriggerPoint" parent="." index="1"]
 position = Vector2( 80, 0 )

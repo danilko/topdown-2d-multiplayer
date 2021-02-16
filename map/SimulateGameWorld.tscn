@@ -1,0 +1,72 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
+[ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
+[ext_resource path="res://map/SimulateGameWorld.cs" type="Script" id=3]
+[ext_resource path="res://environments/CapturableBase.tscn" type="PackedScene" id=4]
+[ext_resource path="res://environments/CapaturableBaseManager.tscn" type="PackedScene" id=6]
+[ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
+[ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
+
+[sub_resource type="Environment" id=1]
+background_mode = 4
+glow_enabled = true
+glow_intensity = 1.0
+
+[node name="Map" type="Node2D"]
+script = ExtResource( 3 )
+
+[node name="Ground" type="TileMap" parent="."]
+self_modulate = Color( 0.74902, 0.74902, 0.74902, 1 )
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 128, 128 )
+cell_quadrant_size = 32
+format = 1
+tile_data = PoolIntArray( -262152, 12, 0, -262151, 12, 0, -262150, 12, 0, -262149, 12, 0, -262148, 12, 0, -262147, 12, 0, -262146, 12, 0, -262145, 12, 0, -327680, 12, 0, -327679, 12, 0, -327678, 12, 0, -327677, 12, 0, -327676, 12, 0, -327675, 12, 0, -327674, 12, 0, -327673, 12, 0, -196616, 12, 0, -196615, 12, 0, -196614, 12, 0, -196613, 12, 0, -196612, 12, 0, -196611, 12, 0, -196610, 12, 0, -196609, 12, 0, -262144, 12, 0, -262143, 12, 0, -262142, 12, 0, -262141, 12, 0, -262140, 12, 0, -262139, 12, 0, -262138, 12, 0, -262137, 12, 0, -131080, 12, 0, -131079, 12, 0, -131078, 12, 0, -131077, 12, 0, -131076, 12, 0, -131075, 12, 0, -131074, 12, 0, -131073, 12, 0, -196608, 12, 0, -196607, 12, 0, -196606, 12, 0, -196605, 12, 0, -196604, 12, 0, -196603, 12, 0, -196602, 12, 0, -196601, 12, 0, -65544, 12, 0, -65543, 12, 0, -65542, 12, 0, -65541, 12, 0, -65540, 12, 0, -65539, 12, 0, -65538, 12, 0, -65537, 12, 0, -131072, 12, 0, -131071, 12, 0, -131070, 12, 0, -131069, 12, 0, -131068, 12, 0, -131067, 12, 0, -131066, 12, 0, -131065, 12, 0, -8, 12, 0, -7, 12, 0, -6, 12, 0, -5, 12, 0, -4, 12, 0, -3, 12, 0, -2, 12, 0, -1, 12, 0, -65536, 12, 0, -65535, 12, 0, -65534, 12, 0, -65533, 12, 0, -65532, 12, 0, -65531, 12, 0, -65530, 12, 0, -65529, 12, 0, 65528, 12, 0, 65529, 12, 0, 65530, 12, 0, 65531, 12, 0, 65532, 12, 0, 65533, 12, 0, 65534, 12, 0, 65535, 12, 0, 0, 12, 0, 1, 12, 0, 2, 12, 0, 3, 12, 0, 4, 12, 0, 5, 12, 0, 6, 12, 0, 7, 12, 0, 131064, 12, 0, 131065, 12, 0, 131066, 12, 0, 131067, 12, 0, 131068, 12, 0, 131069, 12, 0, 131070, 12, 0, 131071, 12, 0, 65536, 12, 0, 65537, 12, 0, 65538, 12, 0, 65539, 12, 0, 65540, 12, 0, 65541, 12, 0, 65542, 12, 0, 65543, 12, 0, 196600, 12, 0, 196601, 12, 0, 196602, 12, 0, 196603, 12, 0, 196604, 12, 0, 196605, 12, 0, 196606, 12, 0, 196607, 12, 0, 131072, 12, 0, 131073, 12, 0, 131074, 12, 0, 131075, 12, 0, 131076, 12, 0, 131077, 12, 0, 131078, 12, 0, 131079, 12, 0, 262136, 12, 0, 262137, 12, 0, 262138, 12, 0, 262139, 12, 0, 262140, 12, 0, 262141, 12, 0, 262142, 12, 0, 262143, 12, 0, 196608, 12, 0, 196609, 12, 0, 196610, 12, 0, 196611, 12, 0, 196612, 12, 0, 196613, 12, 0, 196614, 12, 0, 196615, 12, 0, 327672, 12, 0, 327673, 12, 0, 327674, 12, 0, 327675, 12, 0, 327676, 12, 0, 327677, 12, 0, 327678, 12, 0, 327679, 12, 0, 262144, 12, 0, 262145, 12, 0, 262146, 12, 0, 262147, 12, 0, 262148, 12, 0, 262149, 12, 0, 262150, 12, 0, 262151, 12, 0 )
+
+[node name="RemainEffectManager" type="Node2D" parent="."]
+
+[node name="ObstacleManager" parent="." instance=ExtResource( 7 )]
+position = Vector2( 11.1118, 10.3181 )
+
+[node name="Pickups" type="Node2D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
+[node name="dot" type="Sprite" parent="."]
+texture = ExtResource( 2 )
+
+[node name="MapCoordinate" type="Label" parent="."]
+margin_right = 40.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "TEST"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CapaturableBaseManager" parent="." instance=ExtResource( 6 )]
+
+[node name="BASE 1" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
+position = Vector2( -558.787, -312.88 )
+_defaultTeamCode = 0
+
+[node name="BASE 2" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
+position = Vector2( 596.968, -276.087 )
+_defaultTeamCode = 1
+
+[node name="BASE 3" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
+position = Vector2( 604.528, 305.997 )
+_defaultTeamCode = 0
+
+[node name="BASE 4" parent="CapaturableBaseManager" instance=ExtResource( 4 )]
+position = Vector2( -572.239, 298.437 )
+_defaultTeamCode = 1
+
+[node name="ChangeAgentBehavior" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="GameCamera" parent="." instance=ExtResource( 9 )]
+[connection signal="timeout" from="ChangeAgentBehavior" to="." method="changeAgentBehavior"]

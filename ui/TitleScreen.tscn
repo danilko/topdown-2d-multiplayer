@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
-[ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=2]
+[ext_resource path="res://map/SimulateGameWorld.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
 
@@ -15,7 +15,7 @@ font_data = ExtResource( 1 )
 
 [sub_resource type="Animation" id=3]
 tracks/0/type = "bezier"
-tracks/0/path = NodePath("Title:percent_visible")
+tracks/0/path = NodePath("CanvasLayer/Title:percent_visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -25,7 +25,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 1 )
 }
 tracks/1/type = "value"
-tracks/1/path = NodePath("PlayMessage:visible")
+tracks/1/path = NodePath("CanvasLayer/PlayMessage:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -44,23 +44,26 @@ font_data = ExtResource( 3 )
 [node name="TitleScreen" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 0.857361
-margin_top = -0.857376
-margin_right = 0.857422
-margin_bottom = -0.857361
 script = ExtResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TileMap" type="TileMap" parent="."]
-modulate = Color( 0.494118, 0.494118, 0.494118, 1 )
-scale = Vector2( 0.5, 0.5 )
-tile_set = ExtResource( 2 )
-format = 1
-tile_data = PoolIntArray( 0, 0, 0, 2, 0, 0, 4, 0, 0, 6, 0, 0, 8, 0, 0, 10, 1, 0, 12, 0, 0, 14, 0, 0, 16, 0, 0, 18, 0, 0, 20, 0, 0, 22, 1, 0, 24, 0, 0, 26, 0, 0, 28, 0, 0, 30, 0, 0, 131072, 0, 0, 131074, 0, 0, 131076, 0, 0, 131078, 0, 0, 131080, 0, 0, 131082, 1, 0, 131084, 0, 0, 131086, 0, 0, 131088, 0, 0, 131090, 0, 0, 131092, 0, 0, 131094, 1, 0, 131096, 0, 0, 131098, 0, 0, 131100, 0, 0, 131102, 0, 0, 262144, 10, 0, 262146, 10, 0, 262148, 10, 0, 262150, 10, 0, 262152, 10, 0, 262154, 12, 0, 262156, 10, 0, 262158, 10, 0, 262160, 10, 0, 262162, 10, 0, 262164, 10, 0, 262166, 11, 0, 262168, 10, 0, 262170, 10, 0, 262172, 10, 0, 262174, 10, 0, 393216, 0, 0, 393218, 0, 0, 393220, 0, 0, 393222, 0, 0, 393224, 0, 0, 393226, 1, 0, 393228, 0, 0, 393230, 0, 0, 393232, 0, 0, 393234, 0, 0, 393236, 0, 0, 393238, 1, 0, 393240, 0, 0, 393242, 0, 0, 393244, 0, 0, 393246, 0, 0, 524288, 0, 0, 524290, 0, 0, 524292, 0, 0, 524294, 0, 0, 524296, 0, 0, 524298, 1, 0, 524300, 0, 0, 524302, 0, 0, 524304, 0, 0, 524306, 0, 0, 524308, 0, 0, 524310, 1, 0, 524312, 0, 0, 524314, 0, 0, 524316, 0, 0, 524318, 0, 0, 655360, 0, 0, 655362, 0, 0, 655364, 0, 0, 655366, 0, 0, 655368, 0, 0, 655370, 1, 0, 655372, 0, 0, 655374, 0, 0, 655376, 0, 0, 655378, 0, 0, 655380, 0, 0, 655382, 1, 0, 655384, 0, 0, 655386, 0, 0, 655388, 0, 0, 655390, 0, 0, 786432, 0, 0, 786434, 0, 0, 786436, 0, 0, 786438, 0, 0, 786440, 0, 0, 786442, 1, 0, 786444, 0, 0, 786446, 0, 0, 786448, 0, 0, 786450, 0, 0, 786452, 0, 0, 786454, 1, 0, 786456, 0, 0, 786458, 0, 0, 786460, 0, 0, 786461, 1, 0, 786462, 0, 0, 917504, 10, 0, 917506, 10, 0, 917508, 10, 0, 917510, 10, 0, 917512, 10, 0, 917514, 11, 0, 917516, 10, 0, 917518, 10, 0, 917520, 10, 0, 917522, 10, 0, 917524, 10, 0, 917526, 16, 0, 917528, 0, 0, 917530, 0, 0, 917532, 0, 0, 917534, 0, 0, 1048576, 0, 0, 1048578, 0, 0, 1048580, 0, 0, 1048582, 0, 0, 1048584, 0, 0, 1048586, 1, 0, 1048588, 0, 0, 1048590, 0, 0, 1048592, 0, 0, 1048594, 0, 0, 1048596, 0, 0, 1048598, 0, 0, 1048600, 0, 0, 1048602, 0, 0, 1048604, 0, 0, 1048606, 0, 0, 1179648, 0, 0, 1179650, 0, 0, 1179652, 0, 0, 1179654, 0, 0, 1179656, 0, 0, 1179658, 1, 0, 1179660, 0, 0, 1179662, 0, 0, 1179664, 0, 0, 1179666, 0, 0, 1179668, 0, 0, 1179670, 0, 0, 1179672, 0, 0, 1179674, 0, 0, 1179676, 0, 0, 1179678, 0, 0 )
+[node name="Map" parent="." instance=ExtResource( 2 )]
 
-[node name="Title" type="Label" parent="."]
+[node name="Timer" type="Timer" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.309804, 0.309804, 0.309804, 0.478431 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="CanvasLayer"]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -76,11 +79,13 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 3
 custom_constants/shadow_offset_y = 3
 text = "Mach Battle"
+align = 1
+uppercase = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PlayMessage" type="Label" parent="."]
+[node name="PlayMessage" type="Label" parent="CanvasLayer"]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -100,21 +105,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer"]
 autoplay = "start"
 anims/start = SubResource( 3 )
 
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer"]
 margin_left = 35.0
 margin_top = 355.0
 margin_right = 791.0
 margin_bottom = 641.0
 text = "CONTROL INSTRUCTIONS:
 
-W - UP
-A - RIGHT
-S - DOWN
-D - LEFT
+W/A/S/D - UP/RIGHT/DOWN/LEFT
 R - RELOAD
 1/2/3 - SWITCH LEFT WEAPON
 4/5/6 - SWITCH RIGHT WEAPON
@@ -126,12 +128,12 @@ TAB - PLAYER LIST
 
 CURRENT WINNING/LOSING CONDITION:
 1. ALL ENEMY UNITS DEFEATED (AROUND 100  FROM EACH TEAM)
-2. ALL BASE CAPTURED + NO MORE CURRENT ENEMY UNITS (AS IT RESULT NO MORE ENEMY UNITS CAN BE SPAWNED)"
+2. ALL BASE CAPTURED + NO MORE CURRENT ENEMY UNITS"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btnCreateServer" type="Button" parent="."]
+[node name="btnCreateServer" type="Button" parent="CanvasLayer"]
 margin_left = 765.998
 margin_top = 416.631
 margin_right = 968.998
@@ -142,7 +144,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btnJoinServer" type="Button" parent="."]
+[node name="btnJoinServer" type="Button" parent="CanvasLayer"]
 margin_left = 767.0
 margin_top = 468.968
 margin_right = 973.0
@@ -153,7 +155,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btnExit" type="Button" parent="."]
+[node name="btnExit" type="Button" parent="CanvasLayer"]
 margin_left = 767.0
 margin_top = 526.99
 margin_right = 973.0
@@ -164,7 +166,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelPlayer" type="Panel" parent="."]
+[node name="PanelPlayer" type="Panel" parent="CanvasLayer"]
 visible = false
 margin_left = 18.0
 margin_top = 22.0
@@ -174,14 +176,14 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="PanelPlayer"]
+[node name="Label" type="Label" parent="CanvasLayer/PanelPlayer"]
 margin_left = 9.43109
 margin_top = 2.57213
 margin_right = 90.4311
 margin_bottom = 16.5721
 text = "Player Name"
 
-[node name="txtPlayerName" type="LineEdit" parent="PanelPlayer"]
+[node name="txtPlayerName" type="LineEdit" parent="CanvasLayer/PanelPlayer"]
 margin_left = 5.0
 margin_top = 21.0
 margin_right = 115.0
@@ -191,7 +193,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblPlayerTeam" type="Label" parent="PanelPlayer"]
+[node name="lblPlayerTeam" type="Label" parent="CanvasLayer/PanelPlayer"]
 margin_left = 182.045
 margin_top = 3.56729
 margin_right = 296.045
@@ -201,9 +203,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="spritePlayerIcon" type="Sprite" parent="PanelPlayer"]
+[node name="spritePlayerIcon" type="Sprite" parent="CanvasLayer/PanelPlayer"]
 
-[node name="btPlayerConfirm" type="Button" parent="PanelPlayer"]
+[node name="btPlayerConfirm" type="Button" parent="CanvasLayer/PanelPlayer"]
 margin_left = 184.932
 margin_top = 82.5449
 margin_right = 246.932
@@ -213,7 +215,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btPlayerCancel" type="Button" parent="PanelPlayer"]
+[node name="btPlayerCancel" type="Button" parent="CanvasLayer/PanelPlayer"]
 margin_left = 272.239
 margin_top = 82.5449
 margin_right = 334.239
@@ -223,7 +225,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="txtPlayerTeam" type="SpinBox" parent="PanelPlayer"]
+[node name="txtPlayerTeam" type="SpinBox" parent="CanvasLayer/PanelPlayer"]
 margin_left = 180.0
 margin_top = 22.0
 margin_right = 301.0
@@ -233,7 +235,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelHost" type="Panel" parent="."]
+[node name="PanelHost" type="Panel" parent="CanvasLayer"]
 visible = false
 margin_left = 29.0
 margin_top = 23.0
@@ -243,7 +245,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="txtServerName" type="LineEdit" parent="PanelHost"]
+[node name="txtServerName" type="LineEdit" parent="CanvasLayer/PanelHost"]
 margin_left = 72.2493
 margin_top = 62.8264
 margin_right = 275.249
@@ -253,7 +255,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="PanelHost"]
+[node name="Label" type="Label" parent="CanvasLayer/PanelHost"]
 margin_left = 74.0101
 margin_top = 46.1709
 margin_right = 152.01
@@ -263,14 +265,14 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label2" type="Label" parent="PanelHost"]
+[node name="Label2" type="Label" parent="CanvasLayer/PanelHost"]
 margin_left = 71.1901
 margin_top = 94.2686
 margin_right = 141.19
 margin_bottom = 108.269
 text = "Server Port"
 
-[node name="txtServerPort" type="LineEdit" parent="PanelHost"]
+[node name="txtServerPort" type="LineEdit" parent="CanvasLayer/PanelHost"]
 margin_left = 77.1052
 margin_top = 114.263
 margin_right = 135.105
@@ -280,7 +282,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="txtMaxPlayers" type="SpinBox" parent="PanelHost"]
+[node name="txtMaxPlayers" type="SpinBox" parent="CanvasLayer/PanelHost"]
 margin_left = 168.411
 margin_top = 111.168
 margin_right = 242.411
@@ -290,14 +292,14 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label3" type="Label" parent="PanelHost"]
+[node name="Label3" type="Label" parent="CanvasLayer/PanelHost"]
 margin_left = 168.519
 margin_top = 93.9242
 margin_right = 277.519
 margin_bottom = 107.924
 text = "Max Connections"
 
-[node name="btServerCancel" type="Button" parent="PanelHost"]
+[node name="btServerCancel" type="Button" parent="CanvasLayer/PanelHost"]
 margin_left = 249.19
 margin_top = 151.198
 margin_right = 311.19
@@ -307,7 +309,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btServerCreate" type="Button" parent="PanelHost"]
+[node name="btServerCreate" type="Button" parent="CanvasLayer/PanelHost"]
 margin_left = 174.097
 margin_top = 151.444
 margin_right = 227.097
@@ -317,7 +319,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblCreateSErver" type="Label" parent="PanelHost"]
+[node name="lblCreateSErver" type="Label" parent="CanvasLayer/PanelHost"]
 margin_left = 15.4126
 margin_top = 9.5559
 margin_right = 840.413
@@ -327,7 +329,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelJoin" type="Panel" parent="."]
+[node name="PanelJoin" type="Panel" parent="CanvasLayer"]
 visible = false
 margin_left = 24.0
 margin_top = 20.0
@@ -337,42 +339,42 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="PanelJoin"]
+[node name="Label" type="Label" parent="CanvasLayer/PanelJoin"]
 margin_left = 19.0
 margin_top = 8.0
 margin_right = 847.0
 margin_bottom = 22.0
 text = "Join Server"
 
-[node name="Label2" type="Label" parent="PanelJoin"]
+[node name="Label2" type="Label" parent="CanvasLayer/PanelJoin"]
 margin_left = 34.0463
 margin_top = 37.9151
 margin_right = 80.0463
 margin_bottom = 51.9151
 text = "IP"
 
-[node name="Label3" type="Label" parent="PanelJoin"]
+[node name="Label3" type="Label" parent="CanvasLayer/PanelJoin"]
 margin_left = 161.72
 margin_top = 32.4987
 margin_right = 199.72
 margin_bottom = 46.4987
 text = "Port"
 
-[node name="txtJoinIp" type="LineEdit" parent="PanelJoin"]
+[node name="txtJoinIp" type="LineEdit" parent="CanvasLayer/PanelJoin"]
 margin_left = 25.0
 margin_top = 58.0
 margin_right = 95.0
 margin_bottom = 82.0
 text = "127.0.0.1"
 
-[node name="txtJoinPort" type="LineEdit" parent="PanelJoin"]
+[node name="txtJoinPort" type="LineEdit" parent="CanvasLayer/PanelJoin"]
 margin_left = 157.077
 margin_top = 54.9382
 margin_right = 215.077
 margin_bottom = 78.9382
 text = "31400"
 
-[node name="btnJoin" type="Button" parent="PanelJoin"]
+[node name="btnJoin" type="Button" parent="CanvasLayer/PanelJoin"]
 margin_left = 33.2725
 margin_top = 109.876
 margin_right = 68.2725
@@ -382,13 +384,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lblJoinStatus" type="Label" parent="PanelJoin"]
+[node name="lblJoinStatus" type="Label" parent="CanvasLayer/PanelJoin"]
 margin_left = 32.3404
 margin_top = 141.168
 margin_right = 72.3404
 margin_bottom = 155.168
 
-[node name="btJoinCancel" type="Button" parent="PanelJoin"]
+[node name="btJoinCancel" type="Button" parent="CanvasLayer/PanelJoin"]
 margin_left = 248.19
 margin_top = 150.198
 margin_right = 310.19
@@ -397,14 +399,12 @@ text = "Cancel"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="Timer" type="Timer" parent="."]
-[connection signal="pressed" from="btnCreateServer" to="." method="_onbtnCreateServerPanel"]
-[connection signal="pressed" from="btnJoinServer" to="." method="_onbtnJoinServerPanel"]
-[connection signal="pressed" from="btnExit" to="." method="_onbtnExit"]
-[connection signal="pressed" from="PanelPlayer/btPlayerConfirm" to="." method="_onbtPlayerConfirmPressed"]
-[connection signal="pressed" from="PanelPlayer/btPlayerCancel" to="." method="_onbtCancelPressed"]
-[connection signal="pressed" from="PanelHost/btServerCancel" to="." method="_onbtCancelPressed"]
-[connection signal="pressed" from="PanelHost/btServerCreate" to="." method="_onbtCreatePressed"]
-[connection signal="pressed" from="PanelJoin/btnJoin" to="." method="_onbtJoinPressed"]
-[connection signal="pressed" from="PanelJoin/btJoinCancel" to="." method="_onbtCancelPressed"]
+[connection signal="pressed" from="CanvasLayer/btnCreateServer" to="." method="_onbtnCreateServerPanel"]
+[connection signal="pressed" from="CanvasLayer/btnJoinServer" to="." method="_onbtnJoinServerPanel"]
+[connection signal="pressed" from="CanvasLayer/btnExit" to="." method="_onbtnExit"]
+[connection signal="pressed" from="CanvasLayer/PanelPlayer/btPlayerConfirm" to="." method="_onbtPlayerConfirmPressed"]
+[connection signal="pressed" from="CanvasLayer/PanelPlayer/btPlayerCancel" to="." method="_onbtCancelPressed"]
+[connection signal="pressed" from="CanvasLayer/PanelHost/btServerCancel" to="." method="_onbtCancelPressed"]
+[connection signal="pressed" from="CanvasLayer/PanelHost/btServerCreate" to="." method="_onbtCreatePressed"]
+[connection signal="pressed" from="CanvasLayer/PanelJoin/btnJoin" to="." method="_onbtJoinPressed"]
+[connection signal="pressed" from="CanvasLayer/PanelJoin/btJoinCancel" to="." method="_onbtCancelPressed"]

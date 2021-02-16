@@ -21,8 +21,8 @@ public class TitleScreen : Control
 
     private void setPlayerInfo()
     {
-        network.gamestateNetworkPlayer.name = ((LineEdit)GetNode("PanelPlayer/txtPlayerName")).Text;
-        network.gamestateNetworkPlayer.team = (int)(((SpinBox)GetNode("PanelPlayer/txtPlayerTeam")).Value);
+        network.gamestateNetworkPlayer.name = ((LineEdit)GetNode("CanvasLayer/PanelPlayer/txtPlayerName")).Text;
+        network.gamestateNetworkPlayer.team = (int)(((SpinBox)GetNode("CanvasLayer/PanelPlayer/txtPlayerTeam")).Value);
     }
 
     private void readyToPlay()
@@ -32,24 +32,24 @@ public class TitleScreen : Control
 
     private void joinFail()
     {
-        Label label = (Label)GetNode("PanelJoin/lblJoinStatus");
+        Label label = (Label)GetNode("CanvasLayer/PanelJoin/lblJoinStatus");
         label.Text = "Join Failed";
     }
 
     private void _onbtnCreateServerPanel()
     {
-        ((Panel)GetNode("PanelJoin")).Visible = false;
-        ((Panel)GetNode("PanelPlayer")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelJoin")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelPlayer")).Visible = false;
 
-        ((Panel)GetNode("PanelHost")).Visible = true;
+        ((Panel)GetNode("CanvasLayer/PanelHost")).Visible = true;
     }
 
     private void _onbtnJoinServerPanel()
     {
-        ((Panel)GetNode("PanelHost")).Visible = false;
-        ((Panel)GetNode("PanelPlayer")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelHost")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelPlayer")).Visible = false;
 
-        ((Panel)GetNode("PanelJoin")).Visible = true;
+        ((Panel)GetNode("CanvasLayer/PanelJoin")).Visible = true;
     }
 
     private void _onbtnExit()
@@ -60,13 +60,13 @@ public class TitleScreen : Control
     private void createServer()
     {
         //  Gather values from the GUI and fill the network info
-        LineEdit lineEdit = (LineEdit)GetNode("PanelHost/txtServerPort");
+        LineEdit lineEdit = (LineEdit)GetNode("CanvasLayer/PanelHost/txtServerPort");
         int port = Int32.Parse(lineEdit.Text);
 
-        SpinBox spinBox = (SpinBox)GetNode("PanelHost/txtMaxPlayers");
+        SpinBox spinBox = (SpinBox)GetNode("CanvasLayer/PanelHost/txtMaxPlayers");
         int maxPlayers = (int)(spinBox.Value);
 
-        lineEdit = (LineEdit)GetNode("PanelHost/txtServerName");
+        lineEdit = (LineEdit)GetNode("CanvasLayer/PanelHost/txtServerName");
         String ServerName = lineEdit.Text;
         //And create the server, using the function previously added into the code 
         network.createServer(ServerName, port, maxPlayers);
@@ -74,38 +74,38 @@ public class TitleScreen : Control
 
     private void joinServer()
     {
-        LineEdit lineEdit = (LineEdit)GetNode("PanelJoin/txtJoinPort");
+        LineEdit lineEdit = (LineEdit)GetNode("CanvasLayer/PanelJoin/txtJoinPort");
         int port = Int32.Parse(lineEdit.Text);
-        lineEdit = (LineEdit)GetNode("PanelJoin/txtJoinIp");
+        lineEdit = (LineEdit)GetNode("CanvasLayer/PanelJoin/txtJoinIp");
         String ip = lineEdit.Text;
         network.joinServer(ip, port);
     }
 
     private void _onbtCreatePressed()
     {
-        ((Panel)GetNode("PanelJoin")).Visible = false;
-        ((Panel)GetNode("PanelHost")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelJoin")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelHost")).Visible = false;
 
         gameModeState = GameModeState.Server;
 
-        ((Panel)GetNode("PanelPlayer")).Visible = true;
+        ((Panel)GetNode("CanvasLayer/PanelPlayer")).Visible = true;
     }
 
     private void _onbtJoinPressed()
     {
-        ((Panel)GetNode("PanelJoin")).Visible = false;
-        ((Panel)GetNode("PanelHost")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelJoin")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelHost")).Visible = false;
 
         gameModeState = GameModeState.Client;
 
-        ((Panel)GetNode("PanelPlayer")).Visible = true;
+        ((Panel)GetNode("CanvasLayer/PanelPlayer")).Visible = true;
     }
 
     private void _onbtPlayerConfirmPressed()
     {
-        ((Panel)GetNode("PanelJoin")).Visible = false;
-        ((Panel)GetNode("PanelHost")).Visible = false;
-        ((Panel)GetNode("PanelPlayer")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelJoin")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelHost")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelPlayer")).Visible = false;
 
         // Properly set the local player information
         setPlayerInfo();
@@ -123,9 +123,9 @@ public class TitleScreen : Control
 
     private void _onbtCancelPressed()
     {
-        ((Panel)GetNode("PanelJoin")).Visible = false;
-        ((Panel)GetNode("PanelHost")).Visible = false;
-        ((Panel)GetNode("PanelPlayer")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelJoin")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelHost")).Visible = false;
+        ((Panel)GetNode("CanvasLayer/PanelPlayer")).Visible = false;
     }
 
     public override void _Input(InputEvent @event)
