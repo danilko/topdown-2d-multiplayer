@@ -90,6 +90,10 @@ public class Agent : KinematicBody2D
 
     protected Inventory CurrentInventory;
 
+    protected Timer DamageEffectTimer;
+
+    protected Sprite Body;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -102,6 +106,8 @@ public class Agent : KinematicBody2D
         smoke.Emitting = false;
 
         CurrentInventory = (Inventory)GetNode("Inventory");
+        DamageEffectTimer = (Timer)GetNode("DamageEffectTimer");
+        Body = (Sprite)GetNode("Body");
 
         _health = MaxHealth;
         _energy = MaxEnergy;
@@ -481,6 +487,12 @@ public class Agent : KinematicBody2D
 
         if (trackDamage)
         {
+            if (DamageEffectTimer.IsStopped())
+            {
+                Body.SelfModulate = new Color(10.0f, 10.0f, 10.0f, 1.0f);
+                DamageEffectTimer.Start();
+            }
+
             _health -= amount;
 
             EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
@@ -512,6 +524,11 @@ public class Agent : KinematicBody2D
     public void SetCameraRemotePath(Camera2D camera)
     {
         _remoteTransform2D.RemotePath = camera.GetPath();
+    }
+
+    public void DamageEffectTimerTimeout()
+    {
+        Body.SelfModulate = new Color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public void ReloadRightWeapon()

@@ -76,5 +76,10 @@ texture = ExtResource( 6 )
 scale = Vector2( 3, 3 )
 
 [node name="Inventory" parent="." instance=ExtResource( 8 )]
+
+[node name="DamageEffectTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
 [connection signal="HealthChangedSignal" from="." to="UnitDisplay" method="UpdateUnitBar"]
 [connection signal="animation_finished" from="Explosion" to="." method="_OnExplosionAnimationFinished"]
+[connection signal="timeout" from="DamageEffectTimer" to="." method="DamageEffectTimerTimeout"]
