@@ -18,6 +18,7 @@ public class TeamMapAI : Node2D
     private Node _unitsContainer;
 
     private GameWorld _gameWorld;
+    private InventoryManager _inventoryManager;
 
     private PathFinding _pathFinding;
 
@@ -62,6 +63,25 @@ public class TeamMapAI : Node2D
     {
         _maxUnitUsageAmount = maxUnitUsageAmount;
         _currentUnitUsageAmount = _maxUnitUsageAmount;
+    }
+
+    public bool ChargeAmount(int chargeAmount)
+    {
+        if (_currentUnitUsageAmount - chargeAmount < 0)
+        {
+            return false;
+        }
+        else
+        {
+            _currentUnitUsageAmount = _currentUnitUsageAmount- chargeAmount;
+            return true;
+        }
+    }
+
+    public void AddAmount(int chargeAmount)
+    {
+        _currentUnitUsageAmount = _currentUnitUsageAmount + chargeAmount;
+
     }
 
     public bool isUnitUsageAmountAllowed()
@@ -116,6 +136,7 @@ public class TeamMapAI : Node2D
 
     public void Initialize(GameWorld gameWorld, Godot.Collections.Array bases, Team.TeamCode team, PathFinding pathFinding)
     {
+        _inventoryManager = gameWorld.GetInventoryManager();
         _bases = bases;
         _team.CurrentTeamCode = team;
         _gameWorld = gameWorld;
@@ -209,13 +230,13 @@ public class TeamMapAI : Node2D
         _unitsContainer.AddChild(unit);
 
         // Set the info afterward as some of these depend on child node to be available
-        unit.Initialize(_gameWorld, unitName, displayName, _team.CurrentTeamCode, _pathFinding);
+        unit.Initialize(_gameWorld, unitName, displayName, this, _pathFinding);
 
         // Trigger reload of UI
         unit.changeRightWeapon(0);
         unit.changeLeftWeapon(0);
 
-        _currentUnitUsageAmount -= _unitCost;
+        ChargeAmount(_unitCost);
 
         return unit;
     }

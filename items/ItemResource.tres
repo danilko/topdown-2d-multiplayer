@@ -8,4 +8,4 @@ Name = ""
 Description = ""
 Price = 0
 Stackable = false
-MaxStackable = 1
+MaxStackableCount = 0

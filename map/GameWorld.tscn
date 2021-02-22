@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
 [ext_resource path="res://items/Pickup.tscn" type="PackedScene" id=8]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
+[ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
@@ -80,4 +81,6 @@ _defaultTeamCode = 0
 [node name="RespawnPlayerTimer" type="Timer" parent="."]
 
 [node name="GameCamera" parent="." instance=ExtResource( 9 )]
+
+[node name="InventoryManager" parent="." instance=ExtResource( 10 )]
 [connection signal="timeout" from="Timer" to="." method="_onNetworkRateTimerUpdate"]

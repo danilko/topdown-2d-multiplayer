@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
 [ext_resource path="res://map/SimulateGameWorld.cs" type="Script" id=3]
 [ext_resource path="res://environments/CapturableBase.tscn" type="PackedScene" id=4]
+[ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=5]
 [ext_resource path="res://environments/CapaturableBaseManager.tscn" type="PackedScene" id=6]
 [ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
@@ -69,4 +70,6 @@ wait_time = 5.0
 autostart = true
 
 [node name="GameCamera" parent="." instance=ExtResource( 9 )]
+
+[node name="InventoryManager" parent="." instance=ExtResource( 5 )]
 [connection signal="timeout" from="ChangeAgentBehavior" to="." method="changeAgentBehavior"]

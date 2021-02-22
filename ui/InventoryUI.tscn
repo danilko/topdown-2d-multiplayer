@@ -2,13 +2,13 @@
 
 [ext_resource path="res://inventory/Inventory.tscn" type="PackedScene" id=1]
 [ext_resource path="res://ui/InventoryUI.cs" type="Script" id=2]
-[ext_resource path="res://inventory/InventoryDatabase.tscn" type="PackedScene" id=3]
+[ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=3]
 [ext_resource path="res://ui/ItemPanel.cs" type="Script" id=4]
+
 
 [sub_resource type="Theme" id=1]
 
 [node name="InventoryUI" type="PopupPanel"]
-visible = true
 margin_right = 771.0
 margin_bottom = 404.0
 script = ExtResource( 2 )
@@ -27,33 +27,41 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Inventory" type="GridContainer" parent="TabContainer"]
+[node name="Store" type="MarginContainer" parent="TabContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
 margin_top = 32.0
 margin_right = -4.0
 margin_bottom = -4.0
+
+[node name="Scrollable" type="ScrollContainer" parent="TabContainer/Store"]
+margin_right = 755.0
+margin_bottom = 360.0
+scroll_horizontal_enabled = false
+
+[node name="GridContainerStore" type="GridContainer" parent="TabContainer/Store/Scrollable"]
 custom_constants/vseparation = 4
 custom_constants/hseparation = 4
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="StoreMargin" type="MarginContainer" parent="TabContainer"]
+[node name="Inventory" type="MarginContainer" parent="TabContainer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 40.0
-margin_right = -10.0
-margin_bottom = -10.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
 
-[node name="StoreScrollable" type="ScrollContainer" parent="TabContainer/StoreMargin"]
-margin_right = 743.0
-margin_bottom = 346.0
+[node name="Scrollable" type="ScrollContainer" parent="TabContainer/Inventory"]
+margin_right = 755.0
+margin_bottom = 360.0
 scroll_horizontal_enabled = false
 
-[node name="Store" type="GridContainer" parent="TabContainer/StoreMargin/StoreScrollable"]
+[node name="GridContainerInventory" type="GridContainer" parent="TabContainer/Inventory/Scrollable"]
 custom_constants/vseparation = 4
 custom_constants/hseparation = 4
 __meta__ = {
@@ -126,8 +134,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="InventoryDatabase" parent="." instance=ExtResource( 3 )]
-
 [node name="Inventory" parent="." instance=ExtResource( 1 )]
+
+[node name="Store" parent="." instance=ExtResource( 3 )]
+[connection signal="gui_input" from="ItemPanel" to="ItemPanel" method="_guiInput"]
 [connection signal="mouse_entered" from="ItemPanel" to="ItemPanel" method="mouseEntered"]
 [connection signal="mouse_exited" from="ItemPanel" to="ItemPanel" method="mouseExited"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
@@ -10,6 +10,7 @@
 [ext_resource path="res://ui/MiniMap.tscn" type="PackedScene" id=8]
 [ext_resource path="res://ui/PopUpMessage.tscn" type="PackedScene" id=9]
 [ext_resource path="res://assets/ui/grey_panel.png" type="Texture" id=10]
+[ext_resource path="res://ui/InventoryUI.tscn" type="PackedScene" id=11]
 
 [sub_resource type="DynamicFont" id=1]
 size = 20
@@ -386,6 +387,8 @@ margin_left = 744.189
 margin_top = 96.4272
 margin_right = 999.19
 margin_bottom = 351.427
+
+[node name="InventoryUI" parent="controlGame" instance=ExtResource( 11 )]
 
 [node name="controlOverallMessage" type="Control" parent="."]
 visible = false

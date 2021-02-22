@@ -135,6 +135,7 @@ public class GameWorld : Node2D
     private HUD _hud;
     private PopUpMessage _popUpMessage;
     private MiniMap _miniMap;
+    private InventoryManager _inventoryManager;
 
     public override void _Ready()
     {
@@ -146,7 +147,9 @@ public class GameWorld : Node2D
         _initializeTileMap();
         _initializeObsctacleManager();
         _initializeCapaturableBaseManager();
+        _initializeInventoryManager();
         _initializeTeamMapAI();
+
 
         Input.SetCustomMouseCursor(GD.Load("res://assets/ui/blue_cross.png"), Input.CursorShape.Arrow, new Vector2(16, 16));
 
@@ -271,6 +274,15 @@ public class GameWorld : Node2D
                 capturable.Connect(nameof(CapturableBase.BaseTeamChangeSignal), ai, nameof(TeamMapAI.HandleCapturableBaseCaptured));
             }
         }
+    }
+
+    private void _initializeInventoryManager()
+    {
+        _inventoryManager = (InventoryManager)GetNode("InventoryManager");
+    }
+    public InventoryManager GetInventoryManager()
+    {
+       return _inventoryManager;
     }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots

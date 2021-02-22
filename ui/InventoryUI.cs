@@ -4,7 +4,7 @@ using System;
 public class InventoryUI : PopupPanel
 {
 
-    private InventoryDatabase _inventoryDatabase;
+    private InventoryManager _inventoryManager;
     private Inventory _inventory;
 
     private Panel _itemPanel;
@@ -15,45 +15,85 @@ public class InventoryUI : PopupPanel
     {
 
         _itemPanel = (Panel)GetNode("ItemPanel");
-        _gridContainerStore = (GridContainer)GetNode("TabContainer/StoreMargin/StoreScrollable/Store");
-        //_gridContainerInventory = (GridContainer)GetNode("TabContainer/Inventory");
-
-        // Temporary code
-        Initialize((InventoryDatabase)GetNode("InventoryDatabase"), (Inventory)GetNode("Inventory"));
-        this.PopupCentered(this.RectSize);
+        _gridContainerStore = (GridContainer)GetNode("TabContainer/Store/Scrollable/GridContainerStore");
+        _gridContainerInventory = (GridContainer)GetNode("TabContainer/Inventory/Scrollable/GridContainerInventory");
     }
 
-    public void Initialize(InventoryDatabase inventoryDatabase, Inventory inventory)
+    public void Initialize(InventoryManager inventoryManager, Inventory inventory)
     {
-        _inventoryDatabase = inventoryDatabase;
+        _inventoryManager = inventoryManager;
         _inventory = inventory;
 
-        // // Clean up existing list
-        // if (_gridContainerStore.GetChildCount() != 0)
-        // {
-        //     foreach (Node node in _gridContainerStore.GetChildren())
-        //     {
-        //         node.QueueFree();
-        //     }
-        // }
 
-        foreach (ItemResource itemResource in _inventoryDatabase.GetItems())
+        // Clean up existing list
+        _cleanGridContainer(_gridContainerStore);
+        _cleanGridContainer(_gridContainerInventory);
+
+        _populateGridContainer(_gridContainerStore);
+        _populateGridContainer(_gridContainerInventory);
+    }
+
+    private void _cleanGridContainer(GridContainer gridContainer)
+    {
+        if (gridContainer.GetChildCount() != 0)
         {
-            Panel panel = (Panel)_itemPanel.Duplicate();
-            _gridContainerStore.AddChild(panel);
-            populatePanel(itemResource, panel);
+            foreach (Node node in gridContainer.GetChildren())
+            {
+                node.QueueFree();
+            }
         }
     }
 
-    private void populatePanel(ItemResource itemResource, Panel panel)
+    private void _populateGridContainer(GridContainer gridContainer)
     {
-        ((Label)(panel.GetNode("Name"))).Text = itemResource.Name;
-        ((Label)(panel.GetNode("Price"))).Text = "COST: " + itemResource.Price;
-        ((Label)(panel.GetNode("Description"))).Text = itemResource.Description;
-        ((TextureRect)(panel.GetNode("Image"))).Texture = itemResource.ReferenceTexture;
-        ((TextureRect)(panel.GetNode("Image"))).RectScale = new Vector2(0.5f, 0.5f);
-        panel.Show();
+        Godot.Collections.Array<ItemResource> items = null;
+        if (gridContainer.Name == _gridContainerStore.Name)
+        {
+            items = _inventoryManager.GetPurchasableItems();
+        }
+        else
+        {
+            items = _inventory.GetItems();
+        }
+
+        foreach (ItemResource itemResource in items)
+        {
+            ItemPanel panel = (ItemPanel)_itemPanel.Duplicate();
+
+            gridContainer.AddChild(panel);
+            if (gridContainer.Name == _gridContainerStore.Name)
+            {
+                populatedStorePanel(itemResource, panel);
+            }
+            else
+            {
+                populatedInventoryPanel(itemResource, panel);
+            }
+
+        }
     }
 
+    private void purchaseItem(ItemResource itemResource)
+    {
+        _inventoryManager.BuyItem(itemResource,_inventory);
+
+        // Clean up existing list
+        _cleanGridContainer(_gridContainerInventory);
+        _populateGridContainer(_gridContainerInventory);
+    }
+
+    private void populatedStorePanel(ItemResource itemResource, ItemPanel panel)
+    {
+        panel.Initialize(itemResource);
+        panel.Show();
+
+        panel.Connect(nameof(ItemPanel.ItemPanelClickSignal), this, nameof(purchaseItem));
+    }
+    private void populatedInventoryPanel(ItemResource itemResource, ItemPanel panel)
+    {
+        panel.Initialize(itemResource);
+        panel.Show();
+
+    }
 
 }

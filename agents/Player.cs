@@ -5,6 +5,7 @@ public class Player : Agent
 {
 
     private HUD _hud = null;
+    private InventoryUI _inventoryUI = null;
 
     [Remote]
     public void serverGetPlayerInput(String inputData)
@@ -67,6 +68,10 @@ public class Player : Agent
         ScreenIndicator screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
         AddChild(screenIndicator);
         screenIndicator.Initialize(this);
+
+        // Setup Inventory UI
+        _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");
+        _inventoryUI.Initialize(_gameWorld.GetInventoryManager(), CurrentInventory);
     }
 
     protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
@@ -105,6 +110,18 @@ public class Player : Agent
     public void gatherInput(float delta)
     {
         GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
+
+        if(Input.IsActionJustReleased("inventory"))
+        {
+           if(!_inventoryUI.Visible)
+           {
+                _inventoryUI.PopupCentered();
+           }
+           else
+           {
+                _inventoryUI.Hide();
+           }
+        }
 
         if (Input.IsActionPressed("turn_right"))
         {
@@ -250,7 +267,7 @@ public class Player : Agent
         //some major lag in the game
         gameStates.currentTime -= gameStates.updateDelta;
 
-        if (IsNetworkMaster())
+        if (GetTree().NetworkPeer != null && IsNetworkMaster())
         {
             gatherInput(delta);
         }

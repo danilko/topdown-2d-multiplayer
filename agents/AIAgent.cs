@@ -35,9 +35,9 @@ public class AIAgent : Agent
         _agentAI = (AI)GetNode("AI");
     }
 
-    public override void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode, PathFinding pathFinding)
+    public override void Initialize(GameWorld gameWorld, String unitName, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
     {
-        base.Initialize(gameWorld, unitName, displayName, inputTeamCode, pathFinding);
+        base.Initialize(gameWorld, unitName, displayName, teamMapAI, pathFinding);
         if (GetTree().IsNetworkServer())
         {
             _agentAI.Initialize(_gameWorld, this, pathFinding, DetectRadius);

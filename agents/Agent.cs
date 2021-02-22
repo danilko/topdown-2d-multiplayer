@@ -86,6 +86,10 @@ public class Agent : KinematicBody2D
 
     private Team _team;
 
+    public TeamMapAI _teamMapAI;
+
+    protected Inventory CurrentInventory;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -97,6 +101,8 @@ public class Agent : KinematicBody2D
         Particles2D smoke = (Particles2D)GetNode("Smoke");
         smoke.Emitting = false;
 
+        CurrentInventory = (Inventory)GetNode("Inventory");
+
         _health = MaxHealth;
         _energy = MaxEnergy;
 
@@ -107,27 +113,29 @@ public class Agent : KinematicBody2D
         EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
     }
 
-    public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, Team.TeamCode inputTeamCode, PathFinding pathFinding)
+    public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
     {
         _team = (Team)GetNode("Team");
+        _teamMapAI = teamMapAI;
 
         _gameWorld = gameWorld;
-        SetCurrentTeam(inputTeamCode);
+        SetCurrentTeam(_teamMapAI.GetCurrentTeam());
         SetUnitName(unitName);
         SetDisplayName(displayName);
 
         _health = MaxHealth;
         _energy = MaxEnergy;
 
+        CurrentInventory.Initialize(this);
+
         // Temporary script to automatic load weapon
         UpdateRightWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
         UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LightSaber.tscn"));
         UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
-        
+
         UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/Shield.tscn"));
         UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
         UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
- 
     }
 
     public virtual void changeRightWeapon(int weaponIndex)
@@ -309,6 +317,13 @@ public class Agent : KinematicBody2D
         return _team.CurrentTeamCode;
     }
 
+    public TeamMapAI GetCurrentTeamMapAI()
+    {
+        return _teamMapAI;
+    }
+
+
+
     public String GetDisplayName()
     {
         return _displayName;
@@ -389,34 +404,39 @@ public class Agent : KinematicBody2D
 
     public void Fire(int rightWeapon, int leftWeapon)
     {
-
-        if (rightWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (currentLeftWeaponIndex != -1)
         {
-            ReloadRightWeapon();
-        }
-
-        if (leftWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
-        {
-            ReloadLeftWeapon();
-        }
-
-        if (rightWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentRightWeaponIndex != -1)
-        {
-            // knock back effect
-            if (((Weapon)RightWeapons[currentRightWeaponIndex]).Fire(target) && MaxSpeed != 0)
+            if (rightWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
             {
-                Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                MoveAndSlide(dir * -10 * ((Weapon)RightWeapons[currentRightWeaponIndex]).KnockbackForce);
+                ReloadRightWeapon();
+            }
+
+            if (rightWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentRightWeaponIndex != -1)
+            {
+                // knock back effect
+                if (((Weapon)RightWeapons[currentRightWeaponIndex]).Fire(target) && MaxSpeed != 0)
+                {
+                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+                    MoveAndSlide(dir * -10 * ((Weapon)RightWeapons[currentRightWeaponIndex]).KnockbackForce);
+                }
             }
         }
 
-        if (leftWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentLeftWeaponIndex != -1)
+        if (currentRightWeaponIndex != -1)
         {
-            // knock back effect
-            if (((Weapon)LeftWeapons[currentLeftWeaponIndex]).Fire(target) && MaxSpeed != 0)
+            if (leftWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
             {
-                Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                MoveAndSlide(dir * -10 * ((Weapon)LeftWeapons[currentLeftWeaponIndex]).KnockbackForce);
+                ReloadLeftWeapon();
+            }
+
+            if (leftWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentLeftWeaponIndex != -1)
+            {
+                // knock back effect
+                if (((Weapon)LeftWeapons[currentLeftWeaponIndex]).Fire(target) && MaxSpeed != 0)
+                {
+                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+                    MoveAndSlide(dir * -10 * ((Weapon)LeftWeapons[currentLeftWeaponIndex]).KnockbackForce);
+                }
             }
         }
     }

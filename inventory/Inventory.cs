@@ -2,24 +2,46 @@ using Godot;
 using System;
 
 public class Inventory : Node
-{    
+{
     [Signal]
     public delegate void InventoryChangeSignal();
 
     [Export]
     private Godot.Collections.Array<ItemResource> _items;
 
-    private InventoryDatabase _inventoryDatabase;
+    [Export]
+    private Godot.Collections.Array<ItemResource> _rightWeapons;
+    
+    [Export]
+    private Godot.Collections.Array<ItemResource> _leftWeapons;
+
+    private Agent _agent;
 
     public override void _Ready()
     {
         _items = new Godot.Collections.Array<ItemResource>();
+
+        _rightWeapons = new Godot.Collections.Array<ItemResource>();
+        _rightWeapons.Add(null);
+        _rightWeapons.Add(null);
+        _rightWeapons.Add(null);
+        
+        _leftWeapons = new Godot.Collections.Array<ItemResource>();
+        _leftWeapons.Add(null);
+        _leftWeapons.Add(null);
+        _leftWeapons.Add(null);
+
         EmitSignal(nameof(InventoryChangeSignal), this);
     }
 
-    public void Initialize(InventoryDatabase inventoryDatabase)
+    public void Initialize(Agent agent)
     {
-        _inventoryDatabase = inventoryDatabase;
+        _agent = agent;
+    }
+
+    public TeamMapAI GetCurrentTeamMapAI()
+    {
+        return _agent.GetCurrentTeamMapAI();
     }
 
     public Godot.Collections.Array<ItemResource> GetItems()
@@ -27,27 +49,67 @@ public class Inventory : Node
         return _items;
     }
 
+    public Godot.Collections.Array<ItemResource> GetLeftWeapons()
+    {
+        return _leftWeapons;
+    }
+
+    public Godot.Collections.Array<ItemResource> GetRightWeapons()
+    {
+        return _rightWeapons;
+    }
+
     public ItemResource GetItem(int index)
     {
         return _items[index];
     }
 
-    public void AddItem(String itemName, int quantity)
+    public Boolean HasItem(ItemResource itemResource)
     {
-        if(quantity < 0)
+        if (_items.Count > 0)
         {
-            GD.Print("Cannot add less than 0 item");
-            return;
+            int foundIndex = -1;
+
+            for (int index = 0; index < _items.Count; index++)
+            {
+                if (itemResource.Name == _items[index].Name)
+                {
+                    foundIndex = index;
+                }
+            }
+
+            if (foundIndex != -1)
+            {
+                return true;
+            }
         }
 
-        ItemResource itemResource = _inventoryDatabase.GetItem(itemName);
+        return false;
+    }
 
-        if(itemResource == null)
+    public bool RemoveItem(ItemResource itemResource)
+    {
+        int foundIndex = -1;
+
+        for (int index = 0; index < _items.Count; index++)
         {
-            GD.Print("Cannot load item");
-            return;
-        }        
+            if (itemResource.Name == _items[index].Name)
+            {
+                foundIndex = index;
+            }
+        }
 
+        if (foundIndex != -1)
+        {
+            _items.RemoveAt(foundIndex);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void AddItem(ItemResource itemResource)
+    {
         _items.Add(itemResource);
     }
 }

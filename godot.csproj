@@ -26,6 +26,7 @@
     <Compile Include="environments\CapturableBase.cs" />
     <Compile Include="environments\ObstacleManager.cs" />
     <Compile Include="inventory\Inventory.cs" />
+    <Compile Include="inventory\InventoryManager.cs" />
     <Compile Include="items\ItemResource.cs" />
     <Compile Include="map\SimulateGameWorld.cs" />
     <Compile Include="projectiles\Projectile.cs" />

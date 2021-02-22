@@ -93,7 +93,7 @@ public class SimulateGameWorld : GameWorld
     private TileMap _tileMap;
 
     private GameCamera _camera2D;
-
+    private InventoryManager _inventoryManager;
 
     public override void _Ready()
     {
@@ -103,6 +103,7 @@ public class SimulateGameWorld : GameWorld
         _initializeCamera();
         _initializeTileMap();
         _initializeCapaturableBaseManager();
+        _initializeInventoryManager();
         _initializeTeamMapAI();
         _syncBots();
 
@@ -145,6 +146,11 @@ public class SimulateGameWorld : GameWorld
                 capturable.Connect(nameof(CapturableBase.BaseTeamChangeSignal), ai, nameof(TeamMapAI.HandleCapturableBaseCaptured));
             }
         }
+    }
+
+    private void _initializeInventoryManager()
+    {
+        _inventoryManager = (InventoryManager)GetNode("InventoryManager");
     }
 
     private void _syncBots()
@@ -193,7 +199,7 @@ public class SimulateGameWorld : GameWorld
             enemyNode.setHealth(100);
             enemyNode.changeLeftWeapon(random.RandiRange(0, 100));
             enemyNode.changeRightWeapon(random.RandiRange(0, 100));
-            spawnBotTargetBase[enemyNode.GetUnitName()] =  (spawnBotTargetBase[enemyNode.GetUnitName()] + 1) % _capaturableBaseManager.GetBases().Count;
+            spawnBotTargetBase[enemyNode.GetUnitName()] = (spawnBotTargetBase[enemyNode.GetUnitName()] + 1) % _capaturableBaseManager.GetBases().Count;
         }
     }
 
