@@ -188,7 +188,7 @@ public class AI : Node2D
                     }
 
                     // Chanse engaged agent closer if possible
-                    if(_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 200.0f)
+                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 200.0f)
                     {
                         _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition), delta);
                     }
@@ -219,25 +219,29 @@ public class AI : Node2D
         }
     }
 
-    private void _onRightWeaponNeedReload()
+    private void _onWeaponNeedReload(Weapon.WeaponOrder weaponOrder)
     {
-        _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+        if (weaponOrder == Weapon.WeaponOrder.Left)
+        {
+            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+        }
+        else
+        {
+            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+        }
     }
 
-    private void _onRightWeaponReloadStop()
+    private void _onWeaponReload(Weapon.WeaponOrder weaponOrder, bool isReloading)
     {
-        _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
-    }
+        if (weaponOrder == Weapon.WeaponOrder.Left)
+        {
+            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        }
+        else
+        {
+            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        }
 
-
-    private void _onLeftWeaponNeedReload()
-    {
-        _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
-    }
-
-    private void _onLeftWeaponReloadStop()
-    {
-        _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
     }
 
     private void _onDetectionZoneBodyEntered(Node body)

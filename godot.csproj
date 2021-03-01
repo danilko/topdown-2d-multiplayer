@@ -46,6 +46,7 @@
     <Compile Include="ui\MiniMap.cs" />
     <Compile Include="ui\PopUpMessage.cs" />
     <Compile Include="ui\ScreenIndicator.cs" />
+    <Compile Include="ui\WeaponSlotPanel.cs" />
     <Compile Include="weapons\Shield.cs" />
     <Compile Include="singletons\audios\AudioManager.cs" />
     <Compile Include="agents\AIAgent.cs" />

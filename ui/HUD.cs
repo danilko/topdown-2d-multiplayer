@@ -92,96 +92,49 @@ public class HUD : CanvasLayer
         ((Label)GetNode("lblNetworkRate")).Text = "Network Rate: " + message;
     }
 
-    public void UpdateRightWeaponAmmo(int current, int max)
-    {
-        UpdateWeaponAmmo(current, max, Weapon.WeaponOrder.Right.ToString());
-    }
-    public void UpdateLeftWeaponAmmo(int current, int max)
-    {
-        UpdateWeaponAmmo(current, max, Weapon.WeaponOrder.Left.ToString());
-    }
-
-    public void UpdateWeaponAmmo(int current, int max, String side)
+    public void UpdateWeaponAmmo(int current, int max, Weapon.WeaponOrder weaponOrder)
     {
         //TextureProgress ammoBar = (TextureProgress)GetNode("controlGame/Margin/Container/AmmoBar");
         //ammoBar.Value = value;
-        ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponAmmo")).Text = current + "/" + max;
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Text = current + "/" + max;
 
 
         if (Mathf.Abs((float)current / (float)max) <= 0.1f)
         {
             // Change color during if ammo is under 10%
-            ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponAmmo")).Set("custom_colors/font_color", new Color("#ffc65b"));
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Set("custom_colors/font_color", new Color("#ffc65b"));
         }
         else
         {
-            ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponAmmo")).Set("custom_colors/font_color", new Color("#96ff5b"));
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Set("custom_colors/font_color", new Color("#96ff5b"));
         }
 
         // If not 0 ammo, disable the out ammo message
         if (current == 0)
         {
-            ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponAmmoOut")).Visible = true;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoOut")).Visible = true;
         }
         else
         {
-            ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponAmmoOut")).Visible = false;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoOut")).Visible = false;
         }
     }
 
-    public void UpdateRightWeaponAmmoOut()
+    public void UpdateWeaponAmmoOut(Weapon.WeaponOrder weaponOrder)
     {
-        UpdateWeaponAmmoOut(Weapon.WeaponOrder.Right.ToString());
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoOut")).Visible = true;
     }
 
-    public void UpdateLeftWeaponAmmoOut()
+    public void UpdateWeaponReload(Weapon.WeaponOrder weaponOrder, bool reload)
     {
-        UpdateWeaponAmmoOut(Weapon.WeaponOrder.Left.ToString());
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponReloading")).Visible = reload;
     }
 
-    public void UpdateWeaponAmmoOut(String side)
-    {
-        ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponAmmoOut")).Visible = true;
-    }
 
-    public void UpdateRightWeaponReloadStart()
+    public void UpdateWeapon(Weapon.WeaponType weaponType, Weapon.WeaponOrder weaponOrder)
     {
-        UpdateWeaponReloadStart(Weapon.WeaponOrder.Right.ToString(), true);
-    }
-
-    public void UpdateLeftWeaponReloadStart()
-    {
-        UpdateWeaponReloadStart(Weapon.WeaponOrder.Left.ToString(), true);
-    }
-
-    public void UpdateRightWeaponReloadStop()
-    {
-        UpdateWeaponReloadStart(Weapon.WeaponOrder.Right.ToString(), false);
-    }
-
-    public void UpdateLeftWeaponReloadStop()
-    {
-        UpdateWeaponReloadStart(Weapon.WeaponOrder.Left.ToString(), false);
-    }
-
-    public void UpdateWeaponReloadStart(String side, bool reload)
-    {
-        ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponReloading")).Visible = reload;
-    }
-
-    public void UpdateRightWeapon(Weapon.WeaponType weaponType)
-    {
-        UpdateWeapon(weaponType, Weapon.WeaponOrder.Right.ToString());
-    }
-    public void UpdateLeftWeapon(Weapon.WeaponType weaponType)
-    {
-        UpdateWeapon(weaponType, Weapon.WeaponOrder.Left.ToString());
-    }
-
-    public void UpdateWeapon(Weapon.WeaponType weaponType, String side)
-    {
-        ((Label)GetNode("controlGame/" + side + "WeaponControl/lblWeaponName")).Text = "" + weaponType.ToString();
-        Sprite symbol = ((Sprite)GetNode("controlGame/" + side + "WeaponControl/spWeaponSymbol"));
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponName")).Text = "" + weaponType.ToString();
+        Sprite symbol = ((Sprite)GetNode("controlGame/" + weaponOrder + "WeaponControl/spWeaponSymbol"));
 
         if (weaponType == Weapon.WeaponType.LASER)
         {
@@ -207,6 +160,12 @@ public class HUD : CanvasLayer
         {
             symbol.RegionRect = new Rect2(411f, 3f, 77f, 18f);
             symbol.Scale = new Vector2(1f, 1f) * 0.75f;
+        }
+
+        if (weaponType != Weapon.WeaponType.EMPTY)
+        {
+            symbol.Scale = Vector2.Zero;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Text = "0/0";
         }
     }
 
@@ -244,7 +203,7 @@ public class HUD : CanvasLayer
         ((MiniMap)GetNode("controlGame/MiniMap")).Visible = false;
         ((Control)GetNode("controlGame/LeftWeaponControl")).Visible = false;
         ((Control)GetNode("controlGame/RightWeaponControl")).Visible = false;
-        
+
         ((Control)GetNode("controlOverallMessage")).Visible = true;
 
         ((AnimationPlayer)GetNode("AnimationPlayer")).Play("MessageAnnounce");

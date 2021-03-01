@@ -96,6 +96,7 @@ public class Weapon : Node2D
 
 [node name="Weapon" type="Node2D"]
 script = SubResource( 1 )
+ItemResourceID = ""
 
 [node name="CooldownTimer" type="Timer" parent="."]
 one_shot = true

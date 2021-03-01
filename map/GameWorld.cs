@@ -225,7 +225,6 @@ public class GameWorld : Node2D
             _timer.Connect("timeout", this, nameof(waitingPeriodTimerTimeout));
             _timer.Start();
         }
-
     }
 
     private void _initializeTileMap()
@@ -282,7 +281,7 @@ public class GameWorld : Node2D
     }
     public InventoryManager GetInventoryManager()
     {
-       return _inventoryManager;
+        return _inventoryManager;
     }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots
@@ -592,8 +591,8 @@ public class GameWorld : Node2D
             return;
         }
 
-        agent.changeRightWeapon(item.RightWeaponIndex);
-        agent.changeLeftWeapon(item.LeftWeaponIndex);
+        agent.changeWeapon(item.RightWeaponIndex, Weapon.WeaponOrder.Right);
+        agent.changeWeapon(item.LeftWeaponIndex, Weapon.WeaponOrder.Left);
 
         agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.LeftWeapon);
         agent.setHealth(item.Health);
@@ -780,15 +779,16 @@ public class GameWorld : Node2D
                         moveDir.x = -1 * input.Value.Left;
                         moveDir.x += 1 * input.Value.Right;
 
-                        playerNode.changeRightWeapon(input.Value.RightWeaponIndex);
-                        playerNode.changeLeftWeapon(input.Value.LeftWeaponIndex);
+                        playerNode.changeWeapon(input.Value.RightWeaponIndex, Weapon.WeaponOrder.Right);
+                        playerNode.changeWeapon(input.Value.LeftWeaponIndex, Weapon.WeaponOrder.Left);
 
                         if (!_waitingPeriod)
                         {
                             rightWeapon = input.Value.RightWeaponAction;
                             leftWeapon = input.Value.LeftWeaponAction;
                         }
-                        playerNode.Fire(rightWeapon, leftWeapon);
+                        playerNode.Fire(Weapon.WeaponOrder.Right, rightWeapon);
+                        playerNode.Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
                         playerNode.MoveToward(moveDir, delta);
                         playerNode.RotateToward(input.Value.MousePosition, delta);
@@ -805,8 +805,8 @@ public class GameWorld : Node2D
                     clientData.Rotation = playerNode.Rotation;
                     clientData.RightWeapon = rightWeapon;
                     clientData.LeftWeapon = leftWeapon;
-                    clientData.RightWeaponIndex = playerNode.currentRightWeaponIndex;
-                    clientData.LeftWeaponIndex = playerNode.currentLeftWeaponIndex;
+                    clientData.RightWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
+                    clientData.LeftWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
                     clientData.Health = playerNode.getHealth();
 
                     snapshot.playerData.Add(networkPlayer.Key, clientData);
@@ -850,16 +850,17 @@ public class GameWorld : Node2D
             }
 
 
-            int primaryWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
-            int secondaryWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            int rightWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            int leftWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
 
             if (!_waitingPeriod)
             {
-                primaryWeapon = enemyNode.RightWeaponAction;
-                secondaryWeapon = enemyNode.LeftWeaponAction;
+                rightWeapon = enemyNode.RightWeaponAction;
+                leftWeapon = enemyNode.LeftWeaponAction;
             }
 
-            enemyNode.Fire(primaryWeapon, secondaryWeapon);
+            enemyNode.Fire(Weapon.WeaponOrder.Right, rightWeapon);
+            enemyNode.Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
             if (enemyNode.getHealth() > 0)
             {
@@ -869,20 +870,20 @@ public class GameWorld : Node2D
                 clientData.Position = enemyNode.GlobalPosition;
                 clientData.Rotation = enemyNode.GlobalRotation;
                 clientData.Health = enemyNode.getHealth();
-                clientData.RightWeapon = primaryWeapon;
-                clientData.LeftWeapon = secondaryWeapon;
-                clientData.RightWeaponIndex = enemyNode.currentRightWeaponIndex;
-                clientData.LeftWeaponIndex = enemyNode.currentLeftWeaponIndex;
+                clientData.RightWeapon = rightWeapon;
+                clientData.LeftWeapon = leftWeapon;
+                clientData.RightWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
+                clientData.LeftWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
 
                 // Append into the snapshot
                 snapshot.botData.Add(enemyNode.Name, clientData);
 
                 // This logic is necessary to notify the AI that reload is pick up, so can continue with next state
-                if (primaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+                if (rightWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
                 {
                     enemyNode.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
                 }
-                if (secondaryWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+                if (leftWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
                 {
                     enemyNode.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
                 }
@@ -1350,10 +1351,10 @@ public class GameWorld : Node2D
                 enableAI = true;
             }
 
-            Agent agent =  _teamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI);
+            Agent agent = _teamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI);
             spawnBots.Add(unitName, agent);
 
-             // Add agent marker to minimap
+            // Add agent marker to minimap
             _miniMap.AddAgent(agent);
         }
     }

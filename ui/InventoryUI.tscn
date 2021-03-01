@@ -1,10 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://inventory/Inventory.tscn" type="PackedScene" id=1]
 [ext_resource path="res://ui/InventoryUI.cs" type="Script" id=2]
-[ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=3]
 [ext_resource path="res://ui/ItemPanel.cs" type="Script" id=4]
-
+[ext_resource path="res://ui/WeaponSlotPanel.cs" type="Script" id=5]
 
 [sub_resource type="Theme" id=1]
 
@@ -27,7 +25,8 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Store" type="MarginContainer" parent="TabContainer"]
+[node name="Assembly" type="MarginContainer" parent="TabContainer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -35,12 +34,32 @@ margin_top = 32.0
 margin_right = -4.0
 margin_bottom = -4.0
 
-[node name="Scrollable" type="ScrollContainer" parent="TabContainer/Store"]
+[node name="VSplitContainer" type="VSplitContainer" parent="TabContainer/Assembly"]
+margin_right = 755.0
+margin_bottom = 360.0
+
+[node name="WeaponSlotScrollable" type="ScrollContainer" parent="TabContainer/Assembly/VSplitContainer"]
+margin_right = 755.0
+scroll_vertical_enabled = false
+
+[node name="GridContainerWeaponSlots" type="GridContainer" parent="TabContainer/Assembly/VSplitContainer/WeaponSlotScrollable"]
+custom_constants/vseparation = 4
+custom_constants/hseparation = 4
+columns = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WeaponChoiceScrollable" type="ScrollContainer" parent="TabContainer/Assembly/VSplitContainer"]
+margin_top = 12.0
 margin_right = 755.0
 margin_bottom = 360.0
 scroll_horizontal_enabled = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="GridContainerStore" type="GridContainer" parent="TabContainer/Store/Scrollable"]
+[node name="GridContainerWeaponChoice" type="GridContainer" parent="TabContainer/Assembly/VSplitContainer/WeaponChoiceScrollable"]
 custom_constants/vseparation = 4
 custom_constants/hseparation = 4
 __meta__ = {
@@ -68,75 +87,190 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="Store" type="MarginContainer" parent="TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Scrollable" type="ScrollContainer" parent="TabContainer/Store"]
+margin_right = 755.0
+margin_bottom = 360.0
+scroll_horizontal_enabled = false
+
+[node name="GridContainerStore" type="GridContainer" parent="TabContainer/Store/Scrollable"]
+custom_constants/vseparation = 4
+custom_constants/hseparation = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="ItemPanel" type="Panel" parent="."]
 visible = false
 margin_left = 4.0
 margin_top = 4.0
-margin_right = 767.0
-margin_bottom = 400.0
-rect_min_size = Vector2( 700, 80 )
+margin_right = 764.0
+margin_bottom = 204.0
+rect_min_size = Vector2( 760, 200 )
 script = ExtResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Image" type="TextureRect" parent="ItemPanel"]
-margin_left = 15.7029
-margin_top = 11.2433
-margin_right = 95.7029
-margin_bottom = 41.2433
+margin_top = 3.0
+margin_bottom = 77.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Name" type="Label" parent="ItemPanel"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -177.685
-margin_top = -30.815
-margin_right = -77.6854
-margin_bottom = -16.815
-theme = SubResource( 1 )
+[node name="Name" type="RichTextLabel" parent="ItemPanel"]
+margin_left = 125.0
+margin_top = 10.0
+margin_right = 750.0
+margin_bottom = 48.0
 text = "WEAPON NAME"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Price" type="Label" parent="ItemPanel"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = 116.173
-margin_top = -30.815
-margin_right = 216.173
-margin_bottom = -16.815
+margin_left = 125.354
+margin_top = 52.624
+margin_right = 753.553
+margin_bottom = 66.624
 theme = SubResource( 1 )
 text = "PRICE"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Description" type="Label" parent="ItemPanel"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -177.0
-margin_top = -5.0
-margin_right = 342.0
-margin_bottom = 33.0
+[node name="Description" type="RichTextLabel" parent="ItemPanel"]
+margin_left = 124.293
+margin_top = 125.804
+margin_right = 744.293
+margin_bottom = 184.804
 text = "DESCRIPTION"
-autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Inventory" parent="." instance=ExtResource( 1 )]
+[node name="Used" type="Label" parent="ItemPanel"]
+visible = false
+modulate = Color( 1, 0.25098, 0.25098, 1 )
+margin_left = 125.354
+margin_top = 85.5748
+margin_right = 170.279
+margin_bottom = 99.5748
+text = "USED"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="Store" parent="." instance=ExtResource( 3 )]
-[connection signal="gui_input" from="ItemPanel" to="ItemPanel" method="_guiInput"]
+[node name="Equipped" type="Label" parent="ItemPanel"]
+visible = false
+modulate = Color( 0.431373, 1, 0.427451, 1 )
+margin_left = 179.656
+margin_top = 84.8676
+margin_right = 245.656
+margin_bottom = 98.8676
+text = "EQUIPPED"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Purchase" type="Button" parent="ItemPanel"]
+visible = false
+margin_left = 599.795
+margin_top = 30.0646
+margin_right = 743.795
+margin_bottom = 64.0646
+text = "PURCHASE"
+
+[node name="Equip" type="Button" parent="ItemPanel"]
+visible = false
+margin_left = 600.589
+margin_top = 80.8614
+margin_right = 744.589
+margin_bottom = 114.861
+text = "EQUIP"
+
+[node name="Use" type="Button" parent="ItemPanel"]
+visible = false
+margin_left = 600.589
+margin_top = 80.8614
+margin_right = 744.589
+margin_bottom = 114.861
+text = "USE"
+
+[node name="Unequip" type="Button" parent="ItemPanel"]
+visible = false
+margin_left = 596.223
+margin_top = 80.4645
+margin_right = 740.223
+margin_bottom = 114.465
+text = "UNEQUIP"
+
+[node name="Drop" type="Button" parent="ItemPanel"]
+visible = false
+margin_left = 435.499
+margin_top = 81.2582
+margin_right = 579.499
+margin_bottom = 115.258
+text = "DROP"
+
+[node name="Sell" type="Button" parent="ItemPanel"]
+visible = false
+margin_left = 275.172
+margin_top = 80.4645
+margin_right = 419.172
+margin_bottom = 114.465
+text = "SELL"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WeaponSlotPanel" type="Panel" parent="."]
+visible = false
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 767.0
+margin_bottom = 400.0
+rect_min_size = Vector2( 100, 100 )
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Image" type="TextureRect" parent="WeaponSlotPanel"]
+margin_left = 8.0
+margin_top = 11.0
+margin_right = 95.0
+margin_bottom = 74.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="Label" parent="WeaponSlotPanel"]
+margin_left = 10.0
+margin_top = 80.0
+margin_right = 10.0
+margin_bottom = 10.0
+text = "Right Slot 0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="mouse_entered" from="ItemPanel" to="ItemPanel" method="mouseEntered"]
 [connection signal="mouse_exited" from="ItemPanel" to="ItemPanel" method="mouseExited"]
+[connection signal="pressed" from="ItemPanel/Purchase" to="ItemPanel" method="_purchase"]
+[connection signal="pressed" from="ItemPanel/Equip" to="ItemPanel" method="_equip"]
+[connection signal="pressed" from="ItemPanel/Use" to="ItemPanel" method="_use"]
+[connection signal="pressed" from="ItemPanel/Unequip" to="ItemPanel" method="_unequip"]
+[connection signal="pressed" from="ItemPanel/Drop" to="ItemPanel" method="_drop"]
+[connection signal="pressed" from="ItemPanel/Sell" to="ItemPanel" method="_sell"]
+[connection signal="gui_input" from="WeaponSlotPanel" to="WeaponSlotPanel" method="_guiInput"]
+[connection signal="mouse_entered" from="WeaponSlotPanel" to="WeaponSlotPanel" method="mouseEntered"]
+[connection signal="mouse_exited" from="WeaponSlotPanel" to="WeaponSlotPanel" method="mouseExited"]

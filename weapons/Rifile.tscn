@@ -53,11 +53,11 @@ tracks/1/keys = {
 [node name="Rifile" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 KnockbackForce = 10.0
+ItemResourceID = "SYC-800"
 MaxAmmo = 50
 CooldownTime = 0.1
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )
-WeaponName = "SYC-500 LASER BEAM RIFLE"
 
 [node name="Body" type="Sprite" parent="." index="1"]
 texture = ExtResource( 3 )

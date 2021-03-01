@@ -12,9 +12,9 @@ public class LaserGun : Weapon
         base._Ready();
     }
 
-    public override void Initialize(GameWorld gameWorld, Agent agent )
+    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
     {
-        base.Initialize(gameWorld, agent);
+        base.Initialize(gameWorld, agent, weaponOrder);
 
         _laserRay = ((LaserRay)GetNode("LaserRay"));
         _laserRay.Initialize(gameWorld, _agent, _team);
@@ -35,7 +35,7 @@ public class LaserGun : Weapon
         {
             Cooldown = false;
             Ammo -= 1;
-            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
+            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
             _laserRay.setIsCasting(true);
 
             CooldownTimer.Start();

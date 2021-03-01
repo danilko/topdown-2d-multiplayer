@@ -8,7 +8,7 @@ public class Weapon : Node2D
     [Export]
     public WeaponAmmoType CurrentWeaponAmmoType { get; set; }
 
-    public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER, SHIELD, LIGHTSABER }
+    public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER, SHIELD, LIGHTSABER, EMPTY }
 
     public enum WeaponOrder { Right, Left }
 
@@ -22,10 +22,7 @@ public class Weapon : Node2D
     public delegate void AmmoOutSignal();
 
     [Signal]
-    public delegate void ReloadStartSignal();
-
-    [Signal]
-    public delegate void ReloadStopSignal();
+    public delegate void ReloadSignal();
 
     [Signal]
     public delegate void FireSignal();
@@ -53,10 +50,10 @@ public class Weapon : Node2D
     protected PackedScene Bullet;
 
     [Export]
-    protected String WeaponName = "UNKNOWN";
+    public float KnockbackForce { get; set; }
 
     [Export]
-    public float KnockbackForce { get; set; }
+    public String ItemResourceID {get;set;}
 
     private GameWorld _gameWorld;
 
@@ -65,6 +62,8 @@ public class Weapon : Node2D
 
     protected Timer CooldownTimer;
     protected Timer ReloadTimer;
+
+    private WeaponOrder _weaponOrder = WeaponOrder.Right;
 
     public override void _Ready()
     {
@@ -80,18 +79,30 @@ public class Weapon : Node2D
 
         ReloadTimer = (Timer)GetNode("ReloadTimer");
         ReloadTimer.WaitTime = ReloadTime;
-
-        Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
-
-        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
     }
 
-    public virtual void Initialize(GameWorld gameWorld, Agent agent)
+    public virtual void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
     {
         _agent = agent;
         _team = new Team();
         _team.CurrentTeamCode = agent.GetCurrentTeam();
         _gameWorld = gameWorld;
+        _weaponOrder = weaponOrder;
+
+        Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
+
+        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
+    }
+
+    public WeaponOrder GetWeaponOrder()
+    {
+        return _weaponOrder;
+    }
+
+    public bool isReloading()
+    {
+        // If timer is not stop, then it is reloading
+        return ! ReloadTimer.IsStopped();
     }
 
     public virtual bool Fire(Agent targetAgent)
@@ -100,7 +111,7 @@ public class Weapon : Node2D
         {
             Cooldown = false;
             Ammo -= 1;
-            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
+            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, _weaponOrder);
 
             CooldownTimer.Start();
 
@@ -128,7 +139,7 @@ public class Weapon : Node2D
 
         if (Ammo == 0)
         {
-            EmitSignal(nameof(AmmoOutSignal));
+            EmitSignal(nameof(AmmoOutSignal), GetWeaponOrder());
 
             // Auto reload
             StartReload();
@@ -152,18 +163,18 @@ public class Weapon : Node2D
     public void StartReload()
     {
         // Only allow reload if there is no reload in process
-        if (ReloadTimer.IsStopped())
+        if (! isReloading())
         {
             Ammo = 0;
             ReloadTimer.Start();
-            EmitSignal(nameof(ReloadStartSignal));
+            EmitSignal(nameof(ReloadSignal), _weaponOrder, true);
         }
     }
 
     private void _stopReload()
     {
         AmmoIncrease(MaxAmmo);
-        EmitSignal(nameof(ReloadStopSignal));
+        EmitSignal(nameof(ReloadSignal), _weaponOrder, false);
     }
 
     public void AmmoIncrease(int amount)
@@ -181,7 +192,7 @@ public class Weapon : Node2D
             Ammo = MaxAmmo;
         }
 
-        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo);
+        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
     }
 
     public virtual void onWeaponTimerTimeout()

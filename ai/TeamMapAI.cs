@@ -3,6 +3,9 @@ using System;
 
 public class TeamMapAI : Node2D
 {
+    [Signal]
+    public delegate void TeamUnitUsageAmount();
+
     enum BaseCaptureStartOrder
     {
         FIRST,
@@ -73,15 +76,10 @@ public class TeamMapAI : Node2D
         }
         else
         {
-            _currentUnitUsageAmount = _currentUnitUsageAmount- chargeAmount;
+            _currentUnitUsageAmount = _currentUnitUsageAmount - chargeAmount;
+            EmitSignal(nameof(TeamUnitUsageAmount), _currentUnitUsageAmount);
             return true;
         }
-    }
-
-    public void AddAmount(int chargeAmount)
-    {
-        _currentUnitUsageAmount = _currentUnitUsageAmount + chargeAmount;
-
     }
 
     public bool isUnitUsageAmountAllowed()
@@ -231,10 +229,6 @@ public class TeamMapAI : Node2D
 
         // Set the info afterward as some of these depend on child node to be available
         unit.Initialize(_gameWorld, unitName, displayName, this, _pathFinding);
-
-        // Trigger reload of UI
-        unit.changeRightWeapon(0);
-        unit.changeLeftWeapon(0);
 
         ChargeAmount(_unitCost);
 

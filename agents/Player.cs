@@ -47,22 +47,27 @@ public class Player : Agent
     {
         _hud = hud;
 
-        Connect(nameof(Agent.RightWeaponChangeSignal), _hud, nameof(HUD.UpdateRightWeapon));
-        Connect(nameof(Agent.LeftWeaponChangeSignal), _hud, nameof(HUD.UpdateLeftWeapon));
+        Connect(nameof(Agent.WeaponChangeSignal), _hud, nameof(HUD.UpdateWeapon));
         Connect(nameof(Agent.HealthChangedSignal), _hud, nameof(HUD.UpdateHealth));
         Connect(nameof(Agent.DefeatedAgentChangedSignal), _hud, nameof(HUD.UpdateDefeatedAgent));
 
-        ConnectWeapon(((Weapon)RightWeapons[currentRightWeaponIndex]), Weapon.WeaponOrder.Right);
-        ConnectWeapon(((Weapon)LeftWeapons[currentLeftWeaponIndex]), Weapon.WeaponOrder.Left);
+        for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
+        {
+            Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)index;
+            Weapon weapon = GetWeapons(weaponOrder)[GetCurrentWeaponIndex(weaponOrder)];
+            if (weapon != null)
+            {
+                ConnectWeapon(weapon, weaponOrder);
 
-        // # notify about current weapon to HUD
-        EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
-        // Emit signal to update info
-        ((Weapon)RightWeapons[currentRightWeaponIndex]).EmitSignal(nameof(Weapon.AmmoChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).getAmmo(), ((Weapon)RightWeapons[currentRightWeaponIndex]).getMaxAmmo());
-
-        EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
-        // Emit signal to update info
-        ((Weapon)LeftWeapons[currentLeftWeaponIndex]).EmitSignal(nameof(Weapon.AmmoChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).getAmmo(), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).getMaxAmmo());
+                EmitSignal(nameof(WeaponChangeSignal), weapon.CurrentWeaponType, weaponOrder);
+                // Emit signal to update info
+                weapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), weapon.getAmmo(), weapon.getMaxAmmo());
+            }
+            else
+            {
+                EmitSignal(nameof(WeaponChangeSignal), Weapon.WeaponType.EMPTY, weaponOrder);
+            }
+        }
 
         // Set up the player indicator screen
         ScreenIndicator screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
@@ -79,12 +84,11 @@ public class Player : Agent
         if (currentWeapon != null && _hud != null)
         {
             // Deregister weapon from UI if connected
-            if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo"))
+            if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
             {
-                currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo");
-                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _hud, "Update" + weaponOrder + "WeaponAmmoOut");
-                currentWeapon.Disconnect(nameof(Weapon.ReloadStartSignal), _hud, "Update" + weaponOrder + "WeaponReloadStart");
-                currentWeapon.Disconnect(nameof(Weapon.ReloadStopSignal), _hud, "Update" + weaponOrder + "WeaponReloadStop");
+                currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
+                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
+                currentWeapon.Disconnect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
             }
         }
     }
@@ -94,12 +98,11 @@ public class Player : Agent
         if (currentWeapon != null && _hud != null)
         {
             // Register new weapon with UI if not connect (as cannot connect again)
-            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo"))
+            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
             {
-                currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _hud, "Update" + weaponOrder + "WeaponAmmo");
-                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _hud, "Update" + weaponOrder + "WeaponAmmoOut");
-                currentWeapon.Connect(nameof(Weapon.ReloadStartSignal), _hud, "Update" + weaponOrder + "WeaponReloadStart");
-                currentWeapon.Connect(nameof(Weapon.ReloadStopSignal), _hud, "Update" + weaponOrder + "WeaponReloadStop");
+                currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
+                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
+                currentWeapon.Connect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
             }
 
             base.ConnectWeapon(currentWeapon, weaponOrder);
@@ -109,139 +112,145 @@ public class Player : Agent
 
     public void gatherInput(float delta)
     {
-        GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
-
-        if(Input.IsActionJustReleased("inventory"))
+        if (Input.IsActionJustReleased("inventory"))
         {
-           if(!_inventoryUI.Visible)
-           {
+            if (!_inventoryUI.Visible)
+            {
                 _inventoryUI.PopupCentered();
-           }
-           else
-           {
+            }
+            else
+            {
                 _inventoryUI.Hide();
-           }
-        }
-
-        if (Input.IsActionPressed("turn_right"))
-        {
-            playerInput.Right = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
-        }
-        else
-        {
-            playerInput.Right = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
-        }
-
-        if (Input.IsActionPressed("turn_left"))
-        {
-            playerInput.Left = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
-        }
-        else
-        {
-            playerInput.Left = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
-        }
-
-        if (Input.IsActionPressed("forward"))
-        {
-            playerInput.Up = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
-        }
-        else
-        {
-            playerInput.Up = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
-        }
-
-        if (Input.IsActionPressed("backward"))
-        {
-            playerInput.Down = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
-        }
-        else
-        {
-            playerInput.Down = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+            }
         }
 
 
-        if (Input.IsActionPressed("reload"))
+        // Only read input is inventory is not open
+        if (_inventoryUI == null || !_inventoryUI.Visible)
         {
-            playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
-            playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
-        }
-        else
-        {
-            if (Input.IsActionPressed("left_click"))
+            GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
+
+
+
+            if (Input.IsActionPressed("turn_right"))
             {
-                playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                playerInput.Right = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
             }
             else
             {
-                playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                playerInput.Right = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
             }
 
-            if (Input.IsActionPressed("right_click"))
+            if (Input.IsActionPressed("turn_left"))
             {
-                playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                playerInput.Left = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
             }
             else
             {
-                playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                playerInput.Left = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
             }
-        }
 
-        playerInput.MousePosition = GetGlobalMousePosition();
+            if (Input.IsActionPressed("forward"))
+            {
+                playerInput.Up = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+            }
+            else
+            {
+                playerInput.Up = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+            }
 
-        if (Input.IsKeyPressed((int)KeyList.Key4))
-        {
-            playerInput.RightWeaponIndex = 0;
-        }
-        else if (Input.IsKeyPressed((int)KeyList.Key5))
-        {
-            playerInput.RightWeaponIndex = 1;
-        }
-        else if (Input.IsKeyPressed((int)KeyList.Key6))
-        {
-            playerInput.RightWeaponIndex = 2;
-        }
-        else
-        {
-            playerInput.RightWeaponIndex = currentRightWeaponIndex;
-        }
+            if (Input.IsActionPressed("backward"))
+            {
+                playerInput.Down = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+            }
+            else
+            {
+                playerInput.Down = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+            }
 
-        if (Input.IsKeyPressed((int)KeyList.Key1))
-        {
-            playerInput.LeftWeaponIndex = 0;
-        }
-        else if (Input.IsKeyPressed((int)KeyList.Key2))
-        {
-            playerInput.LeftWeaponIndex = 1;
-        }
-        else if (Input.IsKeyPressed((int)KeyList.Key3))
-        {
-            playerInput.LeftWeaponIndex = 2;
-        }
-        else
-        {
-            playerInput.LeftWeaponIndex = currentLeftWeaponIndex;
-        }
+            if (Input.IsActionPressed("reload"))
+            {
+                playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
+                playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
+            }
+            else
+            {
+                if (Input.IsActionPressed("left_click"))
+                {
+                    playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                }
+                else
+                {
+                    playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                }
+
+                if (Input.IsActionPressed("right_click"))
+                {
+                    playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                }
+                else
+                {
+                    playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                }
+            }
+
+            playerInput.MousePosition = GetGlobalMousePosition();
+
+            if (Input.IsKeyPressed((int)KeyList.Key4))
+            {
+                playerInput.RightWeaponIndex = 0;
+            }
+            else if (Input.IsKeyPressed((int)KeyList.Key5))
+            {
+                playerInput.RightWeaponIndex = 1;
+            }
+            else if (Input.IsKeyPressed((int)KeyList.Key6))
+            {
+                playerInput.RightWeaponIndex = 2;
+            }
+            else
+            {
+                playerInput.RightWeaponIndex = CurrentWeaponIndex[Weapon.WeaponOrder.Right];
+            }
+
+            if (Input.IsKeyPressed((int)KeyList.Key1))
+            {
+                playerInput.LeftWeaponIndex = 0;
+            }
+            else if (Input.IsKeyPressed((int)KeyList.Key2))
+            {
+                playerInput.LeftWeaponIndex = 1;
+            }
+            else if (Input.IsKeyPressed((int)KeyList.Key3))
+            {
+                playerInput.LeftWeaponIndex = 2;
+            }
+            else
+            {
+                playerInput.LeftWeaponIndex = CurrentWeaponIndex[Weapon.WeaponOrder.Left];
+            }
 
 
-        if (GetTree().IsNetworkServer())
-        {
-            gameStates.cacheInput(1, playerInput);
-        }
-        else
-        {
-            String inputData = "";
-            inputData = inputData + playerInput.Right + ";";
-            inputData = inputData + playerInput.Left + ";";
-            inputData = inputData + playerInput.Up + ";";
-            inputData = inputData + playerInput.Down + ";";
-            inputData = inputData + playerInput.RightWeaponAction + ";";
-            inputData = inputData + playerInput.LeftWeaponAction + ";";
-            inputData = inputData + playerInput.MousePosition.x + ";";
-            inputData = inputData + playerInput.MousePosition.y + ";";
-            inputData = inputData + playerInput.RightWeaponIndex + ";";
-            inputData = inputData + playerInput.LeftWeaponIndex + ";";
+            if (GetTree().IsNetworkServer())
+            {
+                gameStates.cacheInput(1, playerInput);
+            }
+            else
+            {
+                String inputData = "";
+                inputData = inputData + playerInput.Right + ";";
+                inputData = inputData + playerInput.Left + ";";
+                inputData = inputData + playerInput.Up + ";";
+                inputData = inputData + playerInput.Down + ";";
+                inputData = inputData + playerInput.RightWeaponAction + ";";
+                inputData = inputData + playerInput.LeftWeaponAction + ";";
+                inputData = inputData + playerInput.MousePosition.x + ";";
+                inputData = inputData + playerInput.MousePosition.y + ";";
+                inputData = inputData + playerInput.RightWeaponIndex + ";";
+                inputData = inputData + playerInput.LeftWeaponIndex + ";";
 
-            RpcUnreliableId(1, nameof(serverGetPlayerInput), inputData);
+                RpcUnreliableId(1, nameof(serverGetPlayerInput), inputData);
+            }
         }
     }
 

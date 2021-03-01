@@ -5,23 +5,22 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 18.0536, 23.2875 )
+extents = Vector2( 21.2159, 45.8855 )
 
 [node name="Shield" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 CurrentWeaponType = 3
+ItemResourceID = "SYC-600"
 CooldownTime = 1.0
 ReloadTime = 1.0
-WeaponName = "SYC-600 MATERIAL SHIELD"
 
 [node name="Sprite" type="Sprite" parent="." index="3"]
-position = Vector2( 0.0763092, 0.280614 )
+scale = Vector2( 0.5, 0.8 )
 texture = ExtResource( 3 )
 region_enabled = true
-region_rect = Rect2( 186, 294, 42, 63 )
+region_rect = Rect2( 734, 365, 65, 116 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." index="4"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" index="0"]
-scale = Vector2( 1.23691, 1.41817 )
 shape = SubResource( 1 )

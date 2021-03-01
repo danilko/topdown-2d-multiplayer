@@ -3,6 +3,14 @@ using System;
 
 public class ItemResource : Resource
 {
+    public enum ItemType { EQUIPABLE, USABLE }
+    
+    [Export]
+    public ItemType CurrentItemType  {get; set;}
+    
+    [Export]
+    public String ItemID {get;set;}
+    
     [Export]
     public String Name {get;set;}
 

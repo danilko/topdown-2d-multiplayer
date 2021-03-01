@@ -42,10 +42,10 @@ extents = Vector2( 97.8958, 125.843 )
 [node name="LightSaber" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 CurrentWeaponType = 4
+ItemResourceID = "SYC-200"
 MaxAmmo = 0
 CooldownTime = 1.0
 ReloadTime = 1.0
-WeaponName = "SYC-200  LIGHT SABER"
 
 [node name="Handler" type="Sprite" parent="." index="3"]
 texture = ExtResource( 2 )

@@ -11,10 +11,12 @@ region = Rect2( 763, 39, 71, 28 )
 
 [resource]
 script = ExtResource( 1 )
-Name = "SYC-500 LASER BEAM RIFLE"
+CurrentItemType = 0
+ItemID = "SYC-800"
+Name = "LASER BEAM RIFLE"
 Description = "Static laser beam rifile (ATTACK = 10)"
 Price = 10
 Stackable = false
-MaxStackable = 1
-ReferenceTexture = SubResource( 1 )
+MaxStackableCount = 0
 ReferencePackedScene = ExtResource( 3 )
+ReferenceTexture = SubResource( 1 )

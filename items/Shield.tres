@@ -11,10 +11,12 @@ region = Rect2( 183, 295, 45, 62 )
 
 [resource]
 script = ExtResource( 1 )
-Name = "SYC-600 MATERIAL SHIELD"
+CurrentItemType = 0
+ItemID = "SYC-600"
+Name = "MATERIAL SHIELD"
 Description = "Static shield able to doge half of entity (ATTACK = 0)"
 Price = 10
 Stackable = false
-MaxStackable = 1
-ReferenceTexture = SubResource( 1 )
+MaxStackableCount = 0
 ReferencePackedScene = ExtResource( 3 )
+ReferenceTexture = SubResource( 1 )

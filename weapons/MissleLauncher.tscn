@@ -10,11 +10,11 @@ script = ExtResource( 2 )
 CurrentWeaponAmmoType = 1
 CurrentWeaponType = 2
 KnockbackForce = 200.0
+ItemResourceID = "SYC-300"
 MaxAmmo = 10
 CooldownTime = 0.5
 ReloadTime = 3.0
 Bullet = ExtResource( 4 )
-WeaponName = "SYC-300 MISSLE LAUNCHER"
 
 [node name="TriggerPoint" parent="." index="1"]
 position = Vector2( 50, 0 )

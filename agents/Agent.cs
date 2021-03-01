@@ -18,10 +18,7 @@ public class Agent : KinematicBody2D
     public delegate void DeadSignal();
 
     [Signal]
-    public delegate void RightWeaponChangeSignal();
-
-    [Signal]
-    public delegate void LeftWeaponChangeSignal();
+    public delegate void WeaponChangeSignal();
 
     [Export]
     public int MaxSpeed { get; set; }
@@ -40,21 +37,18 @@ public class Agent : KinematicBody2D
 
     public float currentTime = 0;
 
-    public int currentRightWeaponIndex { get; set; }
-    public int currentLeftWeaponIndex { get; set; }
     public int RightWeaponAction { set; get; }
     public int LeftWeaponAction { set; get; }
     public bool RightWeaponReloading { set; get; }
     public bool LeftWeaponReloading { set; get; }
 
-    protected Godot.Collections.Array RightWeapons = new Godot.Collections.Array();
-    protected Godot.Collections.Array LeftWeapons = new Godot.Collections.Array();
+    protected Godot.Collections.Array<Weapon> RightWeapons = new Godot.Collections.Array<Weapon>();
+    protected Godot.Collections.Array<Weapon> LeftWeapons = new Godot.Collections.Array<Weapon>();
+
+    protected Godot.Collections.Dictionary<Weapon.WeaponOrder, int> CurrentWeaponIndex = new Godot.Collections.Dictionary<Weapon.WeaponOrder, int>();
 
     [Export]
-    private int MaxRightWeaponCount = 3;
-
-    [Export]
-    private int MaxLeftWeaponCount = 3;
+    private int MaxWeaponCount = 3;
 
 
     [Export]
@@ -112,11 +106,16 @@ public class Agent : KinematicBody2D
         _health = MaxHealth;
         _energy = MaxEnergy;
 
-        currentRightWeaponIndex = -1;
-        currentLeftWeaponIndex = -1;
+        CurrentWeaponIndex.Add(Weapon.WeaponOrder.Left, 0);
+        CurrentWeaponIndex.Add(Weapon.WeaponOrder.Right, 0);
 
         EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
         EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
+    }
+
+    public Inventory GetInventory()
+    {
+        return CurrentInventory;
     }
 
     public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
@@ -134,99 +133,64 @@ public class Agent : KinematicBody2D
 
         CurrentInventory.Initialize(this);
 
-        // Temporary script to automatic load weapon
-        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/Rifile.tscn"));
-        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LightSaber.tscn"));
-        UpdateRightWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
-
-        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/Shield.tscn"));
-        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/MissleLauncher.tscn"));
-        UpdateLeftWeapon((PackedScene)GD.Load("res://weapons/LaserGun.tscn"));
+        _initializeWeapon(LeftWeapons);
+        _initializeWeapon(RightWeapons);
     }
 
-    public virtual void changeRightWeapon(int weaponIndex)
+    private void _initializeWeapon(Godot.Collections.Array<Weapon> weapons)
     {
-        weaponIndex = Mathf.Abs(weaponIndex);
-
-        if (RightWeapons.Count != 0)
+        for (int index = 0; index < MaxWeaponCount; index++)
         {
-            // No need to change weapon if index is same
-            if (weaponIndex % RightWeapons.Count == currentRightWeaponIndex)
-            {
-                return;
-            }
-
-            Weapon currentWeapon = ((Weapon)RightWeapons[currentRightWeaponIndex]);
-
-            // Change of weapon, disable reloading
-            if (currentRightWeaponIndex != weaponIndex)
-            {
-                // Emit singal to disable any previous relad signal
-                currentWeapon.EmitSignal(nameof(Weapon.ReloadStopSignal));
-            }
-
-            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Right);
-
-            currentWeapon.Hide();
-            currentRightWeaponIndex = weaponIndex % RightWeapons.Count;
-
-            currentWeapon = ((Weapon)RightWeapons[currentRightWeaponIndex]);
-
-            currentWeapon.Show();
-            EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
-
-            ConnectWeapon((Weapon)RightWeapons[currentRightWeaponIndex], Weapon.WeaponOrder.Right);
-
-            // Emit signal to update info
-            currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo());
-
+            weapons.Add(null);
         }
     }
 
-    public virtual void changeLeftWeapon(int weaponIndex)
+    public int GetCurrentWeaponIndex(Weapon.WeaponOrder weaponOrder)
+    {
+        return CurrentWeaponIndex[weaponOrder];
+    }
+
+    public virtual void changeWeapon(int weaponIndex, Weapon.WeaponOrder weaponOrder)
     {
         weaponIndex = Mathf.Abs(weaponIndex);
+        Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
 
-        if (LeftWeapons.Count != 0)
+        // Caculate actual index base on availble weapon
+        weaponIndex = weaponIndex % weapons.Count;
+
+        // Not need to switch if same weapon
+        if (CurrentWeaponIndex[weaponOrder] == weaponIndex)
         {
-            // No need to change weapon if index is same
-            if (weaponIndex % LeftWeapons.Count == currentLeftWeaponIndex)
-            {
-                return;
-            }
+            return;
+        }
 
-            Weapon currentWeapon = ((Weapon)LeftWeapons[currentLeftWeaponIndex]);
+        Weapon currentWeapon = ((Weapon)weapons[CurrentWeaponIndex[weaponOrder]]);
 
-            // Change of weapon, disable reloading
-            if (currentLeftWeaponIndex != weaponIndex)
-            {
-                // Emit singal to disable any previous relad signal
-                currentWeapon.EmitSignal(nameof(Weapon.ReloadStopSignal));
-            }
-
-            DisconnectWeapon(currentWeapon, Weapon.WeaponOrder.Left);
-            DisconnectWeapon((Weapon)LeftWeapons[currentLeftWeaponIndex], Weapon.WeaponOrder.Left);
+        if (currentWeapon != null)
+        {
+            DisconnectWeapon(currentWeapon, weaponOrder);
 
             currentWeapon.Hide();
-            currentLeftWeaponIndex = weaponIndex % LeftWeapons.Count;
+        }
 
-            currentWeapon = ((Weapon)LeftWeapons[currentLeftWeaponIndex]);
+        CurrentWeaponIndex[weaponOrder] = weaponIndex % weapons.Count;
+        currentWeapon = ((Weapon)weapons[CurrentWeaponIndex[weaponOrder]]);
 
+
+        if (currentWeapon != null)
+        {
             currentWeapon.Show();
 
-            EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
+            EmitSignal(nameof(WeaponChangeSignal), currentWeapon.CurrentWeaponType, weaponOrder);
 
-            ConnectWeapon(currentWeapon, Weapon.WeaponOrder.Left);
+            ConnectWeapon(currentWeapon, weaponOrder);
 
             // Emit signal to update info
-            currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo());
-
+            currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo(), weaponOrder);
         }
     }
 
-    protected virtual void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
-    {
-    }
+    protected virtual void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder) { }
 
     protected virtual void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
@@ -245,66 +209,79 @@ public class Agent : KinematicBody2D
         return GlobalPosition.DistanceTo(targetPosition) < PositionReachedRadius;
     }
 
-    public Weapon GetCurrentRightWeapon()
+    public Weapon GetCurrentWeapon(Weapon.WeaponOrder weaponOrder)
     {
-        return (Weapon)RightWeapons[currentRightWeaponIndex];
-    }
-
-    public Weapon GetCurrentLeftWeapon()
-    {
-        return (Weapon)RightWeapons[currentRightWeaponIndex];
-    }
-
-    public bool UpdateRightWeapon(PackedScene weapon)
-    {
-        if (RightWeapons.Count < MaxRightWeaponCount)
+        if (weaponOrder == Weapon.WeaponOrder.Right)
         {
-            // Hide existing weapon if exist
-            if (currentRightWeaponIndex != -1)
-            {
-                ((Weapon)RightWeapons[currentRightWeaponIndex]).Hide();
-            }
+            return (Weapon)RightWeapons[CurrentWeaponIndex[weaponOrder]];
+        }
+        else
+        {
+            return (Weapon)LeftWeapons[CurrentWeaponIndex[weaponOrder]];
+        }
+    }
 
-            Position2D weaponHolder = ((Position2D)GetNode("RightWeaponHolder"));
-            Weapon currentWeapon = (Weapon)(weapon.Instance());
-            currentWeapon.Initialize(_gameWorld, this);
-            RightWeapons.Add(currentWeapon);
+    /**
+    AddWeapon
+    Assign weapon to target weaponOrder and index
+    **/
+    public bool EquipWeapon(PackedScene weaponScene, Weapon.WeaponOrder weaponOrder, int index)
+    {
+        Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
 
-            // Update to use this weapon as primary
-            currentRightWeaponIndex = RightWeapons.Count - 1;
-            weaponHolder.AddChild(currentWeapon);
-            EmitSignal(nameof(RightWeaponChangeSignal), ((Weapon)RightWeapons[currentRightWeaponIndex]).CurrentWeaponType);
-            return true;
+        if (weapons[index] != null)
+        {
+            return false;
         }
 
-        return false;
+        Position2D weaponHolder = GetWeaponsHolder(weaponOrder);
+        Weapon weapon = (Weapon)(weaponScene.Instance());
+        weaponHolder.AddChild(weapon);
+        weapon.Initialize(_gameWorld, this, weaponOrder);
+        weapons[index] = weapon;
+        weapon.Hide();
+
+        // Set an incremental to current index, so weapon can be switched
+        int oldIndex = CurrentWeaponIndex[weaponOrder];
+        CurrentWeaponIndex[weaponOrder] = CurrentWeaponIndex[weaponOrder] + 1 % weapons.Count;
+        changeWeapon(oldIndex, weaponOrder);
+
+        return true;
     }
 
-    public bool UpdateLeftWeapon(PackedScene weapon)
+    public Godot.Collections.Array<Weapon> GetWeapons(Weapon.WeaponOrder weaponOrder)
     {
-        if (LeftWeapons.Count < MaxLeftWeaponCount)
+        if (weaponOrder == Weapon.WeaponOrder.Right)
         {
-            // Hide existing weapon if exist
-            if (currentLeftWeaponIndex != -1)
-            {
-                ((Weapon)LeftWeapons[currentLeftWeaponIndex]).Hide();
-            }
-
-            Position2D weaponHolder = ((Position2D)GetNode("LeftWeaponHolder"));
-            Weapon currentWeapon = (Weapon)(weapon.Instance());
-            currentWeapon.Initialize(_gameWorld, this);
-            LeftWeapons.Add(currentWeapon);
-
-            // Update to use this weapon as secondary
-            currentLeftWeaponIndex = LeftWeapons.Count - 1;
-            weaponHolder.AddChild(currentWeapon);
-
-            EmitSignal(nameof(LeftWeaponChangeSignal), ((Weapon)LeftWeapons[currentLeftWeaponIndex]).CurrentWeaponType);
-
-            return true;
+            return RightWeapons;
         }
+        else
+        {
+            return LeftWeapons;
+        }
+    }
 
-        return false;
+    public Position2D GetWeaponsHolder(Weapon.WeaponOrder weaponOrder)
+    {
+        return ((Position2D)GetNode(weaponOrder + "WeaponHolder"));
+    }
+
+    public void UnequipWeapon(Weapon.WeaponOrder weaponOrder, int index)
+    {
+        Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
+
+        Weapon weapon = (Weapon)weapons[CurrentWeaponIndex[weaponOrder]];
+
+        if (weapon != null)
+        {
+            Position2D weaponHolder = GetWeaponsHolder(weaponOrder);
+            weaponHolder.RemoveChild(weapon);
+            // Null the weapon
+            weapons[CurrentWeaponIndex[weaponOrder]] = null;
+            DisconnectWeapon(weapon, Weapon.WeaponOrder.Left);
+            // Empty out weapon
+            weapon.QueueFree();
+        }
     }
 
     public void SetCurrentTeam(Team.TeamCode inputTeamCode)
@@ -377,7 +354,7 @@ public class Agent : KinematicBody2D
     }
 
 
-    public void Sync(Vector2 position, float rotation, int primaryWeapon, int secondaryWeapon)
+    public void Sync(Vector2 position, float rotation, int rightWeapon, int leftWeapon)
     {
 
         Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
@@ -396,7 +373,8 @@ public class Agent : KinematicBody2D
         }
 
 
-        Fire(primaryWeapon, secondaryWeapon);
+        Fire(Weapon.WeaponOrder.Right, rightWeapon);
+        Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
         GlobalPosition = position;
         GlobalRotation = rotation;
@@ -408,43 +386,27 @@ public class Agent : KinematicBody2D
         GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
     }
 
-    public void Fire(int rightWeapon, int leftWeapon)
+    public void Fire(Weapon.WeaponOrder weaponOrder, int weaponAction)
     {
-        if (currentLeftWeaponIndex != -1)
-        {
-            if (rightWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
-            {
-                ReloadRightWeapon();
-            }
+        Weapon weapon = GetWeapons(weaponOrder)[CurrentWeaponIndex[weaponOrder]];
 
-            if (rightWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentRightWeaponIndex != -1)
+        if (weapon != null)
+        {
+            if (weaponAction == (int)GameStates.PlayerInput.InputAction.RELOAD)
+            {
+                ReloadWeapon(weaponOrder);
+            }
+            else if (weaponAction == (int)GameStates.PlayerInput.InputAction.TRIGGER)
             {
                 // knock back effect
-                if (((Weapon)RightWeapons[currentRightWeaponIndex]).Fire(target) && MaxSpeed != 0)
+                if (weapon.Fire(target) && MaxSpeed != 0)
                 {
                     Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                    MoveAndSlide(dir * -10 * ((Weapon)RightWeapons[currentRightWeaponIndex]).KnockbackForce);
+                    MoveAndSlide(dir * -10 * weapon.KnockbackForce);
                 }
             }
         }
 
-        if (currentRightWeaponIndex != -1)
-        {
-            if (leftWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
-            {
-                ReloadLeftWeapon();
-            }
-
-            if (leftWeapon == (int)GameStates.PlayerInput.InputAction.TRIGGER && currentLeftWeaponIndex != -1)
-            {
-                // knock back effect
-                if (((Weapon)LeftWeapons[currentLeftWeaponIndex]).Fire(target) && MaxSpeed != 0)
-                {
-                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                    MoveAndSlide(dir * -10 * ((Weapon)LeftWeapons[currentLeftWeaponIndex]).KnockbackForce);
-                }
-            }
-        }
     }
 
     public void setHealth(int health)
@@ -531,16 +493,10 @@ public class Agent : KinematicBody2D
         Body.SelfModulate = new Color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    public void ReloadRightWeapon()
+    public void ReloadWeapon(Weapon.WeaponOrder weaponOrder)
     {
-        ((Weapon)RightWeapons[currentRightWeaponIndex]).StartReload();
+        ((Weapon)GetWeapons(weaponOrder)[CurrentWeaponIndex[weaponOrder]]).StartReload();
         RightWeaponReloading = false;
-    }
-
-    public void ReloadLeftWeapon()
-    {
-        ((Weapon)LeftWeapons[currentLeftWeaponIndex]).StartReload();
-        LeftWeaponReloading = false;
     }
 
     public void Heal(int amount)
@@ -557,34 +513,6 @@ public class Agent : KinematicBody2D
             Particles2D smoke = (Particles2D)GetNode("Smoke");
             smoke.Emitting = false;
         }
-    }
-
-    public bool AmmoIncrease(Weapon.WeaponAmmoType weaponAmmoType, int amount)
-    {
-        bool consume = false;
-
-        if (weaponAmmoType != Weapon.WeaponAmmoType.ENERGY)
-        {
-            foreach (Weapon currentWeapon in RightWeapons)
-            {
-                if (weaponAmmoType == currentWeapon.CurrentWeaponAmmoType)
-                {
-                    consume = true;
-                    ((Weapon)RightWeapons[currentRightWeaponIndex]).AmmoIncrease(amount);
-                }
-            }
-        }
-        else
-        {
-            _energy = +amount;
-
-            if (_energy > MaxEnergy)
-            {
-                _energy = MaxEnergy;
-            }
-        }
-
-        return consume;
     }
 
     public void Explode()

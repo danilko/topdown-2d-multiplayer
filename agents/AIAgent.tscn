@@ -1,12 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=1]
 [ext_resource path="res://agents/Agent.tscn" type="PackedScene" id=2]
 [ext_resource path="res://ai/AI.tscn" type="PackedScene" id=3]
 [ext_resource path="res://agents/AIAgent.cs" type="Script" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 34.3803, 35.1768 )
+extents = Vector2( 29.6973, 47.915 )
 
 [node name="AIAgent" instance=ExtResource( 2 )]
 collision_mask = 27
@@ -17,15 +16,10 @@ MaxHealth = 100
 TurretSpeed = 10
 DetectRadius = 1000.0
 
-[node name="Body" parent="." index="0"]
-texture = ExtResource( 1 )
-region_enabled = true
-region_rect = Rect2( 288, 103, 73, 79 )
-
-[node name="CollisionShape2D" parent="." index="1"]
-shape = SubResource( 1 )
-
 [node name="PathLine" type="Line2D" parent="." index="7"]
 default_color = Color( 0.952941, 0.235294, 0.0156863, 1 )
 
 [node name="AI" parent="." index="8" instance=ExtResource( 3 )]
+
+[node name="CollisionShape2D" parent="." index="12"]
+shape = SubResource( 1 )

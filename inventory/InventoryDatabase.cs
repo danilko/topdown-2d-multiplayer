@@ -33,11 +33,11 @@ public class InventoryDatabase : Node
         return _items;
     }
 
-    public ItemResource GetItem(String itemName)
+    public ItemResource GetItemByID(String itemID)
     {
         foreach (ItemResource item in _items)
         {
-            if (item.Name == itemName)
+            if (item.ItemID == itemID)
             {
                 return item;
             }

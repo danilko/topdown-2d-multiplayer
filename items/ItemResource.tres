@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource( 1 )
+CurrentItemType = 1
+ItemID = ""
 Name = ""
 Description = ""
 Price = 0
