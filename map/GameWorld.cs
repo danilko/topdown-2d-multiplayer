@@ -142,12 +142,12 @@ public class GameWorld : Node2D
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
 
+        _initializeInventoryManager();
         _initializeHUD();
         _initializeCamera();
         _initializeTileMap();
         _initializeObsctacleManager();
         _initializeCapaturableBaseManager();
-        _initializeInventoryManager();
         _initializeTeamMapAI();
 
 
@@ -264,7 +264,7 @@ public class GameWorld : Node2D
             ai.Name = nameof(TeamMapAI) + "_" + (Team.TeamCode)index;
             AddChild(ai);
 
-            ai.Initialize(this, _capaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
+            ai.Initialize(this, _inventoryManager,  _capaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
 
             _teamMapAIs.Add(ai);
 
@@ -278,10 +278,6 @@ public class GameWorld : Node2D
     private void _initializeInventoryManager()
     {
         _inventoryManager = (InventoryManager)GetNode("InventoryManager");
-    }
-    public InventoryManager GetInventoryManager()
-    {
-        return _inventoryManager;
     }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots
@@ -1231,7 +1227,7 @@ public class GameWorld : Node2D
         if (netId == network.gamestateNetworkPlayer.net_id)
         {
             // Attach camera
-            agent.SetHUD(_hud);
+            agent.SetHUD(_hud, _inventoryManager);
             agent.SetCameraRemotePath(_camera2D);
 
             // Set player marker

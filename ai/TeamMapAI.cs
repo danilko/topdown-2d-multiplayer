@@ -132,9 +132,9 @@ public class TeamMapAI : Node2D
         return true;
     }
 
-    public void Initialize(GameWorld gameWorld, Godot.Collections.Array bases, Team.TeamCode team, PathFinding pathFinding)
+    public void Initialize(GameWorld gameWorld, InventoryManager inventoryManager, Godot.Collections.Array bases, Team.TeamCode team, PathFinding pathFinding)
     {
-        _inventoryManager = gameWorld.GetInventoryManager();
+        _inventoryManager = inventoryManager;
         _bases = bases;
         _team.CurrentTeamCode = team;
         _gameWorld = gameWorld;
@@ -232,7 +232,19 @@ public class TeamMapAI : Node2D
 
         ChargeAmount(_unitCost);
 
+        _assignDefaultWeapon(unit);
+
         return unit;
+    }
+
+    private void _assignDefaultWeapon(Agent agent)
+    {
+        // Add default wepaons
+        _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+        _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+        // TODO: There is bug with shield that will push agent back
+       // _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Left, 0);
+        _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Right, 0);
     }
 
     public void RemoveUnit(String unitID)

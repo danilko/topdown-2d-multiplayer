@@ -57,27 +57,26 @@ public class Inventory : Node
         return _items[index];
     }
 
-    public Boolean HasItem(ItemResource itemResource)
+    public int GetItemIndex(String itemID)
     {
+        int foundIndex = -1;
         if (_items.Count > 0)
         {
-            int foundIndex = -1;
-
             for (int index = 0; index < _items.Count; index++)
             {
-                if (itemResource.ItemID == _items[index].ItemID)
+                if (_items[index] != null && itemID == _items[index].ItemID)
                 {
                     foundIndex = index;
                 }
             }
-
-            if (foundIndex != -1)
-            {
-                return true;
-            }
         }
 
-        return false;
+        return foundIndex;
+    }
+
+    public Boolean HasItem(ItemResource itemResource)
+    {
+        return GetItemIndex(itemResource.ItemID) != -1;
     }
 
     public bool RemoveItem(ItemResource itemResource)

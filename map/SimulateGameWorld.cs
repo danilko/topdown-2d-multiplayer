@@ -100,10 +100,10 @@ public class SimulateGameWorld : GameWorld
         random = new RandomNumberGenerator();
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
 
+        _initializeInventoryManager();
         _initializeCamera();
         _initializeTileMap();
         _initializeCapaturableBaseManager();
-        _initializeInventoryManager();
         _initializeTeamMapAI();
         _syncBots();
 
@@ -137,7 +137,7 @@ public class SimulateGameWorld : GameWorld
             ai.Name = nameof(TeamMapAI) + "_" + (Team.TeamCode)index;
             AddChild(ai);
 
-            ai.Initialize(this, _capaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
+            ai.Initialize(this, _inventoryManager, _capaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
 
             _teamMapAIs.Add(ai);
 

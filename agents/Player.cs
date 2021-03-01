@@ -43,7 +43,7 @@ public class Player : Agent
         }
     }
 
-    public void SetHUD(HUD hud)
+    public void SetHUD(HUD hud, InventoryManager _inventoryManager)
     {
         _hud = hud;
 
@@ -76,7 +76,7 @@ public class Player : Agent
 
         // Setup Inventory UI
         _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");
-        _inventoryUI.Initialize(_gameWorld.GetInventoryManager(), CurrentInventory);
+        _inventoryUI.Initialize(_inventoryManager, CurrentInventory);
     }
 
     protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)

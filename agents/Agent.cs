@@ -243,7 +243,7 @@ public class Agent : KinematicBody2D
 
         // Set an incremental to current index, so weapon can be switched
         int oldIndex = CurrentWeaponIndex[weaponOrder];
-        CurrentWeaponIndex[weaponOrder] = CurrentWeaponIndex[weaponOrder] + 1 % weapons.Count;
+        CurrentWeaponIndex[weaponOrder] = (CurrentWeaponIndex[weaponOrder] + 1) % weapons.Count;
         changeWeapon(oldIndex, weaponOrder);
 
         return true;
@@ -401,7 +401,7 @@ public class Agent : KinematicBody2D
                 // knock back effect
                 if (weapon.Fire(target) && MaxSpeed != 0)
                 {
-                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+                   Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                     MoveAndSlide(dir * -10 * weapon.KnockbackForce);
                 }
             }
