@@ -4,7 +4,7 @@ using System;
 public class TeamMapAI : Node2D
 {
     [Signal]
-    public delegate void TeamUnitUsageAmount();
+    public delegate void TeamUnitUsageAmountChangeSignal();
 
     enum BaseCaptureStartOrder
     {
@@ -77,7 +77,7 @@ public class TeamMapAI : Node2D
         else
         {
             _currentUnitUsageAmount = _currentUnitUsageAmount - chargeAmount;
-            EmitSignal(nameof(TeamUnitUsageAmount), _currentUnitUsageAmount);
+            EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
             return true;
         }
     }

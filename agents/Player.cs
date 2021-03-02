@@ -77,6 +77,12 @@ public class Player : Agent
         // Setup Inventory UI
         _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");
         _inventoryUI.Initialize(_inventoryManager, CurrentInventory);
+
+
+        if (!_teamMapAI.IsConnected(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount)))
+        {
+            _teamMapAI.Connect(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount));
+        }
     }
 
     protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)

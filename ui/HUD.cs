@@ -230,6 +230,11 @@ public class HUD : CanvasLayer
         }
     }
 
+    public void UpdateTeamUnitUsageAmount(int cost)
+    {
+        ((Label)GetNode("lblTeamUnitUsageAmount")).Text = "" + cost;
+    }
+
     private void _onUpdateTimer(String message)
     {
         if (message.Contains("00:00:"))

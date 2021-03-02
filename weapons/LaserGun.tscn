@@ -10,9 +10,9 @@ script = ExtResource( 4 )
 CurrentWeaponType = 1
 KnockbackForce = 10.0
 ItemResourceID = "SYC-1000"
-MaxAmmo = 5
+MaxAmmo = 10
 CooldownTime = 0.5
-ReloadTime = 10.0
+ReloadTime = 5.0
 
 [node name="TriggerPoint" parent="." index="1"]
 position = Vector2( 80, 0 )
