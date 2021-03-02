@@ -111,13 +111,15 @@ public class InventoryManager : Node
             _gameWorld.AddChild(pickup);
 
             pickup.Initialize(this, itemResource);
-            pickup.GlobalPosition = inventory.GetAgent().GlobalPosition + new Vector2(50f, 50f); 
-
+            pickup.GlobalPosition = inventory.GetAgent().GlobalPosition + new Vector2(200f, 200f); 
         }
     }
 
     public void UseItem(int inventoryIndex, Inventory inventory)
     {
-        GD.Print("TODO: IMPLEMENT USE LOGIC IN INVENTORY MANAGER");
+        if (inventory.RemoveItem(inventoryIndex))
+        {
+            // TODO Implement use logic
+        }
     }
 }

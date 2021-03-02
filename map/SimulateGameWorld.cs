@@ -151,6 +151,7 @@ public class SimulateGameWorld : GameWorld
     private void _initializeInventoryManager()
     {
         _inventoryManager = (InventoryManager)GetNode("InventoryManager");
+        _inventoryManager.Initialize(this);
     }
 
     private void _syncBots()

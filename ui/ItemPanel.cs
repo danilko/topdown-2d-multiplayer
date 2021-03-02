@@ -57,7 +57,7 @@ public class ItemPanel : Panel
         _weaponOrder = weaponOrder;
         _weaponIndex = weaponIndex;
 
-        ((RichTextLabel)(GetNode("Name"))).Text = _itemResource.ItemID + " " + _itemResource.Name;
+        ((RichTextLabel)(GetNode("Name"))).Text = "[" + _inventoryIndex + "] " + _itemResource.ItemID + " " + _itemResource.Name;
         ((Label)(GetNode("Price"))).Text = "COST: " + _itemResource.Price;
         ((RichTextLabel)(GetNode("Description"))).Text = _itemResource.Description;
         ((TextureRect)(GetNode("Image"))).Texture = _itemResource.ReferenceTexture;

@@ -46,6 +46,10 @@ __meta__ = {
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = -0.561157
+margin_top = -0.561249
+margin_right = -0.561157
+margin_bottom = -0.561279
 color = Color( 0.309804, 0.309804, 0.309804, 0.478431 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -101,7 +105,7 @@ anims/start = SubResource( 3 )
 [node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer"]
 margin_left = 35.0
 margin_top = 355.0
-margin_right = 791.0
+margin_right = 505.0
 margin_bottom = 641.0
 text = "CONTROL INSTRUCTIONS:
 
@@ -113,7 +117,7 @@ MOUSE - AIM
 MOUSE LEFT CLICK - LEFT WEAPON
 MOUSE RIGHT CLICK - RIGHT WEAPON
 
-TAB - PLAYER LIST
+B - ASSEMBLY/INVENTORY/STORE SYSTEM
 
 CURRENT WINNING/LOSING CONDITION:
 1. ALL ENEMY UNITS DEFEATED (AROUND 100  FROM EACH TEAM)

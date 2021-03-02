@@ -180,6 +180,7 @@ public class Inventory : Node
         _agent.EquipWeapon(_items[itemIndex].ReferencePackedScene, weaponOrder, weaponIndex);
 
         EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
+        EmitSignal(nameof(InventoryChangeSignal));
     }
 
     // Unequip weapon at given index
@@ -192,5 +193,6 @@ public class Inventory : Node
         _usedIndex.Remove(itemIndex);
 
         EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
+        EmitSignal(nameof(InventoryChangeSignal));
     }
 }

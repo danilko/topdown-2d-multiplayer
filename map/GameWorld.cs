@@ -278,6 +278,7 @@ public class GameWorld : Node2D
     private void _initializeInventoryManager()
     {
         _inventoryManager = (InventoryManager)GetNode("InventoryManager");
+        _inventoryManager.Initialize(this);
     }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots

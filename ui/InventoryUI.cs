@@ -64,9 +64,9 @@ public class InventoryUI : PopupPanel
 
     private void _populateWeaponSlots()
     {
-        for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
+        for (int weaponOrderIndex = 0; weaponOrderIndex <= (int)Weapon.WeaponOrder.Left; weaponOrderIndex++)
         {
-            Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)index;
+            Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)weaponOrderIndex;
 
             Agent agent = _inventory.GetAgent();
             if (agent != null && IsInstanceValid(agent))
@@ -95,11 +95,11 @@ public class InventoryUI : PopupPanel
 
                     ItemResource itemResource = null;
 
-                    if (weapons[index] != null)
+                    if (weapons[weaponIndex] != null)
                     {
-                        itemResource = _inventoryManager.GetPurchasableItemByID(weapons[index].ItemResourceID);
+                        itemResource = _inventoryManager.GetPurchasableItemByID(weapons[weaponIndex].ItemResourceID);
                     }
-
+                    
                     // Initialize with current weapon
                     currentWeaponSlotPanel.Initialize(itemResource, weaponOrder, weaponIndex);
                     currentWeaponSlotPanel.Show();
@@ -145,7 +145,7 @@ public class InventoryUI : PopupPanel
 
     private void populatedInventoryPanel(ItemPanel itemPanel, ItemResource itemResource, int inventoryItemIndex)
     {
-        itemPanel.Initialize(itemResource, ItemPanel.ItemPanelType.INVENTORY, -1, Weapon.WeaponOrder.Right, -1);
+        itemPanel.Initialize(itemResource, ItemPanel.ItemPanelType.INVENTORY, inventoryItemIndex, Weapon.WeaponOrder.Right, -1);
         itemPanel.SetUsed(_inventory.isItemIndexInUsed(inventoryItemIndex));
         itemPanel.Connect(nameof(ItemPanel.ItemPanelSaleClickSignal), this, nameof(_saleItem));
 
