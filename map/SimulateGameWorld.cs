@@ -196,9 +196,7 @@ public class SimulateGameWorld : GameWorld
                 continue;
             }
 
-            enemyNode.setHealth(100);
-            enemyNode.changeWeapon(random.RandiRange(0, 100), Weapon.WeaponOrder.Left);
-            enemyNode.changeWeapon(random.RandiRange(0, 100), Weapon.WeaponOrder.Right);
+            enemyNode.Heal(100);
             spawnBotTargetBase[enemyNode.GetUnitName()] = (spawnBotTargetBase[enemyNode.GetUnitName()] + 1) % _capaturableBaseManager.GetBases().Count;
         }
     }

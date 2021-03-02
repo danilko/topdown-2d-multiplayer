@@ -66,7 +66,7 @@ position = Vector2( -572.239, 298.437 )
 _defaultTeamCode = 1
 
 [node name="ChangeAgentBehavior" type="Timer" parent="."]
-wait_time = 5.0
+wait_time = 2.0
 autostart = true
 
 [node name="GameCamera" parent="." instance=ExtResource( 9 )]

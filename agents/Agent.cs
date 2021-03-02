@@ -199,7 +199,7 @@ public class Agent : KinematicBody2D
             // If the current weapon ammo is 0, then notify about out of ammo
             if (currentWeapon.getAmmo() == 0)
             {
-                currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal));
+                currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal), weaponOrder);
             }
         }
     }

@@ -15,6 +15,7 @@ CooldownTime = 1.0
 ReloadTime = 1.0
 
 [node name="Sprite" type="Sprite" parent="." index="3"]
+position = Vector2( 11.25, 0 )
 scale = Vector2( 0.5, 0.8 )
 texture = ExtResource( 3 )
 region_enabled = true
@@ -23,4 +24,5 @@ region_rect = Rect2( 734, 365, 65, 116 )
 [node name="StaticBody2D" type="StaticBody2D" parent="." index="4"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" index="0"]
+position = Vector2( 16, 0 )
 shape = SubResource( 1 )

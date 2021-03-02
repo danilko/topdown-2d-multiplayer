@@ -242,8 +242,8 @@ public class TeamMapAI : Node2D
         // Add default wepaons
         _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
         _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
-        // TODO: There is bug with shield that will push agent back
-       // _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Left, 0);
+
+        _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
         _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
     }
 
