@@ -35,10 +35,13 @@ public class InventoryUI : PopupPanel
 
         _inventory.Connect(nameof(Inventory.WeaponChangeSignal), this, nameof(_updateWeaponChange));
         _inventory.Connect(nameof(Inventory.InventoryChangeSignal), this, nameof(_updateInventoryChange));
+
+        _inventory.EmitSignal(nameof(Inventory.InventoryChangeSignal));
     }
 
     private void _updateInventoryChange()
     {
+        _cleanGridContainer(_gridContainerWeaponChoices);
         _populateGridContainer(_gridContainerInventory);
     }
 
@@ -99,7 +102,7 @@ public class InventoryUI : PopupPanel
                     {
                         itemResource = _inventoryManager.GetPurchasableItemByID(weapons[weaponIndex].ItemResourceID);
                     }
-                    
+
                     // Initialize with current weapon
                     currentWeaponSlotPanel.Initialize(itemResource, weaponOrder, weaponIndex);
                     currentWeaponSlotPanel.Show();

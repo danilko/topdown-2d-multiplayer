@@ -26,7 +26,6 @@ __meta__ = {
 }
 
 [node name="Assembly" type="MarginContainer" parent="TabContainer"]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -112,8 +111,8 @@ __meta__ = {
 visible = false
 margin_left = 4.0
 margin_top = 4.0
-margin_right = 764.0
-margin_bottom = 204.0
+margin_right = 767.0
+margin_bottom = 400.0
 rect_min_size = Vector2( 760, 200 )
 script = ExtResource( 4 )
 __meta__ = {

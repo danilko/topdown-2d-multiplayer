@@ -59,13 +59,13 @@ public class Player : Agent
             {
                 ConnectWeapon(weapon, weaponOrder);
 
-                EmitSignal(nameof(WeaponChangeSignal), weapon.CurrentWeaponType, weaponOrder);
+                EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, GetCurrentWeaponIndex(weaponOrder))], weaponOrder);
                 // Emit signal to update info
-                weapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), weapon.getAmmo(), weapon.getMaxAmmo());
+                weapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), weapon.getAmmo(), weapon.getMaxAmmo(), weaponOrder);
             }
             else
             {
-                EmitSignal(nameof(WeaponChangeSignal), Weapon.WeaponType.EMPTY, weaponOrder);
+                EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder);
             }
         }
 

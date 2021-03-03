@@ -158,12 +158,6 @@ public class Agent : KinematicBody2D
         // Caculate actual index base on availble weapon
         weaponIndex = weaponIndex % weapons.Count;
 
-        // Not need to switch if same weapon
-        if (CurrentWeaponIndex[weaponOrder] == weaponIndex)
-        {
-            return;
-        }
-
         Weapon currentWeapon = ((Weapon)weapons[CurrentWeaponIndex[weaponOrder]]);
 
         if (currentWeapon != null)
@@ -181,9 +175,9 @@ public class Agent : KinematicBody2D
         {
             currentWeapon.Show();
 
-            EmitSignal(nameof(WeaponChangeSignal), currentWeapon.CurrentWeaponType, weaponOrder);
-
             ConnectWeapon(currentWeapon, weaponOrder);
+
+            EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, weaponIndex)], weaponOrder);
 
             // Emit signal to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo(), weaponOrder);
@@ -241,10 +235,11 @@ public class Agent : KinematicBody2D
         weapons[index] = weapon;
         weapon.Hide();
 
-        // Set an incremental to current index, so weapon can be switched
-        int oldIndex = CurrentWeaponIndex[weaponOrder];
-        CurrentWeaponIndex[weaponOrder] = (CurrentWeaponIndex[weaponOrder] + 1) % weapons.Count;
-        changeWeapon(oldIndex, weaponOrder);
+        // If it is current weapon, then perform weapon change
+        if (index == CurrentWeaponIndex[weaponOrder])
+        {
+            changeWeapon(index, weaponOrder);
+        }
 
         return true;
     }
@@ -266,18 +261,21 @@ public class Agent : KinematicBody2D
         return ((Position2D)GetNode(weaponOrder + "WeaponHolder"));
     }
 
+    /**
+    Unequip weapon at given weapon order's given index
+    **/
     public void UnequipWeapon(Weapon.WeaponOrder weaponOrder, int index)
     {
         Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
 
-        Weapon weapon = (Weapon)weapons[CurrentWeaponIndex[weaponOrder]];
+        Weapon weapon = (Weapon)weapons[index];
 
         if (weapon != null)
         {
             Position2D weaponHolder = GetWeaponsHolder(weaponOrder);
             weaponHolder.RemoveChild(weapon);
             // Null the weapon
-            weapons[CurrentWeaponIndex[weaponOrder]] = null;
+            weapons[index] = null;
             DisconnectWeapon(weapon, Weapon.WeaponOrder.Left);
             // Empty out weapon
             weapon.QueueFree();
@@ -401,7 +399,7 @@ public class Agent : KinematicBody2D
                 // knock back effect
                 if (weapon.Fire(target) && MaxSpeed != 0)
                 {
-                   Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                     MoveAndSlide(dir * -10 * weapon.KnockbackForce);
                 }
             }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -7,7 +7,6 @@
 [ext_resource path="res://ui/HUD.tscn" type="PackedScene" id=5]
 [ext_resource path="res://environments/CapaturableBaseManager.tscn" type="PackedScene" id=6]
 [ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
-[ext_resource path="res://items/Pickup.tscn" type="PackedScene" id=8]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
 [ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
 
@@ -34,13 +33,6 @@ tile_data = PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 
 position = Vector2( 11.1118, 10.3181 )
 
 [node name="Pickups" type="Node2D" parent="."]
-
-[node name="Pickup" parent="Pickups" instance=ExtResource( 8 )]
-position = Vector2( 1245.08, 1220.1 )
-
-[node name="Pickup2" parent="Pickups" instance=ExtResource( 8 )]
-position = Vector2( 1390.92, 2052.33 )
-type = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 1 )

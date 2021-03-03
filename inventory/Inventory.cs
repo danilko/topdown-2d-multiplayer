@@ -171,10 +171,9 @@ public class Inventory : Node
         {
             return;
         }
-
+        
         // Unequip weapon first
         UnequipItem(weaponOrder, weaponIndex);
-
         _equipmentIndex.Add(weaponOrder + "_" + weaponIndex, itemIndex);
         _usedIndex.Add(itemIndex);
         _agent.EquipWeapon(_items[itemIndex].ReferencePackedScene, weaponOrder, weaponIndex);

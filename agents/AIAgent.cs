@@ -54,9 +54,9 @@ public class AIAgent : Agent
         if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
             // Deregister weapon with ai
-            if (currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponReload"))
+            if (currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponNeedReload"))
             {
-                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponReload");
+                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponNeedReload");
                 currentWeapon.Disconnect(nameof(Weapon.ReloadSignal), _agentAI, "_onWeaponReload");
             }
         }
@@ -69,9 +69,9 @@ public class AIAgent : Agent
         if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
             // Register weapon with AI
-            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponReload"))
+            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponNeedReload"))
             {
-                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponReload");
+                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _agentAI, "_onWeaponNeedReload");
                 currentWeapon.Connect(nameof(Weapon.ReloadSignal), _agentAI, "_onWeaponReload");
             }
 

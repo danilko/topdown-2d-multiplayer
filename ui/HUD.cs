@@ -112,60 +112,48 @@ public class HUD : CanvasLayer
         // If not 0 ammo, disable the out ammo message
         if (current == 0)
         {
-            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoOut")).Visible = true;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Visible = true;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Text = "AMMO OUT";
         }
         else
         {
-            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoOut")).Visible = false;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Visible = false;
         }
     }
 
     public void UpdateWeaponAmmoOut(Weapon.WeaponOrder weaponOrder)
     {
-        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoOut")).Visible = true;
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Visible = true;
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Text = "AMMO OUT";
     }
 
     public void UpdateWeaponReload(Weapon.WeaponOrder weaponOrder, bool reload)
     {
-        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponReloading")).Visible = reload;
+        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Visible = reload;
+
+        if (reload)
+        {
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Text = "RELOADING";
+        }
     }
 
 
-    public void UpdateWeapon(Weapon.WeaponType weaponType, Weapon.WeaponOrder weaponOrder)
+    public void UpdateWeapon(ItemResource itemResource, Weapon.WeaponOrder weaponOrder)
     {
-        ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponName")).Text = "" + weaponType.ToString();
-        Sprite symbol = ((Sprite)GetNode("controlGame/" + weaponOrder + "WeaponControl/spWeaponSymbol"));
 
-        if (weaponType == Weapon.WeaponType.LASER)
-        {
-            symbol.RegionRect = new Rect2(0f, 263f, 96f, 93f);
-            symbol.Scale = new Vector2(0.5f, 0.25f) * 0.75f;
-        }
-        else if (weaponType == Weapon.WeaponType.RIFILE)
-        {
-            symbol.RegionRect = new Rect2(763f, 39f, 71f, 28f);
-            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
-        }
-        else if (weaponType == Weapon.WeaponType.MISSLELAUNCHER)
-        {
-            symbol.RegionRect = new Rect2(510f, 70f, 53f, 39f);
-            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
-        }
-        else if (weaponType == Weapon.WeaponType.SHIELD)
-        {
-            symbol.RegionRect = new Rect2(183f, 295f, 45f, 62f);
-            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
-        }
-        else if (weaponType == Weapon.WeaponType.LIGHTSABER)
-        {
-            symbol.RegionRect = new Rect2(411f, 3f, 77f, 18f);
-            symbol.Scale = new Vector2(1f, 1f) * 0.75f;
-        }
+        TextureRect symbol = (TextureRect)GetNode("controlGame/" + weaponOrder + "WeaponControl/textureWeaponSymbol");
 
-        if (weaponType != Weapon.WeaponType.EMPTY)
+        if (itemResource == null)
         {
-            symbol.Scale = Vector2.Zero;
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponName")).Text = "NO WEAPON";
+            symbol.RectScale = Vector2.Zero;
             ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Text = "0/0";
+        }
+        else
+        {
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponName")).Text = itemResource.ItemID + " " + itemResource.Name;
+            symbol.Texture = itemResource.ReferenceTexture;
+            symbol.RectScale = new Vector2(0.5f, 0.5f);
         }
     }
 
