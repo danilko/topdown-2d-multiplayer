@@ -1,27 +1,10 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://agents/AIAgent.tscn" type="PackedScene" id=1]
-[ext_resource path="res://projectiles/GunBullet.tscn" type="PackedScene" id=2]
-
-
-
 
 [node name="GunTurret" instance=ExtResource( 1 )]
-Bullet = ExtResource( 2 )
 MaxSpeed = 0
-GunCooldown = 0.1
 DetectRadius = 20.0
 
 [node name="Body" parent="." index="0"]
 region_rect = Rect2( 1031, 62, 47, 51 )
-
-[node name="Turret" parent="." index="2"]
-region_rect = Rect2( 1007, 40, 60, 24 )
-
-[node name="Flash" parent="Turret" index="1"]
-region_rect = Rect2( 212, 61, 58, 33 )
-
-[node name="Laser" parent="Turret" index="2"]
-modulate = Color( 1, 1, 1, 1 )
-position = Vector2( 0, 0 )
-offset = Vector2( 0, 0 )
