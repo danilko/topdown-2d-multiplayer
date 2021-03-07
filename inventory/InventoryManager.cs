@@ -447,7 +447,7 @@ public class InventoryManager : Node
             }
             else
             {
-                RpcId(1, nameof(_serverRemoveItem), info);
+                RpcId(1, nameof(_serverUseItem), info);
             }
 
         }

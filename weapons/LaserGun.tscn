@@ -10,7 +10,7 @@ script = ExtResource( 4 )
 CurrentWeaponType = 1
 KnockbackForce = 10.0
 ItemResourceID = "SYC-1000"
-MaxAmmo = 10
+MaxAmmo = 20
 CooldownTime = 0.5
 ReloadTime = 5.0
 

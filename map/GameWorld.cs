@@ -768,10 +768,10 @@ public class GameWorld : Node2D
 
                     foreach (KeyValuePair<int, GameStates.PlayerInput> input in GameStates.playerInputs[networkPlayer.Key])
                     {
-                        Vector2 moveDir = new Vector2();
-                        moveDir.y = -1 * input.Value.Up;
+                        Vector2 moveDir = Vector2.Zero;
+                        moveDir.y -= 1 * input.Value.Up;
                         moveDir.y += 1 * input.Value.Down;
-                        moveDir.x = -1 * input.Value.Left;
+                        moveDir.x -= 1 * input.Value.Left;
                         moveDir.x += 1 * input.Value.Right;
 
                         playerNode.changeWeapon(input.Value.RightWeaponIndex, Weapon.WeaponOrder.Right);

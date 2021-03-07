@@ -1,43 +1,46 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://projectiles/LaserRay.cs" type="Script" id=1]
 [ext_resource path="res://assets/ui/blue_circle.png" type="Texture" id=2]
 [ext_resource path="res://assets/ui/blue_tick.png" type="Texture" id=3]
 
-[sub_resource type="Gradient" id=1]
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 1
+
+[sub_resource type="Gradient" id=2]
 offsets = PoolRealArray( 0, 0.688222 )
 colors = PoolColorArray( 0.5, 6, 9, 0.98, 1, 1, 1, 0 )
 
-[sub_resource type="GradientTexture" id=2]
-gradient = SubResource( 1 )
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
 
-[sub_resource type="Curve" id=3]
+[sub_resource type="Curve" id=4]
 _data = [ Vector2( 0, 0.976136 ), 0.0, -0.0740261, 0, 0, Vector2( 0.502193, 0.976136 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), -1.36878, -1.36878, 0, 0 ]
 
-[sub_resource type="CurveTexture" id=4]
-curve = SubResource( 3 )
+[sub_resource type="CurveTexture" id=5]
+curve = SubResource( 4 )
 
-[sub_resource type="ParticlesMaterial" id=5]
+[sub_resource type="ParticlesMaterial" id=6]
 flag_disable_z = true
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 120.0
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 scale = 0.5
-scale_curve = SubResource( 4 )
-color_ramp = SubResource( 2 )
+scale_curve = SubResource( 5 )
+color_ramp = SubResource( 3 )
 
-[sub_resource type="ParticlesMaterial" id=6]
+[sub_resource type="ParticlesMaterial" id=7]
 flag_disable_z = true
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 250.0
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 scale = 0.5
-scale_curve = SubResource( 4 )
-color_ramp = SubResource( 2 )
+scale_curve = SubResource( 5 )
+color_ramp = SubResource( 3 )
 
-[sub_resource type="ParticlesMaterial" id=7]
+[sub_resource type="ParticlesMaterial" id=8]
 emission_shape = 2
 emission_box_extents = Vector3( 20, 20, 0 )
 direction = Vector3( 0, 0, 0 )
@@ -54,6 +57,7 @@ script = ExtResource( 1 )
 Damage = 60
 
 [node name="Line2D" type="Line2D" parent="."]
+material = SubResource( 1 )
 points = PoolVector2Array( 0, 0, 100, 0 )
 width = 0.0
 default_color = Color( 0.5, 3, 6, 1 )
@@ -63,17 +67,17 @@ default_color = Color( 0.5, 3, 6, 1 )
 [node name="particles2DCasting" type="Particles2D" parent="."]
 emitting = false
 lifetime = 0.5
-process_material = SubResource( 5 )
+process_material = SubResource( 6 )
 texture = ExtResource( 2 )
 
 [node name="particles2DCollision" type="Particles2D" parent="."]
 emitting = false
 lifetime = 0.5
-process_material = SubResource( 6 )
+process_material = SubResource( 7 )
 texture = ExtResource( 2 )
 
 [node name="particles2DBeam" type="Particles2D" parent="."]
 emitting = false
 amount = 20
-process_material = SubResource( 7 )
+process_material = SubResource( 8 )
 texture = ExtResource( 3 )
