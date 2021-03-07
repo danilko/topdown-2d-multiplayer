@@ -28,7 +28,7 @@ public class InventoryManager : Node
     }
 
     // Add item through unit cost in team
-    public void BuyItem(ItemResource itemResource, Inventory inventory)
+    public void PurchaseItem(ItemResource itemResource, Inventory inventory)
     {
         if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
         {
@@ -263,8 +263,11 @@ public class InventoryManager : Node
             infoIndex++;
 
             float positionX = float.Parse(splitInfo[infoIndex]);
-            float positionY = float.Parse(splitInfo[infoIndex]);
+            infoIndex++;
 
+            float positionY = float.Parse(splitInfo[infoIndex]);
+            infoIndex++;
+            
             _createPickUp(itemResource, new Vector2(positionX, positionY));
         }
     }

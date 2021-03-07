@@ -217,7 +217,7 @@ public class InventoryUI : PopupPanel
 
     private void _purchaseItem(ItemResource itemResource)
     {
-        _inventoryManager.BuyItem(itemResource, _inventory);
+        _inventoryManager.PurchaseItem(itemResource, _inventory);
     }
 
     private void _sellItem(int inventoryIndex)
