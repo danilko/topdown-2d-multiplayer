@@ -8,6 +8,8 @@ public class TitleScreen : Control
     enum GameModeState { Server, Client }
     private GameModeState gameModeState;
 
+    private OptionButton playerTeams;
+
     public override void _Ready()
     {
         network = (Network)GetNode("/root/NETWORK");
@@ -17,12 +19,38 @@ public class TitleScreen : Control
 
         // Ensure the pause is false to recover from disconnection
         GetTree().Paused = false;
+
+        playerTeams = (OptionButton)GetNode("CanvasLayer/PanelPlayer/optPlayerTeam");
+        _populatePlayerTeams();
     }
 
     private void setPlayerInfo()
     {
         network.gamestateNetworkPlayer.name = ((LineEdit)GetNode("CanvasLayer/PanelPlayer/txtPlayerName")).Text;
-        network.gamestateNetworkPlayer.team = (int)(((SpinBox)GetNode("CanvasLayer/PanelPlayer/txtPlayerTeam")).Value);
+        network.gamestateNetworkPlayer.team = playerTeams.Selected;
+    }
+
+    private void _populatePlayerTeams()
+    {
+        playerTeams.Connect("item_selected", this, "_playerTeamSelected");
+
+        for (int index = 0; index < (int)(Team.TeamCode.NEUTRAL); index++)
+        {
+
+
+            Team.TeamCode team = (Team.TeamCode)index;
+            playerTeams.AddItem("" + team);
+        }
+
+        // Pre Select the 0 index
+        playerTeams.Select(0);
+        _playerTeamSelected(0);
+    }
+
+    private void _playerTeamSelected(int index)
+    {
+        TextureRect textureRect = (TextureRect)GetNode("CanvasLayer/PanelPlayer/optTextrect");
+        textureRect.Modulate = Team.TeamColor[index];
     }
 
     private void readyToPlay()

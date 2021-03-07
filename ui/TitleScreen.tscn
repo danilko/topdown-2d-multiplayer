@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://map/SimulateGameWorld.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
+[ext_resource path="res://assets/ui/grey_box.png" type="Texture" id=5]
 
 [sub_resource type="DynamicFont" id=1]
 size = 86
@@ -60,9 +61,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -365.683
+margin_left = -473.901
 margin_top = -128.751
-margin_right = 397.317
+margin_right = 462.099
 margin_bottom = -30.7504
 custom_fonts/font = SubResource( 1 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
@@ -70,7 +71,7 @@ custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 3
 custom_constants/shadow_offset_y = 3
-text = "Mach Battle"
+text = "Machine Battle"
 align = 1
 uppercase = true
 __meta__ = {
@@ -218,15 +219,23 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="txtPlayerTeam" type="SpinBox" parent="CanvasLayer/PanelPlayer"]
-margin_left = 180.0
-margin_top = 22.0
-margin_right = 301.0
-margin_bottom = 46.0
-max_value = 3.0
+[node name="optPlayerTeam" type="OptionButton" parent="CanvasLayer/PanelPlayer"]
+margin_left = 211.218
+margin_top = 21.1199
+margin_right = 370.218
+margin_bottom = 41.1199
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="optTextrect" type="TextureRect" parent="CanvasLayer/PanelPlayer"]
+margin_left = 183.971
+margin_top = 21.827
+margin_right = 221.971
+margin_bottom = 57.827
+rect_scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 5 )
+stretch_mode = 1
 
 [node name="PanelHost" type="Panel" parent="CanvasLayer"]
 visible = false
