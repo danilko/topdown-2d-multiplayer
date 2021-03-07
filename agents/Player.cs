@@ -61,7 +61,7 @@ public class Player : Agent
 
                 EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, GetCurrentWeaponIndex(weaponOrder))], weaponOrder);
                 // Emit signal to update info
-                weapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), weapon.getAmmo(), weapon.getMaxAmmo(), weaponOrder);
+                weapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), weapon.GetAmmo(), weapon.GetMaxAmmo(), weaponOrder);
             }
             else
             {
@@ -266,7 +266,6 @@ public class Player : Agent
         {
             return;
         }
-
 
         // Update the timeout counter and if "outside of the update window", bail
         gameStates.currentTime += delta;

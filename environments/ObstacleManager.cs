@@ -57,7 +57,7 @@ public class ObstacleManager : Node2D
 
         Godot.Collections.Dictionary prebuildObstacles = new Godot.Collections.Dictionary();
 
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             // Add pre - added obstacles
             foreach (Node2D obstacle in GetChildren())
@@ -120,7 +120,7 @@ public class ObstacleManager : Node2D
                 }
                 else
                 {
-                    if (GetTree().IsNetworkServer())
+                    if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
                     {
                         // As there is no obstacle, this cell is a workable path
                         _traverableTiles.Add(new Vector2(xIndex, yIndex));
@@ -135,7 +135,7 @@ public class ObstacleManager : Node2D
             }
         }
 
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             _buildObstaclesCache();
         }
@@ -167,7 +167,7 @@ public class ObstacleManager : Node2D
     }
     private void _onObstacleDestroy(String obstacleName)
     {
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             if (_obstacles.ContainsKey(obstacleName))
             {
@@ -212,7 +212,7 @@ public class ObstacleManager : Node2D
             {
                 obstacle.explode();
 
-                if (GetTree().IsNetworkServer())
+                if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
                 {
                     // As there is no obstacle now, this cell is a workable path
                     _traverableTiles.Add(new Vector2(float.Parse(obstacleName.Split(_obstacleIndexSeparator)[1]), float.Parse(obstacleName.Split(_obstacleIndexSeparator)[2])));

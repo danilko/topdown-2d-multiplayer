@@ -136,7 +136,7 @@ public class InventoryUI : PopupPanel
     {
         itemPanel.Initialize(itemResource, ItemPanel.ItemPanelType.WEAPON, inventoryItemIndex, weaponOrder, weaponIndex);
 
-        itemPanel.SetUsed(_inventory.isItemIndexInUsed(inventoryItemIndex));
+        itemPanel.SetUsed(_inventory.IsItemIndexInUsed(inventoryItemIndex));
         itemPanel.SetEquipped(_inventory.GetEquipItemIndex(weaponOrder, weaponIndex) == inventoryItemIndex);
 
         itemPanel.Show();
@@ -149,8 +149,8 @@ public class InventoryUI : PopupPanel
     private void populatedInventoryPanel(ItemPanel itemPanel, ItemResource itemResource, int inventoryItemIndex)
     {
         itemPanel.Initialize(itemResource, ItemPanel.ItemPanelType.INVENTORY, inventoryItemIndex, Weapon.WeaponOrder.Right, -1);
-        itemPanel.SetUsed(_inventory.isItemIndexInUsed(inventoryItemIndex));
-        itemPanel.Connect(nameof(ItemPanel.ItemPanelSaleClickSignal), this, nameof(_saleItem));
+        itemPanel.SetUsed(_inventory.IsItemIndexInUsed(inventoryItemIndex));
+        itemPanel.Connect(nameof(ItemPanel.ItemPanelSaleClickSignal), this, nameof(_sellItem));
 
         itemPanel.Show();
 
@@ -220,7 +220,7 @@ public class InventoryUI : PopupPanel
         _inventoryManager.BuyItem(itemResource, _inventory);
     }
 
-    private void _saleItem(int inventoryIndex)
+    private void _sellItem(int inventoryIndex)
     {
         _inventoryManager.SellItem(inventoryIndex, _inventory);
     }
@@ -232,7 +232,7 @@ public class InventoryUI : PopupPanel
 
     private void _dropItem(int inventoryIndex)
     {
-        _inventoryManager.DropItem(inventoryIndex, _inventory);
+        _inventoryManager.RemoveItem(inventoryIndex, _inventory, true);
     }
 
     private void populatedStorePanel(ItemPanel itemPanel, ItemResource itemResource, int itemIndex)

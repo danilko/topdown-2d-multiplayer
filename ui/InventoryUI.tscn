@@ -7,6 +7,7 @@
 [sub_resource type="Theme" id=1]
 
 [node name="InventoryUI" type="PopupPanel"]
+visible = true
 margin_right = 771.0
 margin_bottom = 404.0
 script = ExtResource( 2 )
@@ -188,6 +189,9 @@ margin_top = 30.0646
 margin_right = 743.795
 margin_bottom = 64.0646
 text = "PURCHASE"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Equip" type="Button" parent="ItemPanel"]
 visible = false
@@ -197,36 +201,39 @@ margin_right = 744.589
 margin_bottom = 114.861
 text = "EQUIP"
 
-[node name="Use" type="Button" parent="ItemPanel"]
+[node name="Drop" type="Button" parent="ItemPanel"]
 visible = false
 margin_left = 600.589
 margin_top = 80.8614
 margin_right = 744.589
 margin_bottom = 114.861
-text = "USE"
+text = "DROP"
 
 [node name="Unequip" type="Button" parent="ItemPanel"]
 visible = false
-margin_left = 596.223
+margin_left = 602.176
 margin_top = 80.4645
-margin_right = 740.223
+margin_right = 746.176
 margin_bottom = 114.465
 text = "UNEQUIP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="Drop" type="Button" parent="ItemPanel"]
+[node name="Use" type="Button" parent="ItemPanel"]
 visible = false
 margin_left = 435.499
 margin_top = 81.2582
 margin_right = 579.499
 margin_bottom = 115.258
-text = "DROP"
+text = "USE"
 
 [node name="Sell" type="Button" parent="ItemPanel"]
 visible = false
-margin_left = 275.172
-margin_top = 80.4645
-margin_right = 419.172
-margin_bottom = 114.465
+margin_left = 599.795
+margin_top = 30.0646
+margin_right = 743.795
+margin_bottom = 64.0646
 text = "SELL"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -264,12 +271,6 @@ __meta__ = {
 }
 [connection signal="mouse_entered" from="ItemPanel" to="ItemPanel" method="mouseEntered"]
 [connection signal="mouse_exited" from="ItemPanel" to="ItemPanel" method="mouseExited"]
-[connection signal="pressed" from="ItemPanel/Purchase" to="ItemPanel" method="_purchase"]
-[connection signal="pressed" from="ItemPanel/Equip" to="ItemPanel" method="_equip"]
-[connection signal="pressed" from="ItemPanel/Use" to="ItemPanel" method="_use"]
-[connection signal="pressed" from="ItemPanel/Unequip" to="ItemPanel" method="_unequip"]
-[connection signal="pressed" from="ItemPanel/Drop" to="ItemPanel" method="_drop"]
-[connection signal="pressed" from="ItemPanel/Sell" to="ItemPanel" method="_sell"]
 [connection signal="gui_input" from="WeaponSlotPanel" to="WeaponSlotPanel" method="_guiInput"]
 [connection signal="mouse_entered" from="WeaponSlotPanel" to="WeaponSlotPanel" method="mouseEntered"]
 [connection signal="mouse_exited" from="WeaponSlotPanel" to="WeaponSlotPanel" method="mouseExited"]

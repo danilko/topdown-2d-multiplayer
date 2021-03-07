@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=5 format=2]
+
+[ext_resource path="res://items/ItemResource.cs" type="Script" id=1]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
+[ext_resource path="res://weapons/LightSaber.tscn" type="PackedScene" id=3]
+
+[sub_resource type="AtlasTexture" id=1]
+flags = 4
+atlas = ExtResource( 2 )
+region = Rect2( 411, 3, 77, 18 )
+
+[resource]
+script = ExtResource( 1 )
+CurrentItemType = 0
+ItemID = "SYC-200"
+Name = "LIGHT SABER"
+Description = "Light saber for closer combat, able to cut through shield defense if closer enough (ATTACK = 50)"
+Price = 10
+Stackable = false
+MaxStackableCount = 0
+ReferencePackedScene = ExtResource( 3 )
+ReferenceTexture = SubResource( 1 )

@@ -53,7 +53,7 @@ public class Weapon : Node2D
     public float KnockbackForce { get; set; }
 
     [Export]
-    public String ItemResourceID {get;set;}
+    public String ItemResourceID { get; set; }
 
     private GameWorld _gameWorld;
 
@@ -102,7 +102,7 @@ public class Weapon : Node2D
     public bool isReloading()
     {
         // If timer is not stop, then it is reloading
-        return ! ReloadTimer.IsStopped();
+        return !ReloadTimer.IsStopped();
     }
 
     public virtual bool Fire(Agent targetAgent)
@@ -148,14 +148,20 @@ public class Weapon : Node2D
         return false;
     }
 
-    public int getMaxAmmo()
+    public int GetMaxAmmo()
     {
         return MaxAmmo;
     }
 
-    public int getAmmo()
+    public int GetAmmo()
     {
         return Ammo;
+    }
+
+    public void SetAmmo(int ammo)
+    {
+        Ammo = ammo;
+        EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
     }
 
     protected virtual void FireEffect() { }
@@ -163,7 +169,7 @@ public class Weapon : Node2D
     public void StartReload()
     {
         // Only allow reload if there is no reload in process
-        if (! isReloading())
+        if (!isReloading())
         {
             Ammo = 0;
             ReloadTimer.Start();

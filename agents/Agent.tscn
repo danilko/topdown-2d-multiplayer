@@ -10,13 +10,13 @@
 [ext_resource path="res://inventory/Inventory.tscn" type="PackedScene" id=8]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=9]
 
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 1
+
 [sub_resource type="CanvasItemMaterial" id=2]
 blend_mode = 1
 
-[sub_resource type="CanvasItemMaterial" id=3]
-blend_mode = 1
-
-[sub_resource type="RectangleShape2D" id=1]
+[sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 29.5331, 50.0872 )
 
 [node name="Agent" type="KinematicBody2D" groups=[
@@ -95,7 +95,7 @@ region_enabled = true
 region_rect = Rect2( 0, 263, 95, 94 )
 
 [node name="BoosterTrail" parent="RightBooster" instance=ExtResource( 6 )]
-material = SubResource( 2 )
+material = SubResource( 1 )
 position = Vector2( 50, 0 )
 
 [node name="LeftBooster" type="Sprite" parent="."]
@@ -107,14 +107,14 @@ region_enabled = true
 region_rect = Rect2( 0, 263, 95, 94 )
 
 [node name="BoosterTrail" parent="LeftBooster" instance=ExtResource( 6 )]
-material = SubResource( 3 )
+material = SubResource( 2 )
 position = Vector2( 50, 0 )
 lifetime = 0.8
 speed_scale = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0.176773, 0 )
-shape = SubResource( 1 )
+shape = SubResource( 3 )
 
 [node name="Explosion" parent="." instance=ExtResource( 2 )]
 visible = false

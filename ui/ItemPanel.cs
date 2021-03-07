@@ -65,19 +65,34 @@ public class ItemPanel : Panel
 
         if (ItemPanelType.PURCHASE == itemPanelType)
         {
-            ((Button)GetNode("Purchase")).Show();
+            Button btn = ((Button)GetNode("Purchase"));
+            btn.Show();
+            btn.Connect("pressed", this, nameof(_purchase));
         }
         if (ItemPanelType.WEAPON == itemPanelType)
         {
-            ((Button)GetNode("Equip")).Show();
+            Button btn = ((Button)GetNode("Equip"));
+            btn.Show();
+            btn.Connect("pressed", this, nameof(_equip));
+
+            btn = ((Button)GetNode("Unequip"));
+            btn.Connect("pressed", this, nameof(_unequip));
         }
         if (ItemPanelType.INVENTORY == itemPanelType)
         {
-            ((Button)GetNode("Drop")).Show();
-            ((Button)GetNode("Sell")).Show();
+            Button btn = ((Button)GetNode("Drop"));
+            btn.Show();
+            btn.Connect("pressed", this, nameof(_drop));
+
+            btn = ((Button)GetNode("Sell"));
+            btn.Show();
+            btn.Connect("pressed", this, nameof(_sell));
+
             if (_itemResource.CurrentItemType == ItemResource.ItemType.USABLE)
             {
-                ((Button)GetNode("Use")).Show();
+                btn = ((Button)GetNode("Use"));
+                btn.Show();
+                btn.Connect("pressed", this, nameof(_use));
             }
         }
     }
@@ -126,7 +141,7 @@ public class ItemPanel : Panel
         EmitSignal(nameof(ItemPanelInventoryDropClickSignal), _inventoryIndex);
     }
 
-    private void _sale()
+    private void _sell()
     {
         EmitSignal(nameof(ItemPanelInventoryDropClickSignal), _inventoryIndex);
     }

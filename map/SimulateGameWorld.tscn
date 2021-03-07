@@ -72,4 +72,4 @@ autostart = true
 [node name="GameCamera" parent="." instance=ExtResource( 9 )]
 
 [node name="InventoryManager" parent="." instance=ExtResource( 5 )]
-[connection signal="timeout" from="ChangeAgentBehavior" to="." method="changeAgentBehavior"]
+[connection signal="timeout" from="ChangeAgentBehavior" to="." method="_changeAgentBehavior"]

@@ -9,7 +9,7 @@ public class Inventory : Node
     [Signal]
     public delegate void WeaponChangeSignal();
 
-    private int _maxItemCapacity = 20;
+    private int _maxItemCapacity = 12;
 
     private int _availableCapacity;
 
@@ -54,6 +54,11 @@ public class Inventory : Node
 
     public ItemResource GetItem(int index)
     {
+        if (index < 0 || index >= _items.Count)
+        {
+            return null;
+        }
+
         return _items[index];
     }
 
@@ -79,55 +84,23 @@ public class Inventory : Node
         return GetItemIndex(itemResource.ItemID) != -1;
     }
 
-    public bool RemoveItem(ItemResource itemResource)
+    public void RemoveItem(int index)
     {
-        int foundIndex = -1;
-
-        for (int index = 0; index < _items.Count; index++)
-        {
-            if (_items[index] != null && itemResource.ItemID == _items[index].ItemID && !isItemIndexInUsed(index))
-            {
-                foundIndex = index;
-            }
-        }
-
-        if (foundIndex != -1)
-        {
-            _items[foundIndex] = null;
-            _availableCapacity++;
-            EmitSignal(nameof(InventoryChangeSignal));
-            return true;
-        }
-
-        return false;
+        _items[index] = null;
+        _availableCapacity++;
+        EmitSignal(nameof(InventoryChangeSignal));
     }
 
-    public bool RemoveItem(int index)
+    public void AddItem(ItemResource itemResource, int foundIndex = -1)
     {
-        if (_items[index] == null)
+        if (foundIndex == -1)
         {
-            return false;
-        }
-
-        if (!isItemIndexInUsed(index))
-        {
-            _items[index] = null;
-            _availableCapacity++;
-            EmitSignal(nameof(InventoryChangeSignal));
-        }
-
-        return true;
-    }
-
-    public bool AddItem(ItemResource itemResource)
-    {
-        int foundIndex = -1;
-
-        for (int index = 0; index < _items.Count; index++)
-        {
-            if (_items[index] == null)
+            for (int index = 0; index < _items.Count; index++)
             {
-                foundIndex = index;
+                if (_items[index] == null)
+                {
+                    foundIndex = index;
+                }
             }
         }
 
@@ -136,10 +109,7 @@ public class Inventory : Node
             _items[foundIndex] = itemResource;
             _availableCapacity--;
             EmitSignal(nameof(InventoryChangeSignal));
-            return true;
         }
-
-        return false;
     }
 
     public int GetAvailableCapacity()
@@ -147,7 +117,7 @@ public class Inventory : Node
         return _availableCapacity;
     }
 
-    public bool isItemIndexInUsed(int index)
+    public bool IsItemIndexInUsed(int index)
     {
         return _usedIndex.Contains(index);
     }
@@ -156,9 +126,9 @@ public class Inventory : Node
     {
         int index = -1;
 
-        if (_equipmentIndex.ContainsKey(weaponOrder + "_" + weaponIndex))
+        if (_equipmentIndex.ContainsKey((int)weaponOrder + "_" + weaponIndex))
         {
-            index = _equipmentIndex[weaponOrder + "_" + weaponIndex];
+            index = _equipmentIndex[(int)weaponOrder + "_" + weaponIndex];
         }
 
         return index;
@@ -167,16 +137,23 @@ public class Inventory : Node
     // Equip weapon at given index
     public void EquipItem(int itemIndex, Weapon.WeaponOrder weaponOrder, int weaponIndex)
     {
-        if (isItemIndexInUsed(itemIndex))
+        if (IsItemIndexInUsed(itemIndex))
         {
             return;
         }
-        
+
         // Unequip weapon first
         UnequipItem(weaponOrder, weaponIndex);
-        _equipmentIndex.Add(weaponOrder + "_" + weaponIndex, itemIndex);
+        String wepaonKey = (int)weaponOrder + "_" + weaponIndex;
+        _equipmentIndex.Add(wepaonKey, itemIndex);
         _usedIndex.Add(itemIndex);
         _agent.EquipWeapon(_items[itemIndex].ReferencePackedScene, weaponOrder, weaponIndex);
+
+        if (weaponOrder == Weapon.WeaponOrder.Left && weaponIndex == 1)
+        {
+            GD.Print("EQUIP " + _agent.GetUnitName() + " " + weaponOrder + weaponIndex + (_agent.GetWeapons(weaponOrder)[weaponIndex] != null));
+
+        }
 
         EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
         EmitSignal(nameof(InventoryChangeSignal));
@@ -188,10 +165,149 @@ public class Inventory : Node
         int itemIndex = GetEquipItemIndex(weaponOrder, weaponIndex);
 
         _agent.UnequipWeapon(weaponOrder, weaponIndex);
-        _equipmentIndex.Remove(weaponOrder + "_" + weaponIndex);
+        _equipmentIndex.Remove((int)weaponOrder + "_" + weaponIndex);
         _usedIndex.Remove(itemIndex);
 
         EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
+        EmitSignal(nameof(InventoryChangeSignal));
+    }
+
+
+    public String GetInventoryState()
+    {
+        // Set the current inventory count
+        String state = "" + (_items.Count - _availableCapacity) + ";";
+
+        for (int index = 0; index < _items.Count; index++)
+        {
+            if (_items[index] != null)
+            {
+                state = state + index + ";" + _items[index].ItemID + ";";
+            }
+        }
+
+        // sync used item
+        state = state + _usedIndex.Count + ";";
+
+        for (int index = 0; index < _usedIndex.Count; index++)
+        {
+            state = state + _usedIndex[index] + ";";
+        }
+
+        // Need to go through all weapons
+        String weaponInfo = "";
+        int equipmentIndex = 0;
+
+        for (int weaponOrderIndex = 0; weaponOrderIndex <= (int)Weapon.WeaponOrder.Left; weaponOrderIndex++)
+        {
+            Weapon.WeaponOrder currentWeaponOrder = (Weapon.WeaponOrder)weaponOrderIndex;
+            int weaponCount = _agent.GetWeapons(currentWeaponOrder).Count;
+            for (int weaponIndex = 0; weaponIndex < weaponCount; weaponIndex++)
+            {
+                String weaponKey = weaponOrderIndex + "_" + weaponIndex;
+                int weaponItemIndex = -1;
+                int ammo = -1;
+
+                if (_equipmentIndex.ContainsKey(weaponKey))
+                {
+                    weaponItemIndex = _equipmentIndex[weaponKey];
+                    ammo = _agent.GetWeapons(currentWeaponOrder)[weaponIndex].GetAmmo();
+                }
+
+                weaponInfo = weaponInfo + weaponKey + ";" + weaponItemIndex + ";" + ammo + ";";
+
+                equipmentIndex++;
+            }
+        }
+
+        state = state + equipmentIndex + ";" + weaponInfo;
+
+        return state;
+    }
+
+
+    public void SyncInventoryState(String state, InventoryDatabase inventoryDatabase)
+    {
+        String[] stateInfo = state.Split(";");
+        GD.Print("SYNC INVENTORY PAYLOAD " + _agent.GetUnitName() + " " + state);
+        int stateIndex = 0;
+
+        // Set the current inventory count
+        int inventoryCount = int.Parse(stateInfo[stateIndex]);
+        _availableCapacity = _items.Count - inventoryCount;
+
+        stateIndex++;
+
+        // Clean up the inventory
+        for (int index = 0; index < _items.Count; index++)
+        {
+            _items[index] = null;
+        }
+
+        for (int index = 0; index < inventoryCount; index++)
+        {
+            int inventoryInex = int.Parse(stateInfo[stateIndex]);
+            stateIndex++;
+            _items[inventoryInex] = inventoryDatabase.GetItemByID(stateInfo[stateIndex]);
+            stateIndex++;
+        }
+
+        // sync used item
+        int usedIndex = int.Parse(stateInfo[stateIndex]);
+        stateIndex++;
+
+        // Clean up the used index
+        _usedIndex.Clear();
+
+        for (int index = 0; index < usedIndex; index++)
+        {
+            _usedIndex.Add(int.Parse(stateInfo[stateIndex]));
+            stateIndex++;
+        }
+
+        int equipCount = int.Parse(stateInfo[stateIndex]);
+        stateIndex++;
+
+        _equipmentIndex.Clear();
+
+        for (int index = 0; index < equipCount; index++)
+        {
+            String weaponKey = stateInfo[stateIndex];
+            stateIndex++;
+
+            int itemIndex = int.Parse(stateInfo[stateIndex]);
+            stateIndex++;
+
+            int ammo = int.Parse(stateInfo[stateIndex]);
+            stateIndex++;
+
+            Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)int.Parse(weaponKey.Split("_")[0]);
+            int weaponIndex = int.Parse(weaponKey.Split("_")[1]);
+
+            if (itemIndex != -1)
+            {
+                _equipmentIndex.Add(weaponKey, itemIndex);
+
+                if (_agent.GetWeapons(weaponOrder)[weaponIndex] == null || _agent.GetWeapons(weaponOrder)[weaponIndex].ItemResourceID != _items[itemIndex].ItemID)
+                {
+                    // Client is not equip same as server, try to enforced it
+                    _agent.UnequipWeapon(weaponOrder, weaponIndex);
+                    _agent.EquipWeapon(_items[itemIndex].ReferencePackedScene, weaponOrder, weaponIndex);
+                    _agent.GetWeapons(weaponOrder)[weaponIndex].SetAmmo(ammo);
+                    EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
+                }
+            }
+            else
+            {
+                if (_agent.GetWeapons(weaponOrder)[weaponIndex] != null)
+                {
+                    // Client is equip while server does not, try to enforced it
+                    _agent.UnequipWeapon(weaponOrder, weaponIndex);
+                    EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
+                }
+            }
+        }
+
         EmitSignal(nameof(InventoryChangeSignal));
     }
 }

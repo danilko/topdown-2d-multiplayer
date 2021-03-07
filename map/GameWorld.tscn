@@ -21,7 +21,7 @@ script = ExtResource( 3 )
 [node name="HUD" parent="." instance=ExtResource( 5 )]
 
 [node name="Ground" type="TileMap" parent="."]
-modulate = Color( 0.835294, 0.835294, 0.835294, 1 )
+modulate = Color( 0.6, 0.6, 0.6, 1 )
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 128, 128 )
 format = 1

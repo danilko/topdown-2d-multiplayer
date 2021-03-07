@@ -27,7 +27,7 @@ public class Agent : KinematicBody2D
     protected float RotationSpeed;
 
     [Export]
-    protected int MaxHealth;
+    public int MaxHealth { get; set; }
 
     [Export]
     protected int MaxEnergy;
@@ -180,7 +180,7 @@ public class Agent : KinematicBody2D
             EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, weaponIndex)], weaponOrder);
 
             // Emit signal to update info
-            currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.getAmmo(), currentWeapon.getMaxAmmo(), weaponOrder);
+            currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.GetAmmo(), currentWeapon.GetMaxAmmo(), weaponOrder);
         }
     }
 
@@ -191,7 +191,7 @@ public class Agent : KinematicBody2D
         if (currentWeapon != null)
         {
             // If the current weapon ammo is 0, then notify about out of ammo
-            if (currentWeapon.getAmmo() == 0)
+            if (currentWeapon.GetAmmo() == 0)
             {
                 currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal), weaponOrder);
             }
@@ -336,27 +336,31 @@ public class Agent : KinematicBody2D
 
     protected void speedUpBoostTrail()
     {
-        Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
+        for (int index = 0; index < (int)Weapon.WeaponOrder.Left; index++)
+        {
+            Particles2D boosterTrail = (Particles2D)GetNode((Weapon.WeaponOrder)index + "Booster/BoosterTrail");
 
-        boosterTrail.SpeedScale = 10;
-        boosterTrail.Lifetime = 3;
+            boosterTrail.SpeedScale = 10;
+            boosterTrail.Lifetime = 3;
+        }
+
 
     }
 
     protected void slowDownBoostTrail()
     {
-        Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
+        for (int index = 0; index < (int)Weapon.WeaponOrder.Left; index++)
+        {
+            Particles2D boosterTrail = (Particles2D)GetNode((Weapon.WeaponOrder)index + "Booster/BoosterTrail");
 
-        boosterTrail.SpeedScale = 1;
-        boosterTrail.Lifetime = 1;
+            boosterTrail.SpeedScale = 1;
+            boosterTrail.Lifetime = 1;
+        }
     }
 
 
     public void Sync(Vector2 position, float rotation, int rightWeapon, int leftWeapon)
     {
-
-        Particles2D boosterTrail = (Particles2D)GetNode("Partilcle2DBoosterTrail");
-
         // Move effect
         if (position != Position)
         {

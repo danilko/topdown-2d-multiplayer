@@ -28,67 +28,312 @@ public class InventoryManager : Node
     }
 
     // Add item through unit cost in team
-    public bool BuyItem(ItemResource itemResource, Inventory inventory)
+    public void BuyItem(ItemResource itemResource, Inventory inventory)
     {
         if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
         {
+            String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
 
-            if (inventory != null && IsInstanceValid(inventory) && inventory.GetCurrentTeamMapAI().ChargeAmount(itemResource.Price))
+            if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
             {
-                return AddItem(itemResource, inventory);
+                RpcId(1, nameof(_serverPurchaseItem), info);
+            }
+            else
+            {
+                _serverPurchaseItem(info);
+            }
+        }
+    }
+
+    [Remote]
+    private void _serverPurchaseItem(String info)
+    {
+        String[] splitInfo = info.Split(";");
+        int infoIndex = 0;
+
+        ItemResource itemResource = _inventoryDatabase.GetItemByID(splitInfo[infoIndex]);
+        infoIndex++;
+
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        infoIndex++;
+
+        Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+        infoIndex++;
+
+        if (agent != null && IsInstanceValid(agent))
+        {
+            Inventory inventory = agent.GetInventory();
+
+            // No need to sync cost as cost will sync by team AI system
+            if (inventory != null && IsInstanceValid(inventory) && itemResource != null && IsInstanceValid(itemResource))
+            {
+                if (inventory.GetAvailableCapacity() > 0 && teamMapAI.ChargeAmount(itemResource.Price))
+                {
+                    inventory.AddItem(itemResource);
+                }
+
+                // Sync the client no matter if is passing the lastcheck
+                // If not passing, as long as the agent still exit it may indicate cliet is out of sync with server inventory so need to sync
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
             }
 
-            return false;
         }
-
-        return false;
     }
 
-    // Sell item to increase cost in team
-    public bool SellItem(int inventoryIndex, Inventory inventory)
+    // Sell item to increase unit amount in team
+    public void SellItem(int inventoryIndex, Inventory inventory)
     {
-        ItemResource itemResource = inventory.GetItem(inventoryIndex);
-
-        if (inventory.RemoveItem(inventoryIndex))
+        if (inventory != null && IsInstanceValid(inventory))
         {
-            // Debit back the amount
-            inventory.GetCurrentTeamMapAI().ChargeAmount(-itemResource.Price);
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
 
-            return true;
+            if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
+            {
+                RpcId(1, nameof(_serverSellItem), info);
+            }
+            else
+            {
+                _serverSellItem(info);
+            }
         }
-
-        return false;
     }
 
-    public bool AddItem(ItemResource itemResource, Inventory inventory)
+
+    [Remote]
+    private void _serverSellItem(String info)
     {
-        if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
+        String[] splitInfo = info.Split(";");
+        int infoIndex = 0;
+
+        int inventoryIndex = int.Parse(splitInfo[infoIndex]);
+        infoIndex++;
+
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        infoIndex++;
+
+        Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+        infoIndex++;
+
+        if (agent != null && IsInstanceValid(agent))
         {
-            inventory.AddItem(itemResource);
-            return true;
+            Inventory inventory = agent.GetInventory();
+
+            if (inventory != null && IsInstanceValid(inventory))
+            {
+                if (inventory.GetItems()[inventoryIndex] != null && !inventory.IsItemIndexInUsed(inventoryIndex))
+                {
+                    ItemResource itemResource = inventory.GetItem(inventoryIndex);
+                    // Debit back the amount
+                    teamMapAI.ChargeAmount(-itemResource.Price);
+
+                    inventory.RemoveItem(inventoryIndex);
+                }
+
+                // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
+            }
         }
-
-        return false;
     }
-
-    public bool RemoveItem(int inventoryIndex, Inventory inventory)
+    public void AddItem(ItemResource itemResource, Inventory inventory)
     {
-        if (inventory != null && IsInstanceValid(inventory) && inventory.GetItem(inventoryIndex) != null)
+        // Add item only process at master
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            ItemResource itemResource = inventory.GetItem(inventoryIndex);
+            if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
+            {
+                String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
 
-            inventory.RemoveItem(inventoryIndex);
-            return true;
+                _serverAddItem(info);
+            }
         }
-
-        return false;
     }
+
+
+    [Remote]
+    private void _serverAddItem(String info)
+    {
+        String[] splitInfo = info.Split(";");
+        int infoIndex = 0;
+
+        ItemResource itemResource = _inventoryDatabase.GetItemByID(splitInfo[infoIndex]);
+        infoIndex++;
+
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        infoIndex++;
+
+        Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+        infoIndex++;
+
+        if (agent != null && IsInstanceValid(agent) && itemResource != null && IsInstanceValid(itemResource))
+        {
+            Inventory inventory = agent.GetInventory();
+
+            if (inventory != null && IsInstanceValid(inventory))
+            {
+                inventory.AddItem(itemResource);
+
+                // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
+            }
+        }
+    }
+
+
+
+    [Remote]
+    private void _serverRemoveItem(String info)
+    {
+        String[] splitInfo = info.Split(";");
+        int infoIndex = 0;
+
+        int inventoryIndex = int.Parse(splitInfo[infoIndex]);
+        infoIndex++;
+
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        infoIndex++;
+
+        Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+        infoIndex++;
+
+        int dropItem = int.Parse(splitInfo[infoIndex]);
+        infoIndex++;
+
+        if (agent != null && IsInstanceValid(agent))
+        {
+            Inventory inventory = agent.GetInventory();
+
+            if (inventory != null && IsInstanceValid(inventory))
+            {
+                if (inventory.GetItem(inventoryIndex) != null && !inventory.IsItemIndexInUsed(inventoryIndex))
+                {
+                    ItemResource itemResource = inventory.GetItem(inventoryIndex);
+                    inventory.RemoveItem(inventoryIndex);
+
+                    // Will drop item even if local client not able to remove it, as to sync up state with other servers
+                    if (dropItem == 1)
+                    {
+                        Vector2 itemPosition = agent.GlobalPosition + new Vector2(200f, 200f);
+
+                        _createPickUp(itemResource, itemPosition);
+
+                        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                        {
+                            String dropItemInfo = itemResource.ItemID + ";" + itemPosition.x + ";" + itemPosition.y + ";";
+                            Rpc(nameof(_clientCreatePickUp), dropItemInfo);
+                        }
+                    }
+                }
+
+                // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
+            }
+        }
+    }
+
+    private void _createPickUp(ItemResource itemResource, Vector2 itemPosition)
+    {
+        Pickup pickup = (Pickup)((PackedScene)GD.Load("res://items/Pickup.tscn")).Instance();
+        _gameWorld.AddChild(pickup);
+
+        pickup.Initialize(this, itemResource);
+        pickup.GlobalPosition = itemPosition;
+    }
+
+    private void _clientCreatePickUp(String info)
+    {
+        if (!GetTree().IsNetworkServer())
+        {
+            String[] splitInfo = info.Split(";");
+            int infoIndex = 0;
+
+            ItemResource itemResource = _inventoryDatabase.GetItemByID(splitInfo[infoIndex]);
+            infoIndex++;
+
+            float positionX = float.Parse(splitInfo[infoIndex]);
+            float positionY = float.Parse(splitInfo[infoIndex]);
+
+            _createPickUp(itemResource, new Vector2(positionX, positionY));
+        }
+    }
+
+    public void RemoveItem(int inventoryIndex, Inventory inventory, bool dropItem)
+    {
+        if (inventory != null && IsInstanceValid(inventory))
+        {
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (dropItem ? 1 : 0);
+
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+            {
+                _serverRemoveItem(info);
+
+            }
+            else
+            {
+                RpcId(1, nameof(_serverRemoveItem), info);
+            }
+
+
+        }
+    }
+
 
     public void EquipItem(Inventory inventory, int inventoryItemIndex, Weapon.WeaponOrder weaponOrder, int weaponIndex)
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            inventory.EquipItem(inventoryItemIndex, weaponOrder, weaponIndex);
+            String info = inventoryItemIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex;
+
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+            {
+                _serverEquipItem(info);
+            }
+            else
+            {
+                RpcId(1, nameof(_serverEquipItem), info);
+            }
+        }
+    }
+
+    [Remote]
+    private void _serverEquipItem(String info)
+    {
+        int inventoryItemIndex = int.Parse(info.Split(";")[0]);
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(info.Split(";")[1])];
+        Agent agent = teamMapAI.GetUnit(info.Split(";")[2]);
+        Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)int.Parse(info.Split(";")[3]);
+        int weaponIndex = int.Parse(info.Split(";")[4]);
+        if (agent != null && IsInstanceValid(agent))
+        {
+            Inventory inventory = agent.GetInventory();
+
+            // Inventory is not null
+            if (inventory != null && IsInstanceValid(inventory) && inventory.GetItem(inventoryItemIndex) != null)
+            {
+                // It is not in used and is equiptable
+                if (!inventory.IsItemIndexInUsed(inventoryItemIndex) && inventory.GetItem(inventoryItemIndex).CurrentItemType == ItemResource.ItemType.EQUIPABLE)
+                {
+                    // Server local directly process
+                    inventory.EquipItem(inventoryItemIndex, weaponOrder, weaponIndex);
+                }
+
+                // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
+            }
         }
     }
 
@@ -96,30 +341,160 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            inventory.UnequipItem(weaponOrder, weaponIndex);
+            String info = (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex;
 
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+            {
+                _serverUnequipItem(info);
+            }
+            else
+            {
+                RpcId(1, nameof(_serverUnequipItem), info);
+            }
         }
     }
 
-    public void DropItem(int inventoryIndex, Inventory inventory)
+    [Remote]
+    private void _serverUnequipItem(String info)
     {
-        ItemResource itemResource = inventory.GetItem(inventoryIndex);
+        String[] splitInfo = info.Split(";");
+        int infoIndex = 0;
 
-        if (inventory.RemoveItem(inventoryIndex))
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        infoIndex++;
+
+        Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+        infoIndex++;
+
+        Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)int.Parse(splitInfo[infoIndex]);
+        infoIndex++;
+
+        int weaponIndex = int.Parse(splitInfo[infoIndex]);
+        infoIndex++;
+
+        if (agent != null && IsInstanceValid(agent))
         {
-            Pickup pickup = (Pickup)((PackedScene)GD.Load("res://items/Pickup.tscn")).Instance();
-            _gameWorld.AddChild(pickup);
-
-            pickup.Initialize(this, itemResource);
-            pickup.GlobalPosition = inventory.GetAgent().GlobalPosition + new Vector2(200f, 200f); 
+            Inventory inventory = agent.GetInventory();
+            if (inventory != null && IsInstanceValid(inventory))
+            {
+                if (agent.GetWeapons(weaponOrder)[weaponIndex] != null)
+                {
+                    inventory.UnequipItem(weaponOrder, weaponIndex);
+                }
+                // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
+            }
         }
     }
+
+    public void SyncInventory(int rpcId, Agent agent)
+    {
+        if (agent != null && IsInstanceValid(agent))
+        {
+            String info = (int)agent.GetCurrentTeam() + "," + agent.GetUnitName() + "," + agent.GetInventory().GetInventoryState();
+
+            if (rpcId != -1)
+            {
+                RpcId(rpcId, nameof(_syncInventory), info);
+            }
+            else
+            {
+                Rpc(nameof(_syncInventory), info);
+            }
+        }
+    }
+
+    [Remote]
+    private void _syncInventory(String info)
+    {
+        // No need to do on server as server already perform it
+        if (!GetTree().IsNetworkServer())
+        {
+            String[] splitInfo = info.Split(",");
+            int infoIndex = 0;
+
+            TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+            infoIndex++;
+
+            Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+            infoIndex++;
+
+            if (agent != null && IsInstanceValid(agent))
+            {
+                Inventory inventory = agent.GetInventory();
+
+                if (inventory != null && IsInstanceValid(inventory))
+                {
+                    inventory.SyncInventoryState(splitInfo[infoIndex], _inventoryDatabase);
+                }
+            }
+        }
+    }
+
 
     public void UseItem(int inventoryIndex, Inventory inventory)
     {
-        if (inventory.RemoveItem(inventoryIndex))
+        if (inventory != null && IsInstanceValid(inventory))
         {
-            // TODO Implement use logic
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
+
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+            {
+                _serverUseItem(info);
+            }
+            else
+            {
+                RpcId(1, nameof(_serverRemoveItem), info);
+            }
+
         }
     }
+
+
+    [Remote]
+    private void _serverUseItem(String info)
+    {
+        String[] splitInfo = info.Split(";");
+        int infoIndex = 0;
+
+        int inventoryIndex = int.Parse(splitInfo[infoIndex]);
+        infoIndex++;
+
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        infoIndex++;
+
+        Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
+        infoIndex++;
+
+
+        if (agent != null && IsInstanceValid(agent))
+        {
+            Inventory inventory = agent.GetInventory();
+
+            if (inventory != null && IsInstanceValid(inventory))
+            {
+                if (inventory.GetItem(inventoryIndex) != null && !inventory.IsItemIndexInUsed(inventoryIndex))
+                {
+                    ItemResource itemResource = inventory.GetItem(inventoryIndex);
+
+                    inventory.RemoveItem(inventoryIndex);
+                    if (itemResource.ItemID == "SYC-010")
+                    {
+                        agent.Heal(agent.MaxHealth);
+                    }
+                }
+
+                // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
+                if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                {
+                    SyncInventory(-1, agent);
+                }
+            }
+        }
+    }
+
+
 }
