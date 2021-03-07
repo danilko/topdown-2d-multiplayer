@@ -78,7 +78,23 @@ public class TeamMapAI : Node2D
         {
             _currentUnitUsageAmount = _currentUnitUsageAmount - chargeAmount;
             EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
+
+            if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+            {
+                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+            }
+
             return true;
+        }
+    }
+
+    [Remote]
+    private void _clientSetAmount(int amount)
+    {
+        if (!GetTree().IsNetworkServer())
+        {
+            _currentUnitUsageAmount = amount;
+            EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
         }
     }
 

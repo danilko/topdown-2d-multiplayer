@@ -251,6 +251,7 @@ public class InventoryManager : Node
         pickup.GlobalPosition = itemPosition;
     }
 
+    [Remote]
     private void _clientCreatePickUp(String info)
     {
         if (!GetTree().IsNetworkServer())
