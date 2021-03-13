@@ -8,7 +8,9 @@ public class SimulateGameWorld : GameWorld
     public override void _Ready()
     {
         GameStates = (GameStates)GetNode("/root/GAMESTATES");
-
+        // Clean up previous setup state
+        GameStates.SetTeamMapAISettings(null);
+        
         InitializeInventoryManager();
 
         InitializeCamera();

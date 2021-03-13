@@ -8,6 +8,9 @@ public class Network : Node
     //when server is successfully created
     [Signal]
     public delegate void ServerCreatedSignal();
+    // when server create fail
+    [Signal]
+    public delegate void ServerCreateFailSignal();
     //  When the peer successfully joins a server
     [Signal]
     public delegate void JoinSuccessSignal();
@@ -85,7 +88,8 @@ public class Network : Node
         // Try to create the server
         if (peer.CreateServer(serverinfo.used_port, serverinfo.max_players) != Error.Ok)
         {
-            GD.PrintErr("Failed to create server");
+            // Tell the server crate fail
+            EmitSignal(nameof(ServerCreateFailSignal), "SERVER CREATE FAIL AT " + serverName + ":" + port + ". PLEASE CHECK DETAIL AND TRY AGAIN.");
             return;
         }
 
@@ -112,6 +116,10 @@ public class Network : Node
         networkPlayers.Clear();
 
         // Close network server
+        if (GetTree().NetworkPeer != null)
+        {
+            GetTree().NetworkPeer.Dispose();
+        }
         GetTree().NetworkPeer = null;
     }
 
@@ -123,9 +131,10 @@ public class Network : Node
 
         if (peer.CreateClient(ip, port) != Error.Ok)
         {
-            EmitSignal(nameof(JoinFailSignal));
+            EmitSignal(nameof(JoinFailSignal), "JOIN SERVER AT " + ip + ":" + port + " FAIL. PLEASE CHECK DETAIL AND TRY AGAIN.");
             return;
         }
+
         GetTree().NetworkPeer = peer;
     }
 

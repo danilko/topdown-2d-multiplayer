@@ -229,7 +229,6 @@ public class Inventory : Node
     public void SyncInventoryState(String state, InventoryDatabase inventoryDatabase)
     {
         String[] stateInfo = state.Split(";");
-        GD.Print("SYNC INVENTORY PAYLOAD " + _agent.GetUnitName() + " " + state);
         int stateIndex = 0;
 
         // Set the current inventory count

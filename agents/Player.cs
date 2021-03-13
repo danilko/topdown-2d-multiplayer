@@ -82,6 +82,8 @@ public class Player : Agent
         if (!_teamMapAI.IsConnected(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount)))
         {
             _teamMapAI.Connect(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount));
+            // Notify the HUD to change
+            _teamMapAI.ChargeAmount(0);
         }
     }
 

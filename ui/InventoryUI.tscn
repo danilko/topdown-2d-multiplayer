@@ -7,7 +7,6 @@
 [sub_resource type="Theme" id=1]
 
 [node name="InventoryUI" type="PopupPanel"]
-visible = true
 margin_right = 771.0
 margin_bottom = 404.0
 script = ExtResource( 2 )

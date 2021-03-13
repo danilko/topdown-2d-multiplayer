@@ -38,8 +38,10 @@ public class TeamMapAI : Node2D
 
     private int _unitCost = 100;
 
-
     private Timer _advancedTimer;
+
+    [Export]
+    private Boolean _autoSpawnMember = true;
 
     public override void _Ready()
     {
@@ -50,6 +52,16 @@ public class TeamMapAI : Node2D
 
         _advancedTimer = (Timer)GetNode("AdvancedTimer");
         _advancedTimer.WaitTime = _advancedWaitInterval;
+    }
+
+    public Boolean GetAutoSpawnMember()
+    {
+        return _autoSpawnMember;
+    }
+
+    public void SetAutoSpawnMember(Boolean autoSpawnMember)
+    {
+        _autoSpawnMember = autoSpawnMember;
     }
 
     public Team.TeamCode GetCurrentTeam()
@@ -66,6 +78,13 @@ public class TeamMapAI : Node2D
     {
         _maxUnitUsageAmount = maxUnitUsageAmount;
         _currentUnitUsageAmount = _maxUnitUsageAmount;
+
+        EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
+
+        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+        {
+            Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+        }
     }
 
     public bool ChargeAmount(int chargeAmount)
@@ -86,6 +105,18 @@ public class TeamMapAI : Node2D
 
             return true;
         }
+    }
+
+    public void SyncTeamMapAICurrentUnitAmount(int rpcId)
+    {
+            if (rpcId != -1)
+            {
+                RpcId(rpcId, nameof(_clientSetAmount), _currentUnitUsageAmount);
+            }
+            else
+            {
+                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+            }
     }
 
     [Remote]

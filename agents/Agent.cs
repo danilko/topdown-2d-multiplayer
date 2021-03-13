@@ -515,6 +515,8 @@ public class Agent : KinematicBody2D
             Particles2D smoke = (Particles2D)GetNode("Smoke");
             smoke.Emitting = false;
         }
+
+        EmitSignal(nameof(HealthChangedSignal), _health);
     }
 
     public void Explode()

@@ -253,6 +253,8 @@ public class GameWorld : Node2D
 
     protected void InitializeTeamMapAI()
     {
+        Godot.Collections.Array<TeamMapAISetting> teamMapAISettings = GameStates.GetTeamMapAISettings();
+
         TeamMapAIs = new Godot.Collections.Array<TeamMapAI>();
 
         // Start with neutral and above
@@ -263,6 +265,12 @@ public class GameWorld : Node2D
             AddChild(ai);
 
             ai.Initialize(this, _inventoryManager,  CapaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
+
+            if(teamMapAISettings != null)
+            {
+                ai.SetMaxUnitUsageAmount(teamMapAISettings[index].Budget);
+                ai.SetAutoSpawnMember(teamMapAISettings[index].AutoSpawnMember);
+            }
 
             TeamMapAIs.Add(ai);
 
@@ -1140,6 +1148,12 @@ public class GameWorld : Node2D
         // Propagate info of obstacles to other
         if (GetTree().IsNetworkServer() && pininfo.net_id != 1)
         {
+            
+            foreach (TeamMapAI teamMapAI in TeamMapAIs)
+            {
+                teamMapAI.SyncTeamMapAICurrentUnitAmount(pininfo.net_id);
+            }
+
             // Add current bot info to new player
             foreach (String playerIDs in spawnPlayers.Keys)
             {
@@ -1162,6 +1176,7 @@ public class GameWorld : Node2D
                 RpcId(pininfo.net_id, nameof(_syncCapturableBase), index + ";" + (int)capturableBase.GetCaptureBaseTeam());
                 index++;
             }
+
 
             // Sync the destoryed obstacles
             _obstacleManager.syncObstacles(pininfo.net_id);
@@ -1303,7 +1318,7 @@ public class GameWorld : Node2D
 
                     foreach (TeamMapAI currentAI in TeamMapAIs)
                     {
-                        if (currentAI.isNewUnitAllow())
+                        if (currentAI.GetAutoSpawnMember() && currentAI.isNewUnitAllow())
                         {
                             if (currentAI.GetUnitsContainer().GetChildren().Count <= smallestUnitCount)
                             {
