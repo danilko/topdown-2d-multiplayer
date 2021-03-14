@@ -166,7 +166,7 @@ public class AI : Node2D
                 break;
 
             case State.ENGAGE:
-                if (IsInstanceValid(_targetAgent))
+                if (_targetAgent != null && IsInstanceValid(_targetAgent))
                 {
                     _agent.RotateToward(_targetAgent.GlobalPosition, delta);
 
@@ -192,6 +192,10 @@ public class AI : Node2D
                     {
                         _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition), delta);
                     }
+                }
+                else
+                {
+                    _checkTarget();
                 }
                 break;
 
@@ -289,40 +293,53 @@ public class AI : Node2D
                 }
             }
 
-            Godot.Collections.Array<String> removeTargetList = new Godot.Collections.Array<String>();
-
-            foreach (String targetAgentUnitName in _targetAgents.Keys)
+            // If target is not vaild, then will try to check for next target
+            if (_targetAgent == null || IsInstanceValid(_targetAgent))
             {
-                Agent targetAgent = _gameWorld.GetTeamMapAIs()[(int)_targetAgents[targetAgentUnitName]].GetUnit(targetAgentUnitName);
-
-                if (targetAgent != null && IsInstanceValid(targetAgent))
-                {
-                    _targetAgent = targetAgent;
-                }
-                else
-                {
-                    // Remove this target from list as it is no longer valid
-                    removeTargetList.Add(targetAgentUnitName);
-                }
+                // Compute target
+                _checkTarget();
             }
+        }
+    }
 
-            foreach (String targetAgentUnitName in removeTargetList)
+    private void _checkTarget()
+    {
+        _targetAgent = null;
+
+        Godot.Collections.Array<String> removeTargetList = new Godot.Collections.Array<String>();
+
+        foreach (String targetAgentUnitName in _targetAgents.Keys)
+        {
+            Agent targetAgent = _gameWorld.GetTeamMapAIs()[(int)_targetAgents[targetAgentUnitName]].GetUnit(targetAgentUnitName);
+
+            if (targetAgent != null && IsInstanceValid(targetAgent))
             {
-                _targetAgents.Remove(targetAgentUnitName);
+                SetState(State.ENGAGE);
+                _targetAgent = targetAgent;
             }
-
-            // If no possible target, then set to ADVANCE
-            if (_targetAgent == null)
+            else
             {
-                // Set advance if next target is available
-                if (_nextBasePosition != Vector2.Zero)
-                {
-                    SetState(State.ADVANCE);
-                }
-                else
-                {
-                    SetState(State.PATROL);
-                }
+                // Remove this target from list as it is no longer valid
+                removeTargetList.Add(targetAgentUnitName);
+            }
+        }
+
+        foreach (String targetAgentUnitName in removeTargetList)
+        {
+            _targetAgents.Remove(targetAgentUnitName);
+        }
+
+        // If no possible target, then set to ADVANCE
+        if (_targetAgent == null)
+        {
+            // Set advance if next target is available
+            if (_nextBasePosition != Vector2.Zero)
+            {
+                SetState(State.ADVANCE);
+            }
+            else
+            {
+                SetState(State.PATROL);
             }
         }
     }

@@ -39,9 +39,6 @@ public class Agent : KinematicBody2D
 
     public int RightWeaponAction { set; get; }
     public int LeftWeaponAction { set; get; }
-    public bool RightWeaponReloading { set; get; }
-    public bool LeftWeaponReloading { set; get; }
-
     protected Godot.Collections.Array<Weapon> RightWeapons = new Godot.Collections.Array<Weapon>();
     protected Godot.Collections.Array<Weapon> LeftWeapons = new Godot.Collections.Array<Weapon>();
 
@@ -498,7 +495,6 @@ public class Agent : KinematicBody2D
     public void ReloadWeapon(Weapon.WeaponOrder weaponOrder)
     {
         ((Weapon)GetWeapons(weaponOrder)[CurrentWeaponIndex[weaponOrder]]).StartReload();
-        RightWeaponReloading = false;
     }
 
     public void Heal(int amount)

@@ -118,7 +118,7 @@ public class InventoryUI : PopupPanel
         int inventoryItemIndex = 0;
         foreach (ItemResource itemResource in _inventory.GetItems())
         {
-            if (itemResource != null)
+            if (itemResource != null && itemResource.CurrentItemType == ItemResource.ItemType.EQUIPABLE)
             {
                 ItemPanel panel = (ItemPanel)_itemPanel.Duplicate();
 
