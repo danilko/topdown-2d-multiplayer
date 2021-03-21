@@ -23,6 +23,7 @@
     <Compile Include="ai\TeamMapAISetting.cs" />
     <Compile Include="effects\AgentExplosionParticle.cs" />
     <Compile Include="effects\RemainParticles.cs" />
+    <Compile Include="effects\Trail.cs" />
     <Compile Include="environments\CapaturableBaseManager.cs" />
     <Compile Include="environments\CapturableBase.cs" />
     <Compile Include="environments\ObstacleManager.cs" />
