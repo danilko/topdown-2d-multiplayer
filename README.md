@@ -12,7 +12,9 @@ top - down 2D multiplayer base on godot
 Build Downloads
 ======
 Builds for supported platforms can be downloaded below (Linux (Tested on Fedora 30)/Windows 10)
+
 [itch.io](https://danil-ko.itch.io/machine-battle)
+
 [Builds](https://github.com/danilko/topdown-2d-multiplayer/releases)
 
 Code Reference
