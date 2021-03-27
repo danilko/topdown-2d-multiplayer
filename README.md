@@ -3,8 +3,6 @@ top - down 2D multiplayer base on godot
 
  [Youtube Sample](https://www.youtube.com/playlist?list=PLlwvRbWsWmGUtEd47nyo0MUZJVJqvd4Iv)
 
-[![Youtube Video Demo](https://i.ytimg.com/vi/DLI8xl845ag/hqdefault.jpg?sqp=-oaymwEcCPYBEIoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLAvrJO0ZPDmabHROnlyZ-C0-rby0g)](https://www.youtube.com/playlist?list=PLlwvRbWsWmGUtEd47nyo0MUZJVJqvd4Iv)
-
 [![Youtube Video Demo](https://i.ytimg.com/vi/wgWL0kCgRVk/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLAvVGfwbzsVFgHYoW5FtFNr-6UY7Q)](https://www.youtube.com/playlist?list=PLlwvRbWsWmGUtEd47nyo0MUZJVJqvd4Iv)
 
 [![Youtube Video Demo](https://i.ytimg.com/vi/7CSTonTiJrk/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLBPZMplyKSycnOMdniZqFKOLHUKFA)](https://www.youtube.com/playlist?list=PLlwvRbWsWmGUtEd47nyo0MUZJVJqvd4Iv)
