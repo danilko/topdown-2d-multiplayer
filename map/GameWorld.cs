@@ -777,10 +777,10 @@ public class GameWorld : Node2D
                     foreach (KeyValuePair<int, GameStates.PlayerInput> input in GameStates.playerInputs[networkPlayer.Key])
                     {
                         Vector2 moveDir = Vector2.Zero;
-                        moveDir.y -= 1 * input.Value.Up;
-                        moveDir.y += 1 * input.Value.Down;
-                        moveDir.x -= 1 * input.Value.Left;
-                        moveDir.x += 1 * input.Value.Right;
+                        moveDir.y -= input.Value.Up;
+                        moveDir.y += input.Value.Down;
+                        moveDir.x -= input.Value.Left;
+                        moveDir.x += input.Value.Right;
 
                         playerNode.changeWeapon(input.Value.RightWeaponIndex, Weapon.WeaponOrder.Right);
                         playerNode.changeWeapon(input.Value.LeftWeaponIndex, Weapon.WeaponOrder.Left);
@@ -793,8 +793,8 @@ public class GameWorld : Node2D
                         playerNode.Fire(Weapon.WeaponOrder.Right, rightWeapon);
                         playerNode.Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
-                        playerNode.MoveToward(moveDir, delta);
                         playerNode.RotateToward(input.Value.MousePosition, delta);
+                        playerNode.MoveToward(moveDir, delta);
                     }
 
                     // Cleanup the input vector

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -10,10 +10,18 @@
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
 [ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
 
-[sub_resource type="Environment" id=1]
+[sub_resource type="Gradient" id=1]
+offsets = PoolRealArray( 0, 0.699531, 1 )
+colors = PoolColorArray( 0.217608, 0.184296, 0.257812, 1, 0.472656, 0.386399, 0.352646, 1, 1, 1, 1, 1 )
+
+[sub_resource type="GradientTexture" id=2]
+gradient = SubResource( 1 )
+
+[sub_resource type="Environment" id=3]
 background_mode = 4
 glow_enabled = true
-glow_intensity = 1.0
+glow_bloom = 0.1
+adjustment_color_correction = SubResource( 2 )
 
 [node name="Map" type="Node2D"]
 script = ExtResource( 3 )
@@ -21,7 +29,7 @@ script = ExtResource( 3 )
 [node name="HUD" parent="." instance=ExtResource( 5 )]
 
 [node name="Ground" type="TileMap" parent="."]
-modulate = Color( 0.6, 0.6, 0.6, 1 )
+light_mask = -2147483647
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 128, 128 )
 format = 1
@@ -33,9 +41,6 @@ tile_data = PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 
 position = Vector2( 11.1118, 10.3181 )
 
 [node name="Pickups" type="Node2D" parent="."]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( 1 )
 
 [node name="dot" type="Sprite" parent="."]
 texture = ExtResource( 2 )
@@ -75,4 +80,10 @@ _defaultTeamCode = 0
 [node name="GameCamera" parent="." instance=ExtResource( 9 )]
 
 [node name="InventoryManager" parent="." instance=ExtResource( 10 )]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color( 0.623529, 0.623529, 0.698039, 1 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 3 )
 [connection signal="timeout" from="Timer" to="." method="_onNetworkRateTimerUpdate"]

@@ -88,6 +88,7 @@ public class Agent : KinematicBody2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
         network = (Network)GetNode("/root/NETWORK");
 
@@ -327,8 +328,10 @@ public class Agent : KinematicBody2D
 
     public virtual void MoveToward(Vector2 moveDir, float delta)
     {
-        Velocity = moveDir.Normalized() * MaxSpeed * delta * 100;
-        MoveAndSlide(Velocity);
+        Velocity = moveDir.Normalized() * MaxSpeed;
+        
+        // Set the velocity and also set up to be 0 to simulate everything to be wall as top down
+        MoveAndSlide(Velocity, Vector2.Zero);
     }
 
     protected void speedUpBoostTrail()
