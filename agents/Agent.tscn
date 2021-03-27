@@ -11,24 +11,20 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=9]
 [ext_resource path="res://effects/Trail.tscn" type="PackedScene" id=10]
 
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 29.5331, 50.0872 )
-
 [sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 1
 
 [sub_resource type="CanvasItemMaterial" id=2]
 blend_mode = 1
 
+[sub_resource type="CircleShape2D" id=3]
+radius = 50.0
+
 [node name="Agent" type="KinematicBody2D" groups=[
 "Obstacles",
 ]]
 collision_layer = 15
 script = ExtResource( 1 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 0.176773, 0 )
-shape = SubResource( 3 )
 
 [node name="Body" type="Sprite" parent="."]
 scale = Vector2( 0.5, 0.7 )
@@ -146,6 +142,10 @@ position = Vector2( 47, 32 )
 
 [node name="AgentExplosionParticle" parent="." instance=ExtResource( 7 )]
 scale = Vector2( 3, 3 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0.176773, 0 )
+shape = SubResource( 3 )
 
 [node name="Inventory" parent="." instance=ExtResource( 8 )]
 
