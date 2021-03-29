@@ -54,8 +54,8 @@ tracks/1/keys = {
 script = ExtResource( 2 )
 KnockbackForce = 10.0
 ItemResourceID = "SYC-800"
-MaxAmmo = 50
-CooldownTime = 0.15
+MaxAmmo = 100
+CooldownTime = 0.2
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )
 

@@ -111,7 +111,7 @@ public class Weapon : Node2D
         {
             Cooldown = false;
             Ammo -= 1;
-            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, _weaponOrder);
+            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
 
             CooldownTimer.Start();
 

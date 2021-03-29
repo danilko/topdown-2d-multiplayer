@@ -40,13 +40,17 @@ public class Obstacle : StaticBody2D
 
     private int _health;
     private int _maxHealth;
+    private Sprite _icon;
+    protected Timer _damageEffectTimer;
 
     public override void _Ready()
     {
-        Sprite icon = (Sprite)GetNode("Icon");
-        icon.RegionRect = itemRegions[(int)type];
+        _icon = (Sprite)GetNode("Icon");
+        _icon.RegionRect = itemRegions[(int)type];
         _maxHealth = itemHealth[(int)type];
         _health = itemHealth[(int)type];
+
+        _damageEffectTimer = (Timer)GetNode("DamageEffectTimer");
     }
 
     public void TakeEnvironmentDamage(int amount)
@@ -58,11 +62,22 @@ public class Obstacle : StaticBody2D
             EmitSignal(nameof(Obstacle.ObstacleDestroySignal), Name);
         }
 
+        if (_damageEffectTimer.IsStopped())
+        {
+            _icon.SelfModulate = new Color(10.0f, 10.0f, 10.0f, 1.0f);
+            _damageEffectTimer.Start();
+        }
+
         if (_health <= _maxHealth / 2)
         {
             Particles2D smoke = (Particles2D)GetNode("Smoke");
             smoke.Emitting = true;
         }
+    }
+
+    public void DamageEffectTimerTimeout()
+    {
+        _icon.SelfModulate = new Color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public void explode()

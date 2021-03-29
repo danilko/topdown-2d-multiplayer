@@ -8,10 +8,10 @@
 [sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 1
 
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 29.4785, 6.02488 )
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 18.8603, 8.02062 )
 
-[sub_resource type="ParticlesMaterial" id=4]
+[sub_resource type="ParticlesMaterial" id=3]
 emission_shape = 2
 emission_box_extents = Vector3( 20, 20, 0 )
 direction = Vector3( 0, 0, 0 )
@@ -27,24 +27,22 @@ Damage = 10
 Lifetime = 5.0
 
 [node name="Sprite" parent="." index="0"]
-self_modulate = Color( 0.78, 29.66, 23.12, 1 )
+self_modulate = Color( 58.96, 76.16, 29.48, 1 )
 material = SubResource( 1 )
 rotation = 3.14159
-scale = Vector2( 1, 0.5 )
 texture = ExtResource( 2 )
 region_enabled = true
-region_rect = Rect2( 541, 42, 58, 22 )
+region_rect = Rect2( 559, 46, 38, 15 )
 
 [node name="CollisionShape2D" parent="." index="1"]
-shape = SubResource( 3 )
+shape = SubResource( 2 )
 
 [node name="Particles2D" type="Particles2D" parent="." index="4"]
-visible = false
 rotation = -1.5708
 amount = 3
 lifetime = 2.0
 speed_scale = 5.0
-process_material = SubResource( 4 )
+process_material = SubResource( 3 )
 
 [node name="Trail" parent="." index="5" instance=ExtResource( 4 )]
 _length = 15

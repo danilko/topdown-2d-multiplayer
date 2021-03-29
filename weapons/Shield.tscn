@@ -1,18 +1,23 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://weapons/Shield.cs" type="Script" id=2]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
 
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 21.2159, 45.8855 )
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 1
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 13.421, 47.0061 )
 
 [node name="Shield" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 CurrentWeaponType = 3
 ItemResourceID = "SYC-600"
-CooldownTime = 1.0
-ReloadTime = 1.0
+MaxAmmo = 500
+Shot = 0
+CooldownTime = 0.5
+ReloadTime = 0.5
 
 [node name="Sprite" type="Sprite" parent="." index="3"]
 position = Vector2( 11.25, 0 )
@@ -21,8 +26,23 @@ texture = ExtResource( 3 )
 region_enabled = true
 region_rect = Rect2( 734, 365, 65, 116 )
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." index="4"]
+[node name="Effect" type="Sprite" parent="." index="4"]
+visible = false
+modulate = Color( 0.58, 5.23, 3.47, 1 )
+material = SubResource( 1 )
+position = Vector2( 30, 0 )
+scale = Vector2( 0.2, 6 )
+texture = ExtResource( 3 )
+region_enabled = true
+region_rect = Rect2( 561, 46, 35, 14 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." index="5"]
+collision_layer = 31
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" index="0"]
-position = Vector2( 16, 0 )
-shape = SubResource( 1 )
+position = Vector2( 30.5406, 0 )
+shape = SubResource( 2 )
+disabled = true
+
+[node name="PinJoint2D" type="PinJoint2D" parent="StaticBody2D" index="1"]
+node_b = NodePath("..")

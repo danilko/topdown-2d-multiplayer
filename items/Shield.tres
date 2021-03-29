@@ -13,8 +13,8 @@ region = Rect2( 183, 295, 45, 62 )
 script = ExtResource( 1 )
 CurrentItemType = 0
 ItemID = "SYC-600"
-Name = "MATERIAL SHIELD"
-Description = "Static shield able to doge half of entity (ATTACK = 0)"
+Name = "ELECTRIC SHIELD"
+Description = "Able to block certain attack when utilized. It cannot block attack when player move foward (need to pull back to fully utilized). (ATTACK = 0)"
 Price = 10
 Stackable = false
 MaxStackableCount = 0
