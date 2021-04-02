@@ -8,7 +8,7 @@
 blend_mode = 1
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 13.421, 47.0061 )
+extents = Vector2( 49.9311, 53.4294 )
 
 [node name="Shield" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
@@ -36,13 +36,12 @@ texture = ExtResource( 3 )
 region_enabled = true
 region_rect = Rect2( 561, 46, 35, 14 )
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." index="5"]
+[node name="Area2D" type="Area2D" parent="." index="5"]
+priority = 1.0
 collision_layer = 31
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" index="0"]
-position = Vector2( 30.5406, 0 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" index="0"]
+position = Vector2( 70.433, 0 )
 shape = SubResource( 2 )
-disabled = true
-
-[node name="PinJoint2D" type="PinJoint2D" parent="StaticBody2D" index="1"]
-node_b = NodePath("..")
+one_way_collision_margin = 0.0
+[connection signal="area_entered" from="Area2D" to="." method="_onProjectileAreaEntered"]

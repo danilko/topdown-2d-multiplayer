@@ -10,7 +10,7 @@ public class Projectile : Area2D
     int Speed;
 
     [Export]
-    int Damage;
+    public int Damage;
 
     [Export]
     float Lifetime;

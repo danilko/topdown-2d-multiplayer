@@ -1410,6 +1410,10 @@ public class GameWorld : Node2D
             {
                 ((Obstacle)(target)).TakeEnvironmentDamage(damage);
             }
+            else if (target.HasMethod(nameof(Shield.TakeShieldDamage)))
+            {
+                ((Shield)(target)).TakeShieldDamage(damage);
+            }
         }
     }
 

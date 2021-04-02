@@ -12,7 +12,7 @@ public class Shield : Weapon
     public override void _Ready()
     {
         base._Ready();
-        _collisionShape2D = (CollisionShape2D)GetNode("StaticBody2D/CollisionShape2D");
+        _collisionShape2D = (CollisionShape2D)GetNode("Area2D/CollisionShape2D");
         _effect = (Sprite)GetNode("Effect");
     }
 
@@ -20,8 +20,7 @@ public class Shield : Weapon
     {
         base.Initialize(gameWorld, agent, weaponOrder);
 
-        PinJoint2D pinJoint2D = (PinJoint2D)(GetNode("StaticBody2D/PinJoint2D"));
-        pinJoint2D.NodeA = agent.GetPath();
+
 
     }
 
@@ -65,6 +64,38 @@ public class Shield : Weapon
             Cooldown = true;
             _collisionShape2D.Disabled = true;
             _effect.Visible = false;
+        }
+    }
+
+    private void _onProjectileBodyEntered(Node2D body)
+    {
+    }
+
+    public void TakeShieldDamage(int damage)
+    {
+        Ammo -= damage;
+        if (Ammo < 0)
+        {
+            Ammo = 0;
+        }
+    }
+
+    private void _onProjectileAreaEntered(Area2D body)
+    {
+        // Projectile will collide
+        if (body.HasMethod("_onProjectileAreaEntered"))
+        {
+            Projectile projectile = (Projectile)body;
+            Ammo -= projectile.Damage;
+            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
+            projectile.Explode();
+            if (Ammo < 0)
+            {
+                Ammo = 0;
+                EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
+                _collisionShape2D.Disabled = true;
+                CooldownTimer.Start();
+            }
         }
     }
 }

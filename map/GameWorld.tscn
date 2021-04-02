@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://ui/HUD.tscn" type="PackedScene" id=5]
 [ext_resource path="res://environments/CapaturableBaseManager.tscn" type="PackedScene" id=6]
 [ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=8]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
 [ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
 
@@ -22,6 +23,9 @@ background_mode = 4
 glow_enabled = true
 glow_bloom = 0.1
 adjustment_color_correction = SubResource( 2 )
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 26.2427
 
 [node name="Map" type="Node2D"]
 script = ExtResource( 3 )
@@ -86,4 +90,23 @@ color = Color( 0.623529, 0.623529, 0.698039, 1 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 3 )
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+position = Vector2( 1041.48, 2697.13 )
+mass = 0.00102041
+gravity_scale = 0.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite" type="Sprite" parent="RigidBody2D"]
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 810, 65, 46, 50 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource( 4 )
 [connection signal="timeout" from="Timer" to="." method="_onNetworkRateTimerUpdate"]
