@@ -176,19 +176,12 @@ public class AI : Node2D
                     // Only start fire when agent is closely faced to its target agent
                     if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.3)
                     {
-                        // Only can fire if not in reload
-                        if (_agent.RightWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
-                        {
-                            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
-                        }
-                        if (_agent.LeftWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
-                        {
-                            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
-                        }
+                        _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
+                        _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
                     }
 
                     // Chanse engaged agent closer if possible
-                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 200.0f)
+                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 600.0f)
                     {
                         _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition), delta);
                     }

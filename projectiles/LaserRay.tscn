@@ -52,7 +52,8 @@ color = Color( 0.5, 3, 6, 1 )
 [node name="LaserRay" type="RayCast2D"]
 enabled = true
 cast_to = Vector2( 1000, 0 )
-collision_mask = 31
+collision_mask = 7
+collide_with_areas = true
 script = ExtResource( 1 )
 Damage = 60
 

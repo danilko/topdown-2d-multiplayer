@@ -23,7 +23,7 @@ radius = 50.0
 [node name="Agent" type="KinematicBody2D" groups=[
 "Obstacles",
 ]]
-collision_layer = 15
+collision_layer = 31
 script = ExtResource( 1 )
 
 [node name="Body" type="Sprite" parent="."]

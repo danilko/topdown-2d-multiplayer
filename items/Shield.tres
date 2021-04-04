@@ -7,14 +7,14 @@
 [sub_resource type="AtlasTexture" id=1]
 flags = 4
 atlas = ExtResource( 2 )
-region = Rect2( 183, 295, 45, 62 )
+region = Rect2( 690, 258, 34, 103 )
 
 [resource]
 script = ExtResource( 1 )
 CurrentItemType = 0
 ItemID = "SYC-600"
 Name = "ELECTRIC SHIELD"
-Description = "Able to block certain attack when utilized. It cannot block attack when player move foward (need to pull back to fully utilized). (ATTACK = 0)"
+Description = "Utilize specialized material and electricty to spread out attack. It cannot block attack when player move foward (need to pull back to fully utilized). (BLOCK = 200)"
 Price = 10
 Stackable = false
 MaxStackableCount = 0

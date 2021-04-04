@@ -65,10 +65,10 @@ region_enabled = true
 region_rect = Rect2( 764, 39, 71, 26 )
 
 [node name="TriggerPoint" parent="." index="2"]
-position = Vector2( 80, 0 )
+position = Vector2( 120, 0 )
 
 [node name="Flash" type="Sprite" parent="." index="3"]
-modulate = Color( 0, 0, 0, 0 )
+modulate = Color( 1, 1, 1, 0 )
 material = SubResource( 1 )
 position = Vector2( 82.9465, 0 )
 texture = ExtResource( 3 )

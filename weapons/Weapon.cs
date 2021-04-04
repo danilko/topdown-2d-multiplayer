@@ -158,7 +158,7 @@ public class Weapon : Node2D
         return Ammo;
     }
 
-    public void SetAmmo(int ammo)
+    public virtual void SetAmmo(int ammo)
     {
         Ammo = ammo;
         EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
@@ -179,7 +179,7 @@ public class Weapon : Node2D
 
     private void _stopReload()
     {
-        AmmoIncrease(MaxAmmo);
+        SetAmmo(MaxAmmo);
         EmitSignal(nameof(ReloadSignal), _weaponOrder, false);
     }
 

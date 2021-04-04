@@ -71,6 +71,12 @@ public class LaserRay : RayCast2D
                     collider.Explode();
                 }
             }
+            // shield will collide
+            else if (GetCollider().HasMethod("_onShieldAreaEntered"))
+            {
+                ShieldPhysics shieldPhysics = (ShieldPhysics)GetCollider();
+                shieldPhysics.TakeShieldDamage(Damage);
+            }
             else
             {
                 EmitSignal(nameof(RayDamageSignal), Damage, GetCollisionNormal() * -1, _sourceAgent, _sourceTeam, GetCollider());

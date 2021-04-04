@@ -26,7 +26,7 @@ public class Projectile : Area2D
 
     protected Vector2 Velocity;
     private Vector2 acceleration;
-
+    
     // https://gamesounds.xyz/?dir=FXHome
     private AudioStream _musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
     private AudioStream _musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
@@ -34,7 +34,7 @@ public class Projectile : Area2D
     public void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget)
     {
         Connect(nameof(ProjectileDamageSignal), GetParent(), "_onDamageCalculation");
-        
+
         GlobalPosition = position;
 
         Rotation = direction.Angle();
@@ -49,7 +49,6 @@ public class Projectile : Area2D
         Timer timer = (Timer)GetNode("Lifetime");
         timer.WaitTime = Lifetime;
         timer.Start();
-
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(_musicClip);
@@ -70,19 +69,19 @@ public class Projectile : Area2D
 
     public override void _PhysicsProcess(float delta)
     {
-        // Validate if target is available or is freed up (maybe no longer in scene)
-        if (target != null && IsInstanceValid(target))
-        {
-            target = null;
-        }
+            // Validate if target is available or is freed up (maybe no longer in scene)
+            if (target != null && IsInstanceValid(target))
+            {
+                target = null;
+            }
 
-        if (target != null)
-        {
-            acceleration += seek();
-            Velocity += acceleration * delta;
-            Rotation = Velocity.Angle();
-        }
-        Position = Position + Velocity * delta;
+            if (target != null)
+            {
+                acceleration += seek();
+                Velocity += acceleration * delta;
+                Rotation = Velocity.Angle();
+            }
+            Position = Position + Velocity * delta;
     }
 
 
@@ -111,14 +110,15 @@ public class Projectile : Area2D
     private void _onProjectileAreaEntered(Area2D body)
     {
         // Projectile will collide
-         if (body.HasMethod("_onProjectileAreaEntered")){
-             
-             // Only bullets from different team will cloide
-             if(((Projectile)body).GetTeam() != _sourceTeam.CurrentTeamCode)
-             {
+        if (body.HasMethod("_onProjectileAreaEntered"))
+        {
+
+            // Only bullets from different team will cloide
+            if (((Projectile)body).GetTeam() != _sourceTeam.CurrentTeamCode)
+            {
                 Explode();
-             }
-         }
+            }
+        }
     }
 
     private void _onLifetimeTimeout()

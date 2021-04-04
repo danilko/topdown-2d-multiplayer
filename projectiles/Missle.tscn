@@ -30,7 +30,6 @@ scale_curve = SubResource( 4 )
 anim_speed = 1.0
 
 [node name="Missle" instance=ExtResource( 1 )]
-modulate = Color( 1, 1, 1, 1 )
 script = ExtResource( 4 )
 Speed = 1000
 Damage = 30

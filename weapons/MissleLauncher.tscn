@@ -17,7 +17,7 @@ ReloadTime = 2.0
 Bullet = ExtResource( 4 )
 
 [node name="TriggerPoint" parent="." index="1"]
-position = Vector2( 50, 0 )
+position = Vector2( 120, 0 )
 
 [node name="Body" type="Sprite" parent="." index="2"]
 texture = ExtResource( 3 )

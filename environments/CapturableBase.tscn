@@ -9,6 +9,7 @@
 extents = Vector2( 250, 250 )
 
 [node name="CapturableBase" type="Area2D"]
+collision_layer = 16
 script = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

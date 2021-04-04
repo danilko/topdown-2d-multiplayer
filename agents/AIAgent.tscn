@@ -21,5 +21,5 @@ default_color = Color( 0.952941, 0.235294, 0.0156863, 1 )
 
 [node name="AI" parent="." index="8" instance=ExtResource( 3 )]
 
-[node name="CollisionShape2D" parent="." index="12"]
+[node name="CollisionShape2D" parent="." index="20"]
 shape = SubResource( 1 )

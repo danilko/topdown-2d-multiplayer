@@ -1412,7 +1412,7 @@ public class GameWorld : Node2D
             }
             else if (target.HasMethod(nameof(Shield.TakeShieldDamage)))
             {
-                ((Shield)(target)).TakeShieldDamage(damage);
+                ((ShieldPhysics)(target)).TakeShieldDamage(damage);
             }
         }
     }

@@ -16,36 +16,41 @@ public class Shield : Weapon
         _effect = (Sprite)GetNode("Effect");
     }
 
-    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
+    public override bool Fire(Agent targetAgent) { return true; }
+
+    private void _onShieldBodyEntered(Node2D body)
     {
-        base.Initialize(gameWorld, agent, weaponOrder);
-
-
-
     }
 
-    public override bool Fire(Agent targetAgent)
+    private void _toggleShield(Boolean toggle)
     {
-        if (Cooldown && Ammo != 0)
+        _collisionShape2D.SetDeferred("disabled", !toggle);
+        _effect.Visible = toggle;
+    }
+
+    private void _shieldStatusChange(int ammo, int maxAmmo, Weapon.WeaponOrder weaponOrder)
+    {
+        if (ammo == 0)
         {
-            Cooldown = false;
-            Ammo -= 1;
-            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
-
-            CooldownTimer.Start();
-
-            Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-
-            Position2D triggerPoint = (Position2D)GetNode("TriggerPoint");
-
-            _collisionShape2D.Disabled = false;
-            _effect.Visible = true;
-
-            CooldownTimer.Start();
-
-            return true;
+            if (!_collisionShape2D.Disabled)
+            {
+                _toggleShield(false);
+            }
         }
+        else
+        {
+            if (_collisionShape2D.Disabled)
+            {
+                _toggleShield(true);
+            }
+        }
+    }
 
+    public void TakeShieldDamage(int damage)
+    {
+        Ammo -= damage;
+        Ammo = Mathf.Clamp(Ammo, 0, MaxAmmo);
+        SetAmmo(Ammo);
         if (Ammo == 0)
         {
             EmitSignal(nameof(AmmoOutSignal), GetWeaponOrder());
@@ -53,49 +58,17 @@ public class Shield : Weapon
             // Auto reload
             StartReload();
         }
-
-        return false;
     }
 
-    public override void onWeaponTimerTimeout()
-    {
-        if (!_collisionShape2D.Disabled)
-        {
-            Cooldown = true;
-            _collisionShape2D.Disabled = true;
-            _effect.Visible = false;
-        }
-    }
-
-    private void _onProjectileBodyEntered(Node2D body)
-    {
-    }
-
-    public void TakeShieldDamage(int damage)
-    {
-        Ammo -= damage;
-        if (Ammo < 0)
-        {
-            Ammo = 0;
-        }
-    }
-
-    private void _onProjectileAreaEntered(Area2D body)
+    public void OnShieldAreaEntered(Area2D body)
     {
         // Projectile will collide
         if (body.HasMethod("_onProjectileAreaEntered"))
         {
             Projectile projectile = (Projectile)body;
             Ammo -= projectile.Damage;
-            EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
+            TakeShieldDamage(projectile.Damage);
             projectile.Explode();
-            if (Ammo < 0)
-            {
-                Ammo = 0;
-                EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
-                _collisionShape2D.Disabled = true;
-                CooldownTimer.Start();
-            }
         }
     }
 }
