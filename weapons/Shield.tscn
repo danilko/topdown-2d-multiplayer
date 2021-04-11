@@ -1,15 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://weapons/Shield.cs" type="Script" id=2]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=3]
-[ext_resource path="res://weapons/ShieldPhysics.cs" type="Script" id=4]
 
 [sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 1
-
-[sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 11.5371, 53.4294 )
 
 [node name="Shield" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
@@ -36,18 +32,4 @@ scale = Vector2( 0.2, 6 )
 texture = ExtResource( 3 )
 region_enabled = true
 region_rect = Rect2( 561, 46, 35, 14 )
-
-[node name="Area2D" type="Area2D" parent="." index="5"]
-space_override = 1
-priority = 1.0
-collision_layer = 4
-collision_mask = 4
-script = ExtResource( 4 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" index="0"]
-position = Vector2( 24.1728, 0 )
-shape = SubResource( 2 )
-one_way_collision_margin = 0.0
 [connection signal="AmmoChangeSignal" from="." to="." method="_shieldStatusChange"]
-[connection signal="area_entered" from="Area2D" to="." method="OnShieldAreaEntered"]
-[connection signal="body_entered" from="Area2D" to="." method="_onShieldBodyEntered"]

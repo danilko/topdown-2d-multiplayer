@@ -88,7 +88,7 @@ public class Agent : KinematicBody2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        
+
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
         network = (Network)GetNode("/root/NETWORK");
 
@@ -276,7 +276,7 @@ public class Agent : KinematicBody2D
             weapons[index] = null;
             DisconnectWeapon(weapon, Weapon.WeaponOrder.Left);
             // Empty out weapon
-            weapon.QueueFree();
+            weapon.Deinitialize();
         }
     }
 
@@ -329,7 +329,7 @@ public class Agent : KinematicBody2D
     public virtual void MoveToward(Vector2 moveDir, float delta)
     {
         Velocity = moveDir.Normalized() * MaxSpeed;
-        
+
         // Set the velocity and also set up to be 0 to simulate everything to be wall as top down
         MoveAndSlide(Velocity, Vector2.Zero);
     }
@@ -520,6 +520,19 @@ public class Agent : KinematicBody2D
 
     public void Explode()
     {
+        for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
+        {
+            Godot.Collections.Array<Weapon> weapons = GetWeapons((Weapon.WeaponOrder)index);
+
+            foreach (Weapon weapon in weapons)
+            {
+                if (weapon != null)
+                {
+                    weapon.Deinitialize();
+                }
+            }
+        }
+
         CollisionShape2D collisionShape2D = (CollisionShape2D)GetNode("CollisionShape2D");
         collisionShape2D.Disabled = true;
         Alive = false;
@@ -539,6 +552,9 @@ public class Agent : KinematicBody2D
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);
+
+
+
     }
 
     private void _OnExplosionAnimationFinished()

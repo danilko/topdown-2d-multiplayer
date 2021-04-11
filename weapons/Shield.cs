@@ -6,21 +6,40 @@ public class Shield : Weapon
     [Export]
     int Damage = 50;
 
-    private CollisionShape2D _collisionShape2D;
+    private CollisionShape2D _collisionShape2D = null;
     private Sprite _effect;
+    private ShieldPhysics _shieldPhysics;
 
     public override void _Ready()
     {
         base._Ready();
-        _collisionShape2D = (CollisionShape2D)GetNode("Area2D/CollisionShape2D");
+
         _effect = (Sprite)GetNode("Effect");
     }
 
-    public override bool Fire(Agent targetAgent) { return true; }
-
-    private void _onShieldBodyEntered(Node2D body)
+    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
     {
+        _shieldPhysics = (ShieldPhysics)((PackedScene)GD.Load("res://weapons/ShieldPhysics.tscn")).Instance();
+        gameWorld.AddChild(_shieldPhysics);
+
+        _shieldPhysics.Initialize(this);
+        _collisionShape2D = (CollisionShape2D)_shieldPhysics.GetNode("CollisionShape2D");
+
+        base.Initialize(gameWorld, agent, weaponOrder);
+
     }
+
+    public override void Deinitialize()
+    {
+        GetGameWorld().RemoveChild(_shieldPhysics);
+        
+        _shieldPhysics.QueueFree();
+        GD.Print("QUEUE FREE");
+        base.Deinitialize();
+    }
+
+
+    public override bool Fire(Agent targetAgent) { return true; }
 
     private void _toggleShield(Boolean toggle)
     {

@@ -71,6 +71,7 @@ public class SimulateGameWorld : GameWorld
             Vector2 randomPosition = capturableBase.GetRandomPositionWithinCaptureRadius();
 
             enemyNode.MoveToward(randomPosition - enemyNode.GlobalPosition, delta);
+           //enemyNode.MoveAndSlide((SpawnBots[AgentPrefix + ((index + 1) % SpawnBots.Count)].GlobalPosition - enemyNode.GlobalPosition) * 0.1f);
             enemyNode.LookAt(SpawnBots[AgentPrefix + ((index + 1) % SpawnBots.Count)].GlobalPosition);
 
             // Always fire

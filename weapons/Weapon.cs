@@ -94,6 +94,16 @@ public class Weapon : Node2D
         EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
     }
 
+    protected GameWorld GetGameWorld()
+    {
+        return _gameWorld;
+    }
+
+    public virtual void Deinitialize() 
+    {
+        QueueFree();
+    }
+
     public WeaponOrder GetWeaponOrder()
     {
         return _weaponOrder;
