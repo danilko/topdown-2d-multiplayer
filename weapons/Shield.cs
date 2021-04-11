@@ -34,7 +34,6 @@ public class Shield : Weapon
         GetGameWorld().RemoveChild(_shieldPhysics);
         
         _shieldPhysics.QueueFree();
-        GD.Print("QUEUE FREE");
         base.Deinitialize();
     }
 
