@@ -62,8 +62,7 @@ public class LaserRay : RayCast2D
             // Projectile will collide
             if (GetCollider().HasMethod("_onProjectileAreaEntered"))
             {
-
-                Projectile collider = (Projectile)GetCollider();
+                ProjectileArea2D collider = (ProjectileArea2D)(GetCollider());
 
                 // Only bullets from different team will cloide
                 if (collider.GetTeam() != _sourceTeam.CurrentTeamCode)

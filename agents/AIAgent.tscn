@@ -8,11 +8,11 @@
 extents = Vector2( 29.6973, 47.915 )
 
 [node name="AIAgent" instance=ExtResource( 2 )]
-collision_mask = 27
 script = ExtResource( 4 )
 MaxSpeed = 300
 MaxHealth = 100
 RotationSpeed = 5.0
+MaxEnergy = 100
 TurretSpeed = 10
 DetectRadius = 1000.0
 

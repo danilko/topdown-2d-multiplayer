@@ -417,6 +417,12 @@ public class Agent : KinematicBody2D
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
     }
 
+    public void setEnergy(int energy)
+    {
+        _energy = energy;
+        EmitSignal(nameof(HealthChangedSignal), energy * 100 / MaxEnergy);
+    }
+
     public int getHealth()
     {
         return _health;

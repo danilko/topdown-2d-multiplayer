@@ -26,7 +26,6 @@ public class Shield : Weapon
         _collisionShape2D = (CollisionShape2D)_shieldPhysics.GetNode("CollisionShape2D");
 
         base.Initialize(gameWorld, agent, weaponOrder);
-
     }
 
     public override void Deinitialize()
@@ -36,8 +35,7 @@ public class Shield : Weapon
         _shieldPhysics.QueueFree();
         base.Deinitialize();
     }
-
-
+    
     public override bool Fire(Agent targetAgent) { return true; }
 
     private void _toggleShield(Boolean toggle)
@@ -75,18 +73,6 @@ public class Shield : Weapon
 
             // Auto reload
             StartReload();
-        }
-    }
-
-    public void OnShieldAreaEntered(Area2D body)
-    {
-        // Projectile will collide
-        if (body.HasMethod("_onProjectileAreaEntered"))
-        {
-            Projectile projectile = (Projectile)body;
-            Ammo -= projectile.Damage;
-            TakeShieldDamage(projectile.Damage);
-            projectile.Explode();
         }
     }
 }

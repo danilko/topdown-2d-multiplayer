@@ -4,44 +4,36 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://projectiles/RifileBullet.cs" type="Script" id=3]
 [ext_resource path="res://effects/Trail.tscn" type="PackedScene" id=4]
+[ext_resource path="res://projectiles/Particle2DProjectile.tscn" type="PackedScene" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 19.6869, 7.45926 )
-
-[sub_resource type="ParticlesMaterial" id=2]
-emission_shape = 2
-emission_box_extents = Vector3( 20, 20, 0 )
-direction = Vector3( 0, 0, 0 )
-gravity = Vector3( 0, 0, 0 )
-linear_accel = 10.0
-scale = 5.0
-color = Color( 0.5, 3, 6, 1 )
+extents = Vector2( 20.125, 7.75 )
 
 [node name="RifileBullet" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 Speed = 2000
 Damage = 10
-Lifetime = 5.0
+Lifetime = 10.0
 
 [node name="Sprite" parent="." index="0"]
-self_modulate = Color( 0.65, 12.21, 31.79, 1 )
+modulate = Color( 1, 1, 1, 0.478431 )
+self_modulate = Color( 0.65098, 12.2118, 31.7882, 0.509804 )
 rotation = 3.14159
 texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 559, 46, 38, 15 )
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="ProjectileArea2D" parent="." index="3"]
 visible = false
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" parent="ProjectileArea2D" index="0"]
 shape = SubResource( 1 )
 
-[node name="Particles2D" type="Particles2D" parent="." index="4"]
-visible = false
-rotation = -1.5708
-amount = 3
-lifetime = 2.0
-speed_scale = 5.0
-process_material = SubResource( 2 )
-
-[node name="Trail" parent="." index="5" instance=ExtResource( 4 )]
+[node name="Trail" parent="." index="4" instance=ExtResource( 4 )]
 _length = 30
 _width = 5.0
+
+[node name="Particle2DProjectile" parent="." index="5" instance=ExtResource( 5 )]
+scale = Vector2( 0.25, 0.25 )

@@ -51,6 +51,9 @@ public class Player : Agent
         Connect(nameof(Agent.HealthChangedSignal), _hud, nameof(HUD.UpdateHealth));
         Connect(nameof(Agent.DefeatedAgentChangedSignal), _hud, nameof(HUD.UpdateDefeatedAgent));
 
+        setHealth(MaxHealth);
+        setEnergy(MaxEnergy);
+
         for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
         {
             Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)index;
@@ -77,7 +80,6 @@ public class Player : Agent
         // Setup Inventory UI
         _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");
         _inventoryUI.Initialize(_inventoryManager, CurrentInventory);
-
 
         if (!_teamMapAI.IsConnected(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount)))
         {

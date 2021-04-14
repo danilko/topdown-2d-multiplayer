@@ -34,6 +34,7 @@
     <Compile Include="projectiles\Projectile.cs" />
     <Compile Include="projectiles\LaserRay.cs" />
     <Compile Include="projectiles\Missle.cs" />
+    <Compile Include="projectiles\ProjectileArea2D.cs" />
     <Compile Include="projectiles\RifileBullet.cs" />
     <Compile Include="environments\Obstacle.cs" />
     <Compile Include="GameStates.cs" />

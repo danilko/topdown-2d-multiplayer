@@ -21,14 +21,6 @@ public class ShieldPhysics : StaticBody2D
         }
     }
 
-    public void OnShieldAreaEntered(Area2D body)
-    {
-        if (IsInstanceValid(_shield))
-        {
-            _shield.OnShieldAreaEntered(body);
-        }
-    }
-
     public void _updateTransform()
     {
         if (IsInstanceValid(_shield))

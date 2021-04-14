@@ -1,32 +1,29 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://projectiles/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://assets/spr_smoke_strip24.png" type="Texture" id=3]
 [ext_resource path="res://projectiles/Missle.cs" type="Script" id=4]
 
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 27.0382, 9.10533 )
-
-[sub_resource type="CanvasItemMaterial" id=2]
+[sub_resource type="CanvasItemMaterial" id=1]
 resource_local_to_scene = true
 particles_animation = true
 particles_anim_h_frames = 24
 particles_anim_v_frames = 1
 particles_anim_loop = false
 
-[sub_resource type="Curve" id=3]
+[sub_resource type="Curve" id=2]
 _data = [ Vector2( 0, 0 ), 0.0, 0.201237, 0, 0, Vector2( 1, 1 ), -0.0628936, 0.0, 0, 0 ]
 
-[sub_resource type="CurveTexture" id=4]
-curve = SubResource( 3 )
+[sub_resource type="CurveTexture" id=3]
+curve = SubResource( 2 )
 
-[sub_resource type="ParticlesMaterial" id=5]
+[sub_resource type="ParticlesMaterial" id=4]
 flag_disable_z = true
 gravity = Vector3( 0, 0, 0 )
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
-scale_curve = SubResource( 4 )
+scale_curve = SubResource( 3 )
 anim_speed = 1.0
 
 [node name="Missle" instance=ExtResource( 1 )]
@@ -41,15 +38,12 @@ texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 361, 37, 58, 30 )
 
-[node name="CollisionShape2D" parent="." index="1"]
-shape = SubResource( 1 )
-
 [node name="Trail" type="Particles2D" parent="." index="4"]
 show_behind_parent = true
-material = SubResource( 2 )
+material = SubResource( 1 )
 position = Vector2( -40, 0 )
 amount = 32
 lifetime = 0.4
 local_coords = false
-process_material = SubResource( 5 )
+process_material = SubResource( 4 )
 texture = ExtResource( 3 )

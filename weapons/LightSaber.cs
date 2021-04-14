@@ -30,7 +30,7 @@ public class LightSaber : Weapon
         // Projectile will collide
         if (body.HasMethod("_onProjectileAreaEntered"))
         {
-            Projectile projectile = (Projectile)body;
+            ProjectileArea2D projectile = (ProjectileArea2D)body;
             // Only bullets from different team will cloide
             if (projectile.GetTeam() != _team.CurrentTeamCode)
             {
@@ -42,7 +42,6 @@ public class LightSaber : Weapon
         {
             Obstacle obstacle = (Obstacle)body;
             obstacle.TakeEnvironmentDamage(Damage);
-
         }
 
         if (body.HasMethod("TakeDamage"))

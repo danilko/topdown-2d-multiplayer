@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Projectile : Area2D
+public class Projectile : RayCast2D
 {
     [Signal]
     public delegate void ProjectileDamageSignal();
@@ -26,10 +26,12 @@ public class Projectile : Area2D
 
     protected Vector2 Velocity;
     private Vector2 acceleration;
-    
+
     // https://gamesounds.xyz/?dir=FXHome
     private AudioStream _musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
     private AudioStream _musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
+
+    private bool isProjectileStart = false;
 
     public void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget)
     {
@@ -50,6 +52,9 @@ public class Projectile : Area2D
         timer.WaitTime = Lifetime;
         timer.Start();
 
+        isProjectileStart = true;
+        Enabled = isProjectileStart;
+
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(_musicClip);
 
@@ -69,6 +74,8 @@ public class Projectile : Area2D
 
     public override void _PhysicsProcess(float delta)
     {
+        if (isProjectileStart)
+        {
             // Validate if target is available or is freed up (maybe no longer in scene)
             if (target != null && IsInstanceValid(target))
             {
@@ -81,12 +88,31 @@ public class Projectile : Area2D
                 Velocity += acceleration * delta;
                 Rotation = Velocity.Angle();
             }
-            Position = Position + Velocity * delta;
+
+            if (IsColliding())
+            {
+                isProjectileStart = false;
+                Enabled = isProjectileStart;
+
+                // This is the code responsible for able to shoot down bullet with bullet
+                EmitSignal(nameof(ProjectileDamageSignal), Damage, GetCollisionNormal(), source, _sourceTeam, GetCollider());
+
+                Explode();
+
+                AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+                audioManager.playSoundEffect(_musicHitClip);
+            }
+
+            GlobalPosition += Transform.x * Speed * delta;
+            CastTo = Vector2.Right * 2.0f * Speed * delta;
+        }
     }
 
 
     public void Explode()
     {
+        isProjectileStart = false;
+        Enabled = isProjectileStart;
 
         Velocity = new Vector2();
         Sprite sprite = (Sprite)GetNode("Sprite");
@@ -94,31 +120,6 @@ public class Projectile : Area2D
         AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
         explosion.Show();
         explosion.Play("smoke");
-    }
-
-    private void _onProjectileBodyEntered(Node2D body)
-    {
-        // This is the code responsible for able to shoot down bullet with bullet
-        Vector2 hitDir = Velocity.Normalized();
-        Explode();
-
-        AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        audioManager.playSoundEffect(_musicHitClip);
-        EmitSignal(nameof(ProjectileDamageSignal), Damage, hitDir, source, _sourceTeam, body);
-    }
-
-    private void _onProjectileAreaEntered(Area2D body)
-    {
-        // Projectile will collide
-        if (body.HasMethod("_onProjectileAreaEntered"))
-        {
-
-            // Only bullets from different team will cloide
-            if (((Projectile)body).GetTeam() != _sourceTeam.CurrentTeamCode)
-            {
-                Explode();
-            }
-        }
     }
 
     private void _onLifetimeTimeout()
