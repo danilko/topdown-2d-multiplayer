@@ -55,7 +55,7 @@ script = ExtResource( 2 )
 KnockbackForce = 10.0
 ItemResourceID = "SYC-800"
 MaxAmmo = 100
-CooldownTime = 0.2
+CooldownTime = 0.15
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )
 

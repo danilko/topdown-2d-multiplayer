@@ -1,6 +1,9 @@
 using Godot;
 using System;
 
+// Concept from following
+// from https://www.fiverr.com/nathanwfranke
+// from https://www.fiverr.com/nonunknown
 public class Projectile : RayCast2D
 {
     [Signal]

@@ -8,13 +8,16 @@ public class Shield : Weapon
 
     private CollisionShape2D _collisionShape2D = null;
     private Sprite _effect;
+        private Sprite _body;
     private ShieldPhysics _shieldPhysics;
+    protected Timer DamageEffectTimer;
 
     public override void _Ready()
     {
         base._Ready();
-
+_body = (Sprite)GetNode("Sprite");
         _effect = (Sprite)GetNode("Effect");
+        DamageEffectTimer = (Timer)GetNode("DamageEffectTimer");
     }
 
     public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
@@ -44,6 +47,11 @@ public class Shield : Weapon
         _effect.Visible = toggle;
     }
 
+    public void DamageEffectTimerTimeout()
+    {
+        _body.SelfModulate = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
     private void _shieldStatusChange(int ammo, int maxAmmo, Weapon.WeaponOrder weaponOrder)
     {
         if (ammo == 0)
@@ -67,6 +75,13 @@ public class Shield : Weapon
         Ammo -= damage;
         Ammo = Mathf.Clamp(Ammo, 0, MaxAmmo);
         SetAmmo(Ammo);
+
+                    if (DamageEffectTimer.IsStopped())
+            {
+                _body.SelfModulate = new Color(10.0f, 10.0f, 10.0f, 1.0f);
+                DamageEffectTimer.Start();
+            }
+
         if (Ammo == 0)
         {
             EmitSignal(nameof(AmmoOutSignal), GetWeaponOrder());

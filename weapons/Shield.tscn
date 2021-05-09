@@ -32,4 +32,9 @@ scale = Vector2( 0.2, 6 )
 texture = ExtResource( 3 )
 region_enabled = true
 region_rect = Rect2( 561, 46, 35, 14 )
+
+[node name="DamageEffectTimer" type="Timer" parent="." index="5"]
+wait_time = 0.1
+one_shot = true
 [connection signal="AmmoChangeSignal" from="." to="." method="_shieldStatusChange"]
+[connection signal="timeout" from="DamageEffectTimer" to="." method="DamageEffectTimerTimeout"]
