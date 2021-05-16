@@ -48,10 +48,9 @@ Damage = 10
 Lifetime = 10.0
 
 [node name="Sprite" parent="." index="0"]
-modulate = Color( 1, 1, 1, 0.478431 )
-self_modulate = Color( 31.7882, 1.38076, 0.65098, 0.509804 )
+self_modulate = Color( 24.28, 1.16, 0, 1 )
 rotation = 3.14159
-scale = Vector2( 1, 0.5 )
+scale = Vector2( 1.25, 0.25 )
 texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 568, 179, 34, 18 )
@@ -65,7 +64,8 @@ collision_mask = 4
 shape = SubResource( 1 )
 
 [node name="Trail" parent="." index="4" instance=ExtResource( 4 )]
-_width = 5.0
+_length = 8
+_width = 3.0
 
 [node name="Particle2DProjectile" parent="." index="5" instance=ExtResource( 5 )]
 material = SubResource( 2 )
