@@ -18,6 +18,7 @@ shape = SubResource( 1 )
 [node name="PatrolTimer" type="Timer" parent="."]
 wait_time = 5.0
 one_shot = true
+autostart = true
 
 [node name="PathLine" type="Line2D" parent="."]
 visible = false

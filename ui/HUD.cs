@@ -15,7 +15,6 @@ public class HUD : CanvasLayer
 
     bool lblMessage = false;
 
-
     public override void _Ready()
     {
         // Connect event handler to the player_list_changed signal

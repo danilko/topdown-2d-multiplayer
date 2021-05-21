@@ -32,6 +32,8 @@ public class GameWorld : Node2D
 
     protected GameStates GameStates;
 
+    private PostProcess _postProcess;
+
     private class SpwanInfo
     {
         public long spawn_index { get; set; }
@@ -79,7 +81,7 @@ public class GameWorld : Node2D
     int spawned_bots = 0;
 
     protected Dictionary<String, Agent> SpawnBots = new Dictionary<String, Agent>();
-   protected Dictionary<String, Agent> spawnPlayers = new Dictionary<String, Agent>();
+    protected Dictionary<String, Agent> spawnPlayers = new Dictionary<String, Agent>();
 
 
     Network network;
@@ -176,6 +178,8 @@ public class GameWorld : Node2D
         _popUpMessage = (PopUpMessage)_hud.GetNode("PopUpMessage");
 
         _miniMap.Iniitialize(CapaturableBaseManager);
+
+        _postProcess = (PostProcess)GetNode("PostProcess");
     }
 
     private void _initializeNetwork()
@@ -190,7 +194,7 @@ public class GameWorld : Node2D
         {
             // Connect player remove logic
             network.Connect(nameof(Network.PlayerRemovedSignal), this, nameof(onPlayerRemoved));
-        
+
             // Spawn the players
             _initializeNewPlayer(network.gamestateNetworkPlayer.ToString());
             _syncBots();
@@ -264,9 +268,9 @@ public class GameWorld : Node2D
             ai.Name = nameof(TeamMapAI) + "_" + (Team.TeamCode)index;
             AddChild(ai);
 
-            ai.Initialize(this, _inventoryManager,  CapaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
+            ai.Initialize(this, _inventoryManager, CapaturableBaseManager.GetBases(), (Team.TeamCode)index, _pathFinding);
 
-            if(teamMapAISettings != null)
+            if (teamMapAISettings != null)
             {
                 ai.SetMaxUnitUsageAmount(teamMapAISettings[index].Budget);
                 ai.SetAutoSpawnMember(teamMapAISettings[index].AutoSpawnMember);
@@ -672,6 +676,9 @@ public class GameWorld : Node2D
             _popUpMessage.NotifyMessage("NOTIFICATION", currentSpawnCache[id].GetUnitName() + " (" + currentSpawnCache[id].GetCurrentTeam().ToString() + ") IS ELIMINATED");
 
             TeamMapAIs[(int)currentSpawnCache[id].GetCurrentTeam()].RemoveUnit(currentSpawnCache[id].Name);
+
+
+
         }
 
         if (currentSpawnCache.ContainsKey(id))
@@ -691,7 +698,7 @@ public class GameWorld : Node2D
         if (Mathf.Abs(existingPosition.x - _camera2D.GlobalPosition.y) < GetViewport().Size.x &&
          Mathf.Abs(existingPosition.y - _camera2D.GlobalPosition.y) < GetViewport().Size.y)
         {
-            _camera2D.StartScreenShake();
+            //   _camera2D.StartScreenShake();
         }
 
 
@@ -699,6 +706,11 @@ public class GameWorld : Node2D
         {
             _checkGameWinningCondition();
         }
+    }
+
+    public void StartScreenShake()
+    {
+        _camera2D.StartScreenShake();
     }
 
     private void createObserver(Vector2 position)
@@ -1148,7 +1160,7 @@ public class GameWorld : Node2D
         // Propagate info of obstacles to other
         if (GetTree().IsNetworkServer() && pininfo.net_id != 1)
         {
-            
+
             foreach (TeamMapAI teamMapAI in TeamMapAIs)
             {
                 teamMapAI.SyncTeamMapAICurrentUnitAmount(pininfo.net_id);
@@ -1375,6 +1387,11 @@ public class GameWorld : Node2D
 
     public override void _PhysicsProcess(float delta)
     {
+        if (Input.IsActionJustPressed("left_click"))
+        {
+            _postProcess.shockwave(GetGlobalMousePosition());
+        }
+
         // Update the timeout counter
         CurrentTime += delta;
         if (CurrentTime < GameStates.updateDelta)

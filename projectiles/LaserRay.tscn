@@ -61,17 +61,19 @@ Damage = 60
 material = SubResource( 1 )
 points = PoolVector2Array( 0, 0, 100, 0 )
 width = 0.0
-default_color = Color( 0.5, 3, 6, 1 )
+default_color = Color( 10, 10, 10, 1 )
 
 [node name="Tween" type="Tween" parent="."]
 
 [node name="particles2DCasting" type="Particles2D" parent="."]
+scale = Vector2( 2, 2 )
 emitting = false
 lifetime = 0.5
 process_material = SubResource( 6 )
 texture = ExtResource( 2 )
 
 [node name="particles2DCollision" type="Particles2D" parent="."]
+scale = Vector2( 2, 2 )
 emitting = false
 lifetime = 0.5
 process_material = SubResource( 7 )
@@ -79,6 +81,6 @@ texture = ExtResource( 2 )
 
 [node name="particles2DBeam" type="Particles2D" parent="."]
 emitting = false
-amount = 20
+amount = 40
 process_material = SubResource( 8 )
 texture = ExtResource( 3 )

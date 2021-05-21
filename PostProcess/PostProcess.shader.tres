@@ -1,0 +1,47 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+const float pi = 3.14159265358979;
+uniform vec2 camera_position = vec2(0.0);
+uniform vec2 camera_size = vec2(0.0);
+
+uniform float shockwave_start_time = -1.0;
+uniform vec2 shockwave_position = vec2(0.0);
+
+uniform float shockwave_expand_speed = 1000.0;
+uniform float shockwave_thickness = 100.0;
+uniform float shockwave_distortion_strength = 30.0;
+uniform float shockwave_fade_speed = 2.0;
+
+void fragment() {
+	if(shockwave_start_time < 0.0) {
+		return;
+	}
+	
+	float effective_time = TIME - shockwave_start_time;
+	
+	vec2 frag = UV * camera_size;
+	vec2 local = shockwave_position - camera_position;
+	
+	float interval = clamp((distance(local, frag) - effective_time * shockwave_expand_speed) / shockwave_thickness, 0.0, 1.0);
+	float distort_power = sin(interval * pi) * (1.0 - effective_time * shockwave_fade_speed);
+	vec2 uv = SCREEN_UV;
+	if(distort_power > 0.0) {
+		uv += normalize(local - frag) * distort_power * shockwave_distortion_strength / camera_size;
+	}
+	COLOR = texture(SCREEN_TEXTURE, uv);
+}
+"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/camera_position = Vector2( 0, 0 )
+shader_param/camera_size = Vector2( 0, 0 )
+shader_param/shockwave_start_time = -1.0
+shader_param/shockwave_position = Vector2( 0, 0 )
+shader_param/shockwave_expand_speed = 1000.0
+shader_param/shockwave_thickness = 100.0
+shader_param/shockwave_distortion_strength = 30.0
+shader_param/shockwave_fade_speed = 2.0

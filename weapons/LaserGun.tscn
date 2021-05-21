@@ -25,5 +25,4 @@ region_rect = Rect2( -1, 263, 96, 93 )
 
 [node name="LaserRay" parent="." index="3" instance=ExtResource( 5 )]
 position = Vector2( 120, 0 )
-collision_mask = 7
 Damage = 30

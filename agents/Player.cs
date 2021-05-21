@@ -45,6 +45,8 @@ public class Player : Agent
 
     public void SetHUD(HUD hud, InventoryManager _inventoryManager)
     {
+        isCurrentPlayer = true;
+        
         _hud = hud;
 
         Connect(nameof(Agent.WeaponChangeSignal), _hud, nameof(HUD.UpdateWeapon));

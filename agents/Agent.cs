@@ -85,6 +85,8 @@ public class Agent : KinematicBody2D
 
     protected Sprite Body;
 
+    protected bool isCurrentPlayer = false;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -405,6 +407,12 @@ public class Agent : KinematicBody2D
                 {
                     Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
                     MoveAndSlide(dir * -10 * weapon.KnockbackForce);
+
+                    if(isCurrentPlayer)
+                    {
+                    _gameWorld.StartScreenShake();
+                    }
+
                 }
             }
         }
