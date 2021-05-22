@@ -405,18 +405,29 @@ public class Agent : KinematicBody2D
                 // knock back effect
                 if (weapon.Fire(target) && MaxSpeed != 0)
                 {
-                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
-                    MoveAndSlide(dir * -10 * weapon.KnockbackForce);
+                    Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation).Normalized();
 
-                    if(isCurrentPlayer)
+                    if(weapon.KnockbackForce > 0)
                     {
-                    _gameWorld.StartScreenShake();
+                        ApplyKnockBackForce(-1.0f * dir * weapon.KnockbackForce);
                     }
+
 
                 }
             }
         }
 
+    }
+
+    public void ApplyKnockBackForce(Vector2 force)
+    {
+        // 100 is the tweak effect to have a nice knocback
+        MoveAndSlide(force * 100);
+
+        if(isCurrentPlayer)
+        {
+            _gameWorld.StartScreenShake();
+        }
     }
 
     public void setHealth(int health)
@@ -474,6 +485,8 @@ public class Agent : KinematicBody2D
             _health -= amount;
 
             EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
+
+            ApplyKnockBackForce(-1.0f * dir * amount * 0.5f);
 
             if (_health < MaxHealth / 2)
             {

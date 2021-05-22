@@ -99,6 +99,8 @@ region_rect = Rect2( 0, 263, 95, 94 )
 [node name="BoosterTrail" parent="RightBooster" instance=ExtResource( 6 )]
 material = SubResource( 1 )
 position = Vector2( 50, 0 )
+lifetime = 0.8
+speed_scale = 2.0
 
 [node name="Trail" parent="RightBooster" instance=ExtResource( 10 )]
 _length = 30
