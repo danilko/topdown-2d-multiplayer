@@ -9,10 +9,10 @@
 script = ExtResource( 2 )
 CurrentWeaponAmmoType = 1
 CurrentWeaponType = 2
-KnockbackForce = 200.0
+KnockbackForce = 20.0
 ItemResourceID = "SYC-300"
-MaxAmmo = 100
-CooldownTime = 0.5
+MaxAmmo = 20
+CooldownTime = 2.0
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )
 

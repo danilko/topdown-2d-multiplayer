@@ -14,13 +14,13 @@ extents = Vector2( 20.125, 7.75 )
 blend_mode = 1
 light_mode = 1
 
-[sub_resource type="Gradient" id=10]
+[sub_resource type="Gradient" id=3]
 colors = PoolColorArray( 10, 10, 10, 1, 1, 1, 1, 0.25 )
 
-[sub_resource type="GradientTexture" id=11]
-gradient = SubResource( 10 )
+[sub_resource type="GradientTexture" id=4]
+gradient = SubResource( 3 )
 
-[sub_resource type="ParticlesMaterial" id=12]
+[sub_resource type="ParticlesMaterial" id=5]
 emission_shape = 2
 emission_box_extents = Vector3( 1, 1, 1 )
 flag_disable_z = true
@@ -32,9 +32,9 @@ orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 linear_accel = 100.0
 scale = 10.0
-color_ramp = SubResource( 11 )
+color_ramp = SubResource( 4 )
 
-[sub_resource type="CanvasItemMaterial" id=9]
+[sub_resource type="CanvasItemMaterial" id=6]
 blend_mode = 1
 
 [node name="RifileBullet" instance=ExtResource( 1 )]
@@ -63,12 +63,12 @@ _width = 8.0
 [node name="Particle2DProjectile" parent="." index="5" instance=ExtResource( 5 )]
 material = SubResource( 2 )
 speed_scale = 2.0
-process_material = SubResource( 12 )
+process_material = SubResource( 5 )
 texture = null
 
 [node name="Sprite2" type="Sprite" parent="." index="6"]
 self_modulate = Color( 2, 2, 2, 1 )
-material = SubResource( 9 )
+material = SubResource( 6 )
 position = Vector2( 0, -0.132428 )
 scale = Vector2( 1, 2 )
 texture = ExtResource( 7 )

@@ -23,9 +23,9 @@ public class Projectile : RayCast2D
 
     Node2D target = null;
 
-    Node2D source = null;
+    protected Node2D Source = null;
 
-    private Team _sourceTeam;
+    protected Team SourceTeam;
 
     protected Vector2 Velocity;
     private Vector2 acceleration;
@@ -36,9 +36,12 @@ public class Projectile : RayCast2D
 
     private bool isProjectileStart = false;
 
+    protected GameWorld GameWorld;
+
     public void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget)
     {
-        Connect(nameof(ProjectileDamageSignal), GetParent(), "_onDamageCalculation");
+        GameWorld = (GameWorld)GetParent();
+        Connect(nameof(ProjectileDamageSignal), GameWorld, "_onDamageCalculation");
 
         GlobalPosition = position;
 
@@ -48,8 +51,8 @@ public class Projectile : RayCast2D
         acceleration = new Vector2();
 
         target = inTarget;
-        source = inSource;
-        _sourceTeam = sourceTeam;
+        Source = inSource;
+        SourceTeam = sourceTeam;
 
         Timer timer = (Timer)GetNode("Lifetime");
         timer.WaitTime = Lifetime;
@@ -65,7 +68,7 @@ public class Projectile : RayCast2D
 
     public Team.TeamCode GetTeam()
     {
-        return _sourceTeam.CurrentTeamCode;
+        return SourceTeam.CurrentTeamCode;
     }
 
     private Vector2 seek()
@@ -97,8 +100,7 @@ public class Projectile : RayCast2D
                 isProjectileStart = false;
                 Enabled = isProjectileStart;
 
-                // This is the code responsible for able to shoot down bullet with bullet
-                EmitSignal(nameof(ProjectileDamageSignal), Damage, GetCollisionNormal(), source, _sourceTeam, GetCollider());
+                ComputeDamage();
 
                 Explode();
 
@@ -111,6 +113,11 @@ public class Projectile : RayCast2D
         }
     }
 
+    protected virtual void ComputeDamage()
+    {
+        // This is the code responsible for able to shoot down bullet with bullet
+        EmitSignal(nameof(ProjectileDamageSignal), Damage, GetCollisionNormal(), Source, SourceTeam, GetCollider());
+    }
 
     public void Explode()
     {

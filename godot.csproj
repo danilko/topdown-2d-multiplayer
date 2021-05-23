@@ -33,6 +33,7 @@
     <Compile Include="map\SimulateGameWorld.cs" />
     <Compile Include="PostProcess\PostProcess.cs" />
     <Compile Include="PostProcess\TestScene.cs" />
+    <Compile Include="projectiles\ExplosionRay.cs" />
     <Compile Include="projectiles\Projectile.cs" />
     <Compile Include="projectiles\LaserRay.cs" />
     <Compile Include="projectiles\Missle.cs" />
