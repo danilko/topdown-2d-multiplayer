@@ -87,7 +87,7 @@ public class LaserRay : RayCast2D
         line2DLaser.Points = newPoints;
 
         particles2DBeam.Position = castPoint * 0.5f;
-        particles2DBeam.ProcessMaterial.Set("emission_box_extents", new Vector3(castPoint.x, 20.0f, 0.0f));
+        particles2DBeam.ProcessMaterial.Set("emission_box_extents", new Vector3(castPoint.x, 5.0f, 0.0f));
     }
 
     public void Initialize(GameWorld gameWorld, Agent sourceAgent, Team sourceTeam)
@@ -107,6 +107,7 @@ public class LaserRay : RayCast2D
     {
         return isCasting;
     }
+    
     public void setIsCasting(bool isCasting)
     {
         this.isCasting = isCasting;
@@ -132,7 +133,7 @@ public class LaserRay : RayCast2D
     public void appear()
     {
         tween.StopAll();
-        tween.InterpolateProperty(line2DLaser, "width", 0.0f, 20.0f, 0.2f);
+        tween.InterpolateProperty(line2DLaser, "width", 0.0f, 5.0f, 0.2f);
         tween.Start();
     }
 
@@ -140,7 +141,7 @@ public class LaserRay : RayCast2D
     public void disappear()
     {
         tween.StopAll();
-        tween.InterpolateProperty(line2DLaser, "width", 20.0f, 0.0f, 0.1f);
+        tween.InterpolateProperty(line2DLaser, "width", 5.0f, 0.0f, 0.1f);
         tween.Start();
     }
 

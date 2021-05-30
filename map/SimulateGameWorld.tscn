@@ -12,7 +12,11 @@
 [sub_resource type="Environment" id=1]
 background_mode = 4
 glow_enabled = true
+glow_levels/1 = true
+glow_levels/2 = true
+glow_levels/4 = true
 glow_intensity = 1.0
+glow_blend_mode = 1
 
 [node name="Map" type="Node2D"]
 script = ExtResource( 3 )
@@ -70,6 +74,7 @@ wait_time = 2.0
 autostart = true
 
 [node name="GameCamera" parent="." instance=ExtResource( 9 )]
+zoom = Vector2( 4, 4 )
 
 [node name="InventoryManager" parent="." instance=ExtResource( 5 )]
 [connection signal="timeout" from="ChangeAgentBehavior" to="." method="_changeAgentBehavior"]

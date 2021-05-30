@@ -11,10 +11,10 @@ blend_mode = 1
 script = ExtResource( 2 )
 CurrentWeaponType = 3
 ItemResourceID = "SYC-600"
-MaxAmmo = 500
+MaxAmmo = 100
 Shot = 0
 CooldownTime = 0.5
-ReloadTime = 10.0
+ReloadTime = 20.0
 Damage = 1
 
 [node name="Sprite" type="Sprite" parent="." index="3"]
@@ -25,7 +25,7 @@ region_enabled = true
 region_rect = Rect2( 734, 365, 65, 116 )
 
 [node name="Effect" type="Sprite" parent="." index="4"]
-modulate = Color( 0.58, 5.23, 3.47, 1 )
+modulate = Color( 0.58, 1.74, 2.31, 1 )
 material = SubResource( 1 )
 position = Vector2( 30, 0 )
 scale = Vector2( 0.2, 6 )

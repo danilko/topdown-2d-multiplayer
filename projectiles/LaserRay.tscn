@@ -47,7 +47,7 @@ direction = Vector3( 0, 0, 0 )
 gravity = Vector3( 0, 0, 0 )
 linear_accel = 10.0
 scale = 0.5
-color = Color( 0.5, 3, 6, 1 )
+color = Color( 0.5, 1, 2, 1 )
 
 [node name="LaserRay" type="RayCast2D"]
 enabled = true
@@ -61,7 +61,7 @@ Damage = 60
 material = SubResource( 1 )
 points = PoolVector2Array( 0, 0, 100, 0 )
 width = 0.0
-default_color = Color( 10, 10, 10, 1 )
+default_color = Color( 0.8, 1, 2, 1 )
 
 [node name="Tween" type="Tween" parent="."]
 

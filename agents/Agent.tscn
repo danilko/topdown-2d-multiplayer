@@ -98,13 +98,15 @@ region_rect = Rect2( 0, 263, 95, 94 )
 
 [node name="BoosterTrail" parent="RightBooster" instance=ExtResource( 6 )]
 material = SubResource( 1 )
-position = Vector2( 50, 0 )
+position = Vector2( 200, 0 )
+amount = 10
 lifetime = 0.8
 speed_scale = 2.0
+explosiveness = 0.2
+randomness = 1.0
 
 [node name="Trail" parent="RightBooster" instance=ExtResource( 10 )]
-_length = 30
-_width = 20.0
+_length = 20
 
 [node name="LeftBooster" type="Sprite" parent="."]
 position = Vector2( -31.395, -39.063 )
@@ -116,13 +118,15 @@ region_rect = Rect2( 0, 263, 95, 94 )
 
 [node name="BoosterTrail" parent="LeftBooster" instance=ExtResource( 6 )]
 material = SubResource( 2 )
-position = Vector2( 50, 0 )
+position = Vector2( 200, 0 )
+amount = 10
 lifetime = 0.8
 speed_scale = 2.0
+explosiveness = 0.2
+randomness = 1.0
 
 [node name="Trail" parent="LeftBooster" instance=ExtResource( 10 )]
-_length = 30
-_width = 20.0
+_length = 20
 
 [node name="Explosion" parent="." instance=ExtResource( 2 )]
 visible = false

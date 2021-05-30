@@ -21,9 +21,13 @@ gradient = SubResource( 1 )
 [sub_resource type="Environment" id=3]
 background_mode = 4
 glow_enabled = true
+glow_levels/1 = true
+glow_levels/2 = true
+glow_levels/4 = true
 glow_intensity = 1.5
 glow_bloom = 0.1
-glow_hdr_threshold = 0.5
+glow_blend_mode = 1
+glow_hdr_threshold = 0.9
 adjustment_color_correction = SubResource( 2 )
 
 [node name="Map" type="Node2D"]

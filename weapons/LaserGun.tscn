@@ -10,9 +10,9 @@ script = ExtResource( 4 )
 CurrentWeaponType = 1
 KnockbackForce = 10.0
 ItemResourceID = "SYC-1000"
-MaxAmmo = 30
+MaxAmmo = 10
 CooldownTime = 0.5
-ReloadTime = 5.0
+ReloadTime = 10.0
 
 [node name="TriggerPoint" parent="." index="1"]
 position = Vector2( 120, 0 )
@@ -25,4 +25,4 @@ region_rect = Rect2( -1, 263, 96, 93 )
 
 [node name="LaserRay" parent="." index="3" instance=ExtResource( 5 )]
 position = Vector2( 120, 0 )
-Damage = 30
+Damage = 20

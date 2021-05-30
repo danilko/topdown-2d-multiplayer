@@ -1,11 +1,10 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://projectiles/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://projectiles/RifileBullet.cs" type="Script" id=3]
 [ext_resource path="res://effects/Trail.tscn" type="PackedScene" id=4]
 [ext_resource path="res://projectiles/Particle2DProjectile.tscn" type="PackedScene" id=5]
-[ext_resource path="res://assets/shadow_circle.png" type="Texture" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 20.125, 7.75 )
@@ -15,7 +14,7 @@ blend_mode = 1
 light_mode = 1
 
 [sub_resource type="Gradient" id=3]
-colors = PoolColorArray( 10, 10, 10, 1, 1, 1, 1, 0.25 )
+colors = PoolColorArray( 2, 2, 2, 1, 1, 1, 1, 0.25 )
 
 [sub_resource type="GradientTexture" id=4]
 gradient = SubResource( 3 )
@@ -34,9 +33,6 @@ linear_accel = 100.0
 scale = 10.0
 color_ramp = SubResource( 4 )
 
-[sub_resource type="CanvasItemMaterial" id=6]
-blend_mode = 1
-
 [node name="RifileBullet" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 Speed = 4000
@@ -44,10 +40,12 @@ Damage = 10
 Lifetime = 10.0
 
 [node name="Sprite" parent="." index="0"]
-self_modulate = Color( 10, 10, 10, 1 )
+self_modulate = Color( 3, 2, 1, 1 )
+rotation = 3.14159
+scale = Vector2( 3, 0.5 )
 texture = ExtResource( 2 )
 region_enabled = true
-region_rect = Rect2( 623, 200, 73, 34 )
+region_rect = Rect2( 653, 41, 30, 24 )
 
 [node name="ProjectileArea2D" parent="." index="3"]
 visible = false
@@ -58,17 +56,10 @@ collision_mask = 4
 shape = SubResource( 1 )
 
 [node name="Trail" parent="." index="4" instance=ExtResource( 4 )]
-_width = 8.0
+_width = 5.0
 
 [node name="Particle2DProjectile" parent="." index="5" instance=ExtResource( 5 )]
 material = SubResource( 2 )
 speed_scale = 2.0
 process_material = SubResource( 5 )
 texture = null
-
-[node name="Sprite2" type="Sprite" parent="." index="6"]
-self_modulate = Color( 2, 2, 2, 1 )
-material = SubResource( 6 )
-position = Vector2( 0, -0.132428 )
-scale = Vector2( 1, 2 )
-texture = ExtResource( 7 )
