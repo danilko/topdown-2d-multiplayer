@@ -478,7 +478,7 @@ public class Agent : KinematicBody2D
         {
             if (DamageEffectTimer.IsStopped())
             {
-                Body.SelfModulate = new Color(10.0f, 10.0f, 10.0f, 1.0f);
+                Body.SelfModulate = new Color(5.0f, 5.0f, 5.0f, 1.0f);
                 DamageEffectTimer.Start();
             }
 

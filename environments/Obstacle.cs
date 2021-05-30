@@ -64,7 +64,7 @@ public class Obstacle : StaticBody2D
 
         if (_damageEffectTimer.IsStopped())
         {
-            _icon.SelfModulate = new Color(10.0f, 10.0f, 10.0f, 1.0f);
+            _icon.SelfModulate = new Color(3.0f, 3.0f, 3.0f, 1.0f);
             _damageEffectTimer.Start();
         }
 

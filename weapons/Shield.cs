@@ -78,7 +78,7 @@ _body = (Sprite)GetNode("Sprite");
 
                     if (DamageEffectTimer.IsStopped())
             {
-                _body.SelfModulate = new Color(10.0f, 10.0f, 10.0f, 1.0f);
+                _body.SelfModulate = new Color(5.0f, 5.0f, 5.0f, 1.0f);
                 DamageEffectTimer.Start();
             }
 
