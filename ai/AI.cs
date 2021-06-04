@@ -173,8 +173,8 @@ public class AI : Node2D
                     // Calculate rotation
                     float angelToTargetAgent = _agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition).Angle();
 
-                    // Only start fire when agent is closely faced to its target agent
-                    if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.3)
+                    // Only start fire when agent is closely faced to its target agent (around Pi / 4)
+                    if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.8f)
                     {
                         _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
                         _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
@@ -255,13 +255,10 @@ public class AI : Node2D
                     _targetAgent = agent;
                     SetState(State.ENGAGE);
                 }
-                else
+                // Save as list of future target
+                if (!_targetAgents.ContainsKey(agent.GetUnitName()))
                 {
-                    // Save as list of future target
-                    if (!_targetAgents.ContainsKey(agent.GetUnitName()))
-                    {
-                        _targetAgents.Add(agent.GetUnitName(), agent.GetCurrentTeam());
-                    }
+                    _targetAgents.Add(agent.GetUnitName(), agent.GetCurrentTeam());
                 }
             }
         }
@@ -278,12 +275,10 @@ public class AI : Node2D
             {
                 _targetAgent = null;
             }
-            else
+            
+            if (_targetAgents.ContainsKey(agent.GetUnitName()))
             {
-                if (_targetAgents.ContainsKey(agent.GetUnitName()))
-                {
-                    _targetAgents.Remove(agent.GetUnitName());
-                }
+                _targetAgents.Remove(agent.GetUnitName());
             }
 
             // If target is not vaild, then will try to check for next target
