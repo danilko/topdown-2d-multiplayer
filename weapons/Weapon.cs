@@ -57,7 +57,7 @@ public class Weapon : Node2D
 
     private GameWorld _gameWorld;
 
-    protected Agent _agent;
+    protected Agent Agent;
     protected Team _team;
 
     protected Timer CooldownTimer;
@@ -83,7 +83,7 @@ public class Weapon : Node2D
 
     public virtual void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
     {
-        _agent = agent;
+        Agent = agent;
         _team = new Team();
         _team.CurrentTeamCode = agent.GetCurrentTeam();
         _gameWorld = gameWorld;
@@ -134,12 +134,12 @@ public class Weapon : Node2D
                 for (int i = 0; i < Shot; i++)
                 {
                     float a = -Spread + i * (2 * Spread) / (Shot - 1);
-                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), _agent, _team, targetAgent);
+                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), Agent, _team, targetAgent);
                 }
             }
             else
             {
-                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, _agent, _team, targetAgent);
+                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent);
             }
 
             FireEffect();

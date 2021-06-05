@@ -50,7 +50,7 @@ public class LightSaber : Weapon
             // Only bullets from different team will cloide
             if (agent.GetCurrentTeam() != _team.CurrentTeamCode)
             {
-                agent.TakeDamage(Damage, (agent.GlobalPosition - _agent.GlobalPosition).Normalized(), _agent, _team);
+                agent.TakeDamage(Damage, (agent.GlobalPosition - Agent.GlobalPosition).Normalized(), Agent, _team);
             }
         }
     }

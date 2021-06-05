@@ -8,16 +8,18 @@ public class Shield : Weapon
 
     private CollisionShape2D _collisionShape2D = null;
     private Sprite _effect;
-        private Sprite _body;
+    private Sprite _body;
     private ShieldPhysics _shieldPhysics;
     protected Timer DamageEffectTimer;
+    private Particles2D _smoke;
 
     public override void _Ready()
     {
         base._Ready();
-_body = (Sprite)GetNode("Sprite");
+        _body = (Sprite)GetNode("Sprite");
         _effect = (Sprite)GetNode("Effect");
         DamageEffectTimer = (Timer)GetNode("DamageEffectTimer");
+        _smoke = (Particles2D)GetNode("Smoke");
     }
 
     public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
@@ -34,17 +36,40 @@ _body = (Sprite)GetNode("Sprite");
     public override void Deinitialize()
     {
         GetGameWorld().RemoveChild(_shieldPhysics);
-        
+
         _shieldPhysics.QueueFree();
         base.Deinitialize();
     }
-    
-    public override bool Fire(Agent targetAgent) { return true; }
+
+    public override bool Fire(Agent targetAgent)
+    {
+        if (Cooldown)
+        {
+            float moveYFloat = 25.0f;
+
+            if(GetWeaponOrder() == WeaponOrder.Right)
+            {
+                moveYFloat = moveYFloat * -1.0f;
+            }
+
+            Position = new Vector2(0.0f, moveYFloat);
+            Cooldown = false;
+        }
+        else
+        {
+            CooldownTimer.Stop();
+        }
+
+        CooldownTimer.Start();
+
+        return true;
+    }
 
     private void _toggleShield(Boolean toggle)
     {
         _collisionShape2D.SetDeferred("disabled", !toggle);
         _effect.Visible = toggle;
+        _smoke.Visible = !toggle;
     }
 
     public void DamageEffectTimerTimeout()
@@ -76,11 +101,11 @@ _body = (Sprite)GetNode("Sprite");
         Ammo = Mathf.Clamp(Ammo, 0, MaxAmmo);
         SetAmmo(Ammo);
 
-                    if (DamageEffectTimer.IsStopped())
-            {
-                _body.SelfModulate = new Color(5.0f, 5.0f, 5.0f, 1.0f);
-                DamageEffectTimer.Start();
-            }
+        if (DamageEffectTimer.IsStopped())
+        {
+            _body.SelfModulate = new Color(5.0f, 5.0f, 5.0f, 1.0f);
+            DamageEffectTimer.Start();
+        }
 
         if (Ammo == 0)
         {
@@ -89,5 +114,13 @@ _body = (Sprite)GetNode("Sprite");
             // Auto reload
             StartReload();
         }
+    }
+
+    public override void onWeaponTimerTimeout()
+    {
+        Cooldown = true;
+
+        Position = Vector2.Zero;
+
     }
 }

@@ -17,7 +17,7 @@ public class LaserGun : Weapon
         base.Initialize(gameWorld, agent, weaponOrder);
 
         _laserRay = ((LaserRay)GetNode("LaserRay"));
-        _laserRay.Initialize(gameWorld, _agent, _team);
+        _laserRay.Initialize(gameWorld, Agent, _team);
     }
 
     public override void onWeaponTimerTimeout()

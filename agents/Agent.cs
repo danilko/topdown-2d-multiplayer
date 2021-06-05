@@ -261,6 +261,11 @@ public class Agent : KinematicBody2D
         return ((Position2D)GetNode(weaponOrder + "WeaponHolder"));
     }
 
+    public Position2D GetCentralWeaponsHolder()
+    {
+        return ((Position2D)GetNode("CentralWeaponHolder"));
+    }
+
     /**
     Unequip weapon at given weapon order's given index
     **/

@@ -140,6 +140,9 @@ rotation = 3.14159
 [node name="LeftWeaponHolder" type="Position2D" parent="."]
 position = Vector2( 47, -32 )
 
+[node name="CentralWeaponHolder" type="Position2D" parent="."]
+position = Vector2( 50, 0 )
+
 [node name="RightWeaponHolder" type="Position2D" parent="."]
 position = Vector2( 47, 32 )
 
