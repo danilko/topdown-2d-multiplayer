@@ -47,6 +47,9 @@ texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 653, 41, 30, 24 )
 
+[node name="Explosion" parent="." index="2"]
+scale = Vector2( 0.3, 0.3 )
+
 [node name="ProjectileArea2D" parent="." index="3"]
 visible = false
 collision_layer = 4

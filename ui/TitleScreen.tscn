@@ -519,6 +519,7 @@ margin_left = 25.0
 margin_top = 25.0
 margin_right = 393.0
 margin_bottom = 104.0
+
 [connection signal="pressed" from="CanvasLayer/btnCreateServer" to="." method="_onbtnCreateServerPanel"]
 [connection signal="pressed" from="CanvasLayer/btnJoinServer" to="." method="_onbtnJoinServerPanel"]
 [connection signal="pressed" from="CanvasLayer/btnExit" to="." method="_onbtnExit"]

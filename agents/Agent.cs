@@ -228,7 +228,7 @@ public class Agent : KinematicBody2D
             return false;
         }
 
-        Position2D weaponHolder = GetWeaponsHolder(weaponOrder);
+        Node2D weaponHolder = GetWeaponsHolder(weaponOrder);
         Weapon weapon = (Weapon)(weaponScene.Instance());
         weaponHolder.AddChild(weapon);
         weapon.Initialize(_gameWorld, this, weaponOrder);
@@ -256,14 +256,9 @@ public class Agent : KinematicBody2D
         }
     }
 
-    public Position2D GetWeaponsHolder(Weapon.WeaponOrder weaponOrder)
+    public Node2D GetWeaponsHolder(Weapon.WeaponOrder weaponOrder)
     {
-        return ((Position2D)GetNode(weaponOrder + "WeaponHolder"));
-    }
-
-    public Position2D GetCentralWeaponsHolder()
-    {
-        return ((Position2D)GetNode("CentralWeaponHolder"));
+        return ((Node2D)GetNode(weaponOrder + "WeaponHolder"));
     }
 
     /**
@@ -277,7 +272,7 @@ public class Agent : KinematicBody2D
 
         if (weapon != null)
         {
-            Position2D weaponHolder = GetWeaponsHolder(weaponOrder);
+            Node2D weaponHolder = GetWeaponsHolder(weaponOrder);
             weaponHolder.RemoveChild(weapon);
             // Null the weapon
             weapons[index] = null;
@@ -393,6 +388,11 @@ public class Agent : KinematicBody2D
     public void RotateToward(Vector2 location, float delta)
     {
         GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
+        Node2D weaponHolder = GetWeaponsHolder(Weapon.WeaponOrder.Right);
+        weaponHolder.GlobalRotation = Mathf.LerpAngle(weaponHolder.GlobalRotation, weaponHolder.GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
+
+        weaponHolder = GetWeaponsHolder(Weapon.WeaponOrder.Left);
+        weaponHolder.GlobalRotation = Mathf.LerpAngle(weaponHolder.GlobalRotation, weaponHolder.GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
     }
 
     public void Fire(Weapon.WeaponOrder weaponOrder, int weaponAction)

@@ -25,10 +25,18 @@ public class PathFinding : Node2D
     [Export]
     private int UpdateTRaversableTilesTime = 10;
 
+    // Debug flag
+    private bool debug = false;
+
     public override void _Ready()
     {
         _aStar = new AStar2D();
         _grid = (Node2D)GetNode("Grid");
+
+        if(!debug)
+        {
+        _grid.Visible = false;
+        }
 
         _tilestoWorld = new Godot.Collections.Dictionary();
         _gridRects = new Godot.Collections.Dictionary<int, ColorRect>();
@@ -224,11 +232,13 @@ public class PathFinding : Node2D
                     if (!_aStar.ArePointsConnected(fromId, toId))
                     {
                         // Debug code
+                        if(debug)
+                        {
                         Line2D line2d = new Line2D();
                         Vector2[] points = { (Vector2)_tilestoWorld[fromId], (Vector2)_tilestoWorld[toId] };
                         line2d.Points = points;
                         _tileMap.AddChild(line2d);
-
+                        }
                         _aStar.ConnectPoints(fromId, toId, true);
                     }
                 }

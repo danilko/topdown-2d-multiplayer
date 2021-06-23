@@ -137,13 +137,10 @@ rotation = 3.14159
 
 [node name="UnitDisplay" parent="." instance=ExtResource( 5 )]
 
-[node name="LeftWeaponHolder" type="Position2D" parent="."]
+[node name="LeftWeaponHolder" type="Node2D" parent="."]
 position = Vector2( 47, -32 )
 
-[node name="CentralWeaponHolder" type="Position2D" parent="."]
-position = Vector2( 50, 0 )
-
-[node name="RightWeaponHolder" type="Position2D" parent="."]
+[node name="RightWeaponHolder" type="Node2D" parent="."]
 position = Vector2( 47, 32 )
 
 [node name="Team" parent="." instance=ExtResource( 4 )]
@@ -162,6 +159,7 @@ shape = SubResource( 3 )
 [node name="DamageEffectTimer" type="Timer" parent="."]
 wait_time = 0.1
 one_shot = true
+
 [connection signal="HealthChangedSignal" from="." to="UnitDisplay" method="UpdateUnitBar"]
 [connection signal="animation_finished" from="Explosion" to="." method="_OnExplosionAnimationFinished"]
 [connection signal="timeout" from="DamageEffectTimer" to="." method="DamageEffectTimerTimeout"]

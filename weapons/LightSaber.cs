@@ -6,14 +6,24 @@ public class LightSaber : Weapon
     [Export]
     int Damage = 50;
 
+    private AnimationPlayer animationPlayer;
+
+   public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
+    {
+       base.Initialize(gameWorld, agent, weaponOrder);
+       animationPlayer = (AnimationPlayer)GetNode("AnimationPlayer");
+
+       // Rotated weapon
+       animationPlayer.Play("Attack_" + GetWeaponOrder());
+    }
+
 
     public override bool Fire(Agent targetAgent)
     {
         if (Cooldown)
         {
             Cooldown = false;
-            AnimationPlayer animationPlayer = (AnimationPlayer)GetNode("AnimationPlayer");
-            animationPlayer.Play("Attack");
+            animationPlayer.Play("Attack_" + GetWeaponOrder());
         }
 
         return false;
