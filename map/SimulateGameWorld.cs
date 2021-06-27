@@ -47,8 +47,21 @@ public class SimulateGameWorld : GameWorld
         }
     }
 
+    private void onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target)
+    {
+        Projectile newProjectile = (Projectile)projectile.Instance();
+        AddChild(newProjectile);
+        newProjectile.Initialize(_position, _direction, source, sourceTeam, target);
+    }
+
     public override void _PhysicsProcess(float delta)
     {
+                 if (Input.IsActionPressed("left_click"))
+                {
+                    onProjectileShoot((PackedScene)GD.Load("res://projectiles/RifileBullet.tscn"), GetGlobalMousePosition(), Vector2.Right, null, new Team(), null);
+                }
+
+        
         // Update the timeout counter
         CurrentTime += delta;
         if (CurrentTime < GameStates.updateDelta)

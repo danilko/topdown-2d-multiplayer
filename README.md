@@ -37,6 +37,10 @@ How to make a Top-down Shooter in Godot
 
 https://www.youtube.com/watch?v=gXkkNSfxLRI&list=PLpwc3ughKbZexDyPexHN2MXLliKAovkpl
 
+Visual Effects
+
+https://www.youtube.com/channel/UChaDoWxaw4I--8ioWjkzHrw
+
 Artifact Reference
 ======
 Graphic Asset by Kenny (please consider donate to Kenny on the website if like them, the attached one are all free ones, the paid version is not included as should purchase them through Kenney's site)

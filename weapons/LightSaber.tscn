@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
@@ -8,11 +8,13 @@
 [sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 1
 
-[sub_resource type="Gradient" id=2]
+[sub_resource type="Curve" id=2]
+_data = [ Vector2( 0.0690909, 0.990909 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), -2.23684, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=3]
 colors = PoolColorArray( 0.87451, 0.87451, 0.87451, 0.470588, 0.617676, 0.988281, 0.988281, 0.792157 )
 
-[sub_resource type="Animation" id=3]
-resource_name = "Attack_Left"
+[sub_resource type="Animation" id=4]
 length = 0.2
 step = 0.01
 tracks/0/type = "value"
@@ -117,7 +119,7 @@ tracks/3/keys = {
 "values": [ Vector2( 10, 0 ), Vector2( 30, 0 ), Vector2( 10, 0 ), Vector2( 0, 0 ) ]
 }
 
-[sub_resource type="RectangleShape2D" id=4]
+[sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 97.8958, 125.843 )
 
 [node name="LightSaber" instance=ExtResource( 1 )]
@@ -151,10 +153,11 @@ _width = 180.0
 [node name="Line" type="Line2D" parent="Handler/Laser/Node" index="0"]
 visible = false
 width = 180.0
-gradient = SubResource( 2 )
+width_curve = SubResource( 2 )
+gradient = SubResource( 3 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="4"]
-anims/Attack_Left = SubResource( 3 )
+anims/Attack_Left = SubResource( 4 )
 anims/Attack_Right = SubResource( 5 )
 
 [node name="Area2D" type="Area2D" parent="." index="5"]
@@ -164,7 +167,7 @@ collision_mask = 15
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" index="0"]
 position = Vector2( 57.1696, -61.416 )
-shape = SubResource( 4 )
+shape = SubResource( 6 )
 disabled = true
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationFinished"]

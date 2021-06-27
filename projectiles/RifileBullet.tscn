@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://projectiles/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
@@ -14,12 +14,18 @@ blend_mode = 1
 light_mode = 1
 
 [sub_resource type="Gradient" id=3]
-colors = PoolColorArray( 2, 2, 2, 1, 1, 1, 1, 0.25 )
+colors = PoolColorArray( 2, 0.98, 0.73, 1, 1, 1, 1, 0.25 )
 
 [sub_resource type="GradientTexture" id=4]
 gradient = SubResource( 3 )
 
-[sub_resource type="ParticlesMaterial" id=5]
+[sub_resource type="Curve" id=5]
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), -1.96477, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=6]
+curve = SubResource( 5 )
+
+[sub_resource type="ParticlesMaterial" id=7]
 emission_shape = 2
 emission_box_extents = Vector3( 1, 1, 1 )
 flag_disable_z = true
@@ -31,7 +37,12 @@ orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 linear_accel = 100.0
 scale = 10.0
+scale_curve = SubResource( 6 )
 color_ramp = SubResource( 4 )
+
+[sub_resource type="Gradient" id=8]
+offsets = PoolRealArray( 0, 0.306818, 0.738636, 1 )
+colors = PoolColorArray( 1, 1, 1, 0, 1.07884, 0.528992, 0.288047, 1, 2, 0.7925, 0.32, 1, 5, 2, 1, 1 )
 
 [node name="RifileBullet" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
@@ -40,9 +51,8 @@ Damage = 10
 Lifetime = 10.0
 
 [node name="Sprite" parent="." index="0"]
-self_modulate = Color( 3, 2, 1, 1 )
+self_modulate = Color( 3, 0.95, 0.51, 1 )
 rotation = 3.14159
-scale = Vector2( 3, 0.5 )
 texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 653, 41, 30, 24 )
@@ -58,11 +68,12 @@ collision_mask = 4
 [node name="CollisionShape2D" parent="ProjectileArea2D" index="0"]
 shape = SubResource( 1 )
 
-[node name="Trail" parent="." index="4" instance=ExtResource( 4 )]
-_width = 5.0
-
-[node name="Particle2DProjectile" parent="." index="5" instance=ExtResource( 5 )]
+[node name="Particle2DProjectile" parent="." index="4" instance=ExtResource( 5 )]
 material = SubResource( 2 )
 speed_scale = 2.0
-process_material = SubResource( 5 )
+process_material = SubResource( 7 )
 texture = null
+
+[node name="Trail" parent="." index="5" instance=ExtResource( 4 )]
+_length = 5
+_gradientColor = SubResource( 8 )

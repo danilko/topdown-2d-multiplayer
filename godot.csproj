@@ -21,6 +21,7 @@
     <Compile Include="ai\AI.cs" />
     <Compile Include="ai\TeamMapAI.cs" />
     <Compile Include="ai\TeamMapAISetting.cs" />
+    <Compile Include="Demo\DemoEnvironment.cs" />
     <Compile Include="effects\AgentExplosionParticle.cs" />
     <Compile Include="effects\RemainParticles.cs" />
     <Compile Include="effects\Trail.cs" />

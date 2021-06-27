@@ -105,5 +105,6 @@ one_shot = true
 
 [node name="ReloadTimer" type="Timer" parent="."]
 one_shot = true
+
 [connection signal="timeout" from="CooldownTimer" to="." method="onWeaponTimerTimeout"]
 [connection signal="timeout" from="ReloadTimer" to="." method="_stopReload"]

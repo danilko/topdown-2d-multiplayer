@@ -119,7 +119,7 @@ public class Projectile : RayCast2D
         EmitSignal(nameof(ProjectileDamageSignal), Damage, GetCollisionNormal(), Source, SourceTeam, GetCollider());
     }
 
-    public void Explode()
+    public virtual void Explode()
     {
         isProjectileStart = false;
         Enabled = isProjectileStart;
@@ -130,6 +130,7 @@ public class Projectile : RayCast2D
         AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
         explosion.Show();
         explosion.Play("smoke");
+        
     }
 
     private void _onLifetimeTimeout()
