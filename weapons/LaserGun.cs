@@ -12,9 +12,9 @@ public class LaserGun : Weapon
         base._Ready();
     }
 
-    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
+    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder, int weaponIndex)
     {
-        base.Initialize(gameWorld, agent, weaponOrder);
+        base.Initialize(gameWorld, agent, weaponOrder, weaponIndex);
 
         _laserRay = ((LaserRay)GetNode("LaserRay"));
         _laserRay.Initialize(gameWorld, Agent, _team);

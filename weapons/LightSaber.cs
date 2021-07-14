@@ -8,9 +8,9 @@ public class LightSaber : Weapon
 
     private AnimationPlayer animationPlayer;
 
-   public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
+   public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder, int weaponIndex)
     {
-       base.Initialize(gameWorld, agent, weaponOrder);
+       base.Initialize(gameWorld, agent, weaponOrder, weaponIndex);
        animationPlayer = (AnimationPlayer)GetNode("AnimationPlayer");
 
        // Rotated weapon

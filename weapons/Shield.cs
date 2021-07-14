@@ -4,7 +4,10 @@ using System;
 public class Shield : Weapon
 {
     [Export]
-    int Damage = 50;
+    protected int Damage = 50;
+
+    [Export]
+    protected bool Recoverable = false;
 
     private CollisionShape2D _collisionShape2D = null;
     private Sprite _effect;
@@ -12,6 +15,8 @@ public class Shield : Weapon
     private ShieldPhysics _shieldPhysics;
     protected Timer DamageEffectTimer;
     private Particles2D _smoke;
+
+
 
     public override void _Ready()
     {
@@ -22,7 +27,7 @@ public class Shield : Weapon
         _smoke = (Particles2D)GetNode("Smoke");
     }
 
-    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
+    public override void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder, int weaponIndex)
     {
         _shieldPhysics = (ShieldPhysics)((PackedScene)GD.Load("res://weapons/ShieldPhysics.tscn")).Instance();
         gameWorld.AddChild(_shieldPhysics);
@@ -30,7 +35,7 @@ public class Shield : Weapon
         _shieldPhysics.Initialize(this);
         _collisionShape2D = (CollisionShape2D)_shieldPhysics.GetNode("CollisionShape2D");
 
-        base.Initialize(gameWorld, agent, weaponOrder);
+        base.Initialize(gameWorld, agent, weaponOrder, weaponIndex);
     }
 
     public override void Deinitialize()
@@ -47,7 +52,7 @@ public class Shield : Weapon
         {
             float moveYFloat = 25.0f;
 
-            if(GetWeaponOrder() == WeaponOrder.Right)
+            if (GetWeaponOrder() == WeaponOrder.Right)
             {
                 moveYFloat = moveYFloat * -1.0f;
             }
@@ -64,6 +69,16 @@ public class Shield : Weapon
 
         return true;
     }
+
+    public override void  StartReload()
+    {
+            if (Recoverable)
+            {
+
+                base.StartReload();
+            }
+    }
+
 
     private void _toggleShield(Boolean toggle)
     {
@@ -109,11 +124,33 @@ public class Shield : Weapon
 
         if (Ammo == 0)
         {
-            EmitSignal(nameof(AmmoOutSignal), GetWeaponOrder());
+            if (Recoverable)
+            {
 
-            // Auto reload
-            StartReload();
+                EmitSignal(nameof(AmmoOutSignal), GetWeaponOrder());
+
+                // Auto reload
+                StartReload();
+            }
+            else
+            {
+
+                AnimatedSprite animatedSprite = (AnimatedSprite)GetNode("Explosion");
+                animatedSprite.Show();
+                animatedSprite.Play("fire");
+
+
+            }
         }
+    }
+
+    public void _OnExplosionAnimationFinished()
+    {
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+        {
+            Unequip();
+        }
+
     }
 
     public override void onWeaponTimerTimeout()

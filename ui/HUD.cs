@@ -146,7 +146,8 @@ public class HUD : CanvasLayer
         {
             ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponName")).Text = "NO WEAPON";
             symbol.RectScale = Vector2.Zero;
-            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Text = "0/0";
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmo")).Text = "";
+            ((Label)GetNode("controlGame/" + weaponOrder + "WeaponControl/lblWeaponAmmoMessage")).Text = "";
         }
         else
         {

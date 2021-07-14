@@ -43,11 +43,13 @@ public class GameWorld : Node2D
     public class ClientData : Godot.Object
     {
         public String Id;
+        public int Health;
         public Vector2 Position;
         public float Rotation;
         public int RightWeapon;
         public int LeftWeapon;
-        public int Health;
+        public float RightWeaponRotation;
+        public float LeftWeaponRotation;
         public int RightWeaponIndex;
         public int LeftWeaponIndex;
     }
@@ -58,25 +60,6 @@ public class GameWorld : Node2D
         public Godot.Collections.Dictionary playerData = new Godot.Collections.Dictionary();
         public Godot.Collections.Dictionary botData = new Godot.Collections.Dictionary();
     }
-
-
-
-    public class ClientState
-    {
-        public Vector2 FromPosition;
-        public float FromRotation;
-        public Vector2 ToPosition;
-        public float ToRotation;
-        public int primaryWeapon;
-        public int LeftWeapon;
-        public int Health;
-        public float Time;
-        public Node2D Node;
-    }
-
-    Dictionary<String, ClientState> clientStates = new Dictionary<String, ClientState>();
-
-
 
     int spawned_bots = 0;
 
@@ -229,6 +212,11 @@ public class GameWorld : Node2D
             _timer.Connect("timeout", this, nameof(waitingPeriodTimerTimeout));
             _timer.Start();
         }
+    }
+
+    public InventoryManager getInventoryManager()
+    {
+        return _inventoryManager;
     }
 
     protected void InitializeTileMap()
@@ -521,6 +509,8 @@ public class GameWorld : Node2D
     {
         clientData.Id = encodedData.Split(";")[parseIndex];
         parseIndex++;
+        clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
         clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
         clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
@@ -531,7 +521,9 @@ public class GameWorld : Node2D
         parseIndex++;
         clientData.LeftWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
-        clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.RightWeaponRotation = float.Parse(encodedData.Split(";")[parseIndex]);
+        parseIndex++;
+        clientData.LeftWeaponRotation = float.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
         clientData.RightWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
@@ -544,12 +536,14 @@ public class GameWorld : Node2D
     private String encodeClientData(ClientData clientData)
     {
         String encodedData = "" + clientData.Id + ";";
+        encodedData = encodedData + clientData.Health + ";";
         encodedData = encodedData + clientData.Position.x + ";";
         encodedData = encodedData + clientData.Position.y + ";";
         encodedData = encodedData + clientData.Rotation + ";";
         encodedData = encodedData + clientData.RightWeapon + ";";
         encodedData = encodedData + clientData.LeftWeapon + ";";
-        encodedData = encodedData + clientData.Health + ";";
+        encodedData = encodedData + clientData.RightWeaponRotation + ";";
+        encodedData = encodedData + clientData.LeftWeaponRotation + ";";
         encodedData = encodedData + clientData.RightWeaponIndex + ";";
         encodedData = encodedData + clientData.LeftWeaponIndex + ";";
 
@@ -601,7 +595,7 @@ public class GameWorld : Node2D
         agent.changeWeapon(item.RightWeaponIndex, Weapon.WeaponOrder.Right);
         agent.changeWeapon(item.LeftWeaponIndex, Weapon.WeaponOrder.Left);
 
-        agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.LeftWeapon);
+        agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.RightWeaponRotation, item.LeftWeapon, item.LeftWeaponRotation);
         agent.setHealth(item.Health);
     }
 
@@ -820,6 +814,8 @@ public class GameWorld : Node2D
                     clientData.Rotation = playerNode.Rotation;
                     clientData.RightWeapon = rightWeapon;
                     clientData.LeftWeapon = leftWeapon;
+                    clientData.RightWeaponRotation = playerNode.GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation;
+                    clientData.LeftWeaponRotation = playerNode.GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation;
                     clientData.RightWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
                     clientData.LeftWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
                     clientData.Health = playerNode.getHealth();
@@ -887,6 +883,8 @@ public class GameWorld : Node2D
                 clientData.Health = enemyNode.getHealth();
                 clientData.RightWeapon = rightWeapon;
                 clientData.LeftWeapon = leftWeapon;
+                clientData.RightWeaponRotation = enemyNode.GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation;
+                clientData.LeftWeaponRotation = enemyNode.GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation;
                 clientData.RightWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
                 clientData.LeftWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
 

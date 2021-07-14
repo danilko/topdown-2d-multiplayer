@@ -213,7 +213,7 @@ public class InventoryManager : Node
 
             if (inventory != null && IsInstanceValid(inventory))
             {
-                if (inventory.GetItem(inventoryIndex) != null && !inventory.IsItemIndexInUsed(inventoryIndex))
+                if (inventory.GetItem(inventoryIndex) != null)
                 {
                     ItemResource itemResource = inventory.GetItem(inventoryIndex);
                     inventory.RemoveItem(inventoryIndex);
@@ -341,11 +341,11 @@ public class InventoryManager : Node
         }
     }
 
-    public void UnequipItem(Inventory inventory, Weapon.WeaponOrder weaponOrder, int weaponIndex)
+    public void UnequipItem(Inventory inventory, Weapon.WeaponOrder weaponOrder, int weaponIndex, int dropWeapon)
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex;
+            String info = (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex + ";" + dropWeapon;
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -376,6 +376,8 @@ public class InventoryManager : Node
         int weaponIndex = int.Parse(splitInfo[infoIndex]);
         infoIndex++;
 
+        int dropWeapon = int.Parse(splitInfo[infoIndex]);
+
         if (agent != null && IsInstanceValid(agent))
         {
             Inventory inventory = agent.GetInventory();
@@ -383,7 +385,7 @@ public class InventoryManager : Node
             {
                 if (agent.GetWeapons(weaponOrder)[weaponIndex] != null)
                 {
-                    inventory.UnequipItem(weaponOrder, weaponIndex);
+                    inventory.UnequipItem(weaponOrder, weaponIndex, dropWeapon);
                 }
                 // Sync the client no matter if is passing (if not passing, it may indicate cliet is out of sync with server inventory so need to sync)
                 if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())

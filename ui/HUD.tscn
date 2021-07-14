@@ -429,4 +429,5 @@ margin_bottom = 56.6489
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/MessageAnnounce = SubResource( 3 )
+
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationPlayerFinished"]

@@ -65,6 +65,8 @@ public class Weapon : Node2D
 
     private WeaponOrder _weaponOrder = WeaponOrder.Right;
 
+    private int _weaponIndex = -1;
+
     public override void _Ready()
     {
         if (MaxAmmo == 0)
@@ -81,13 +83,14 @@ public class Weapon : Node2D
         ReloadTimer.WaitTime = ReloadTime;
     }
 
-    public virtual void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder)
+    public virtual void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder, int weaponIndex)
     {
         Agent = agent;
         _team = new Team();
         _team.CurrentTeamCode = agent.GetCurrentTeam();
         _gameWorld = gameWorld;
         _weaponOrder = weaponOrder;
+        _weaponIndex = weaponIndex;
 
         Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
 
@@ -99,7 +102,7 @@ public class Weapon : Node2D
         return _gameWorld;
     }
 
-    public virtual void Deinitialize() 
+    public virtual void Deinitialize()
     {
         QueueFree();
     }
@@ -174,9 +177,15 @@ public class Weapon : Node2D
         EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
     }
 
+    public virtual void Unequip()
+    {
+        // Remove item and unequip it
+        _gameWorld.getInventoryManager().UnequipItem(Agent.GetInventory(), _weaponOrder, _weaponIndex, 1);
+    }
+
     protected virtual void FireEffect() { }
 
-    public void StartReload()
+    public virtual void StartReload()
     {
         // Only allow reload if there is no reload in process
         if (!isReloading())

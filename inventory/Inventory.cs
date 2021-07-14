@@ -143,7 +143,7 @@ public class Inventory : Node
         }
 
         // Unequip weapon first
-        UnequipItem(weaponOrder, weaponIndex);
+        UnequipItem(weaponOrder, weaponIndex, 0);
         String wepaonKey = (int)weaponOrder + "_" + weaponIndex;
         _equipmentIndex.Add(wepaonKey, itemIndex);
         _usedIndex.Add(itemIndex);
@@ -154,7 +154,7 @@ public class Inventory : Node
     }
 
     // Unequip weapon at given index
-    public void UnequipItem(Weapon.WeaponOrder weaponOrder, int weaponIndex)
+    public void UnequipItem(Weapon.WeaponOrder weaponOrder, int weaponIndex, int dropWeapon)
     {
         int itemIndex = GetEquipItemIndex(weaponOrder, weaponIndex);
 
@@ -163,7 +163,17 @@ public class Inventory : Node
         _usedIndex.Remove(itemIndex);
 
         EmitSignal(nameof(WeaponChangeSignal), weaponOrder, weaponIndex);
-        EmitSignal(nameof(InventoryChangeSignal));
+
+        if (dropWeapon == 1)
+        {
+            RemoveItem(itemIndex);
+        }
+        else
+        {
+            // Manually call as no remove item
+            EmitSignal(nameof(InventoryChangeSignal));
+        }
+
     }
 
 

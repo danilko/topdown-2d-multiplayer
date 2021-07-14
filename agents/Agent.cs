@@ -182,6 +182,10 @@ public class Agent : KinematicBody2D
             // Emit signal to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.GetAmmo(), currentWeapon.GetMaxAmmo(), weaponOrder);
         }
+        else
+        {
+            EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder);
+        }
     }
 
     protected virtual void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder) { }
@@ -231,7 +235,7 @@ public class Agent : KinematicBody2D
         Node2D weaponHolder = GetWeaponsHolder(weaponOrder);
         Weapon weapon = (Weapon)(weaponScene.Instance());
         weaponHolder.AddChild(weapon);
-        weapon.Initialize(_gameWorld, this, weaponOrder);
+        weapon.Initialize(_gameWorld, this, weaponOrder, index);
         weapons[index] = weapon;
         weapon.Hide();
 
@@ -276,10 +280,12 @@ public class Agent : KinematicBody2D
             weaponHolder.RemoveChild(weapon);
             // Null the weapon
             weapons[index] = null;
-            DisconnectWeapon(weapon, Weapon.WeaponOrder.Left);
+            DisconnectWeapon(weapon, weaponOrder);
             // Empty out weapon
             weapon.Deinitialize();
         }
+
+        EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder);
     }
 
     public void SetCurrentTeam(Team.TeamCode inputTeamCode)
@@ -361,7 +367,7 @@ public class Agent : KinematicBody2D
     }
 
 
-    public void Sync(Vector2 position, float rotation, int rightWeapon, int leftWeapon)
+    public void Sync(Vector2 position, float rotation, int rightWeapon, float rightWeaponRotation, int leftWeapon, float leftWeaponRotation)
     {
         // Move effect
         if (position != Position)
@@ -376,12 +382,15 @@ public class Agent : KinematicBody2D
             slowDownBoostTrail();
         }
 
+        GlobalPosition = position;
+        GlobalRotation = rotation;
 
+        GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation = rightWeaponRotation;
+        GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation = leftWeaponRotation;
+        
         Fire(Weapon.WeaponOrder.Right, rightWeapon);
         Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
-        GlobalPosition = position;
-        GlobalRotation = rotation;
     }
 
 

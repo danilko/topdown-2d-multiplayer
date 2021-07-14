@@ -164,7 +164,7 @@ public class InventoryUI : PopupPanel
     }
     private void _unequipWeapon(Weapon.WeaponOrder weaponOrder, int weaponIndex)
     {
-        _inventoryManager.UnequipItem(_inventory, weaponOrder, weaponIndex);
+        _inventoryManager.UnequipItem(_inventory, weaponOrder, weaponIndex, 0);
     }
 
     private void _cleanGridContainer(GridContainer gridContainer)
