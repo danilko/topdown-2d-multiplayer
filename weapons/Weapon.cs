@@ -8,12 +8,7 @@ public class Weapon : Node2D
     [Export]
     public WeaponAmmoType CurrentWeaponAmmoType { get; set; }
 
-    public enum WeaponType { RIFILE, LASER, MISSLELAUNCHER, SHIELD, LIGHTSABER, EMPTY }
-
     public enum WeaponOrder { Right, Left }
-
-    [Export]
-    public WeaponType CurrentWeaponType { get; set; }
 
     [Signal]
     public delegate void AmmoChangeSignal();
@@ -137,12 +132,12 @@ public class Weapon : Node2D
                 for (int i = 0; i < Shot; i++)
                 {
                     float a = -Spread + i * (2 * Spread) / (Shot - 1);
-                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), Agent, _team, targetAgent);
+                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), Agent, _team, targetAgent, Vector2.Zero);
                 }
             }
             else
             {
-                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent);
+                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent, Vector2.Zero);
             }
 
             FireEffect();

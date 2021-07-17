@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=1]
+[ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=2]
+[ext_resource path="res://weapons/MultiTunnelMissleLauncher.cs" type="Script" id=3]
+[ext_resource path="res://projectiles/MultiTunnelMissle.tscn" type="PackedScene" id=4]
+
+[node name="MultiTunnelMissleLauncher" instance=ExtResource( 2 )]
+script = ExtResource( 3 )
+KnockbackForce = 5.0
+ItemResourceID = "SYC-310"
+MaxAmmo = 20
+CooldownTime = 2.0
+ReloadTime = 30.0
+Bullet = ExtResource( 4 )
+
+[node name="TriggerPoint1" type="Position2D" parent="TriggerPoint" index="0"]
+position = Vector2( -116, 40 )
+
+[node name="TriggerPoint2" type="Position2D" parent="TriggerPoint" index="1"]
+position = Vector2( -80, 40 )
+
+[node name="Sprite" type="Sprite" parent="." index="3"]
+position = Vector2( -100, 0 )
+rotation = 1.5708
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 184, 294, 45, 64 )

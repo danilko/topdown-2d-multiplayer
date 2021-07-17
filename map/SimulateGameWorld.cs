@@ -47,21 +47,8 @@ public class SimulateGameWorld : GameWorld
         }
     }
 
-    private void onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target)
-    {
-        Projectile newProjectile = (Projectile)projectile.Instance();
-        AddChild(newProjectile);
-        newProjectile.Initialize(_position, _direction, source, sourceTeam, target);
-    }
-
     public override void _PhysicsProcess(float delta)
     {
-                 if (Input.IsActionPressed("left_click"))
-                {
-                    onProjectileShoot((PackedScene)GD.Load("res://projectiles/RifileBullet.tscn"), GetGlobalMousePosition(), Vector2.Right, null, new Team(), null);
-                }
-
-        
         // Update the timeout counter
         CurrentTime += delta;
         if (CurrentTime < GameStates.updateDelta)
@@ -84,7 +71,7 @@ public class SimulateGameWorld : GameWorld
             Vector2 randomPosition = capturableBase.GetRandomPositionWithinCaptureRadius();
 
             enemyNode.MoveToward(randomPosition - enemyNode.GlobalPosition, delta);
-           //enemyNode.MoveAndSlide((SpawnBots[AgentPrefix + ((index + 1) % SpawnBots.Count)].GlobalPosition - enemyNode.GlobalPosition) * 0.1f);
+            enemyNode.MoveAndSlide((SpawnBots[AgentPrefix + ((index + 1) % SpawnBots.Count)].GlobalPosition - enemyNode.GlobalPosition) * 0.1f);
             enemyNode.LookAt(SpawnBots[AgentPrefix + ((index + 1) % SpawnBots.Count)].GlobalPosition);
 
             // Always fire

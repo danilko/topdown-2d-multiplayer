@@ -14,7 +14,8 @@ blend_mode = 1
 light_mode = 1
 
 [sub_resource type="Gradient" id=3]
-colors = PoolColorArray( 2, 0.98, 0.73, 1, 1, 1, 1, 0.25 )
+offsets = PoolRealArray( 0, 0.236607, 0.285714, 1 )
+colors = PoolColorArray( 5, 1.97, 0.1, 1, 10, 0.07, 0, 0.94, 4.64286, 0.271873, 0.180357, 0.933036, 1, 1, 1, 0.25 )
 
 [sub_resource type="GradientTexture" id=4]
 gradient = SubResource( 3 )
@@ -70,7 +71,6 @@ shape = SubResource( 1 )
 
 [node name="Particle2DProjectile" parent="." index="4" instance=ExtResource( 5 )]
 material = SubResource( 2 )
-speed_scale = 2.0
 process_material = SubResource( 7 )
 texture = null
 

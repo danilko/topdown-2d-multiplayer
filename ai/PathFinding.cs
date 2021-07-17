@@ -33,9 +33,9 @@ public class PathFinding : Node2D
         _aStar = new AStar2D();
         _grid = (Node2D)GetNode("Grid");
 
-        if(!debug)
+        if (!debug)
         {
-        _grid.Visible = false;
+            _grid.Visible = false;
         }
 
         _tilestoWorld = new Godot.Collections.Dictionary();
@@ -232,12 +232,12 @@ public class PathFinding : Node2D
                     if (!_aStar.ArePointsConnected(fromId, toId))
                     {
                         // Debug code
-                        if(debug)
+                        if (debug)
                         {
-                        Line2D line2d = new Line2D();
-                        Vector2[] points = { (Vector2)_tilestoWorld[fromId], (Vector2)_tilestoWorld[toId] };
-                        line2d.Points = points;
-                        _tileMap.AddChild(line2d);
+                            Line2D line2d = new Line2D();
+                            Vector2[] points = { (Vector2)_tilestoWorld[fromId], (Vector2)_tilestoWorld[toId] };
+                            line2d.Points = points;
+                            _tileMap.AddChild(line2d);
                         }
                         _aStar.ConnectPoints(fromId, toId, true);
                     }

@@ -8,7 +8,6 @@
 [node name="MissleLauncher" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 CurrentWeaponAmmoType = 1
-CurrentWeaponType = 2
 KnockbackForce = 20.0
 ItemResourceID = "SYC-300"
 MaxAmmo = 20

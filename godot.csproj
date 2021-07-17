@@ -35,6 +35,7 @@
     <Compile Include="PostProcess\PostProcess.cs" />
     <Compile Include="PostProcess\TestScene.cs" />
     <Compile Include="projectiles\ExplosionRay.cs" />
+    <Compile Include="projectiles\MultiTunnelMissle.cs" />
     <Compile Include="projectiles\Projectile.cs" />
     <Compile Include="projectiles\LaserRay.cs" />
     <Compile Include="projectiles\Missle.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="ui\ScreenIndicator.cs" />
     <Compile Include="ui\TeamSettingPanel.cs" />
     <Compile Include="ui\WeaponSlotPanel.cs" />
+    <Compile Include="weapons\MultiTunnelMissleLauncher.cs" />
     <Compile Include="weapons\Shield.cs" />
     <Compile Include="singletons\audios\AudioManager.cs" />
     <Compile Include="agents\AIAgent.cs" />

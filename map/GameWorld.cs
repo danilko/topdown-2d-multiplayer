@@ -1404,11 +1404,11 @@ public class GameWorld : Node2D
         _updateState();
     }
 
-    private void _onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target)
+    private void _onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target, Vector2 defaultTarget)
     {
         Projectile newProjectile = (Projectile)projectile.Instance();
         AddChild(newProjectile);
-        newProjectile.Initialize(_position, _direction, source, sourceTeam, target);
+        newProjectile.Initialize(_position, _direction, source, sourceTeam, target, defaultTarget);
     }
 
     private void _onDamageCalculation(int damage, Vector2 hitDir, Godot.Object source, Team sourceTeam, Godot.Object target)

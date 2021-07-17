@@ -10,35 +10,36 @@ public class Projectile : RayCast2D
     public delegate void ProjectileDamageSignal();
 
     [Export]
-    int Speed;
+    protected int Speed;
 
     [Export]
-    public int Damage;
+    protected int Damage;
 
     [Export]
     float Lifetime;
 
     [Export]
-    float steer_force = 0;
+    protected float SteerForce = 0;
 
-    Node2D target = null;
+    protected Node2D Target = null;
 
     protected Node2D Source = null;
 
     protected Team SourceTeam;
 
     protected Vector2 Velocity;
-    private Vector2 acceleration;
+    protected Vector2 Acceleration;
 
     // https://gamesounds.xyz/?dir=FXHome
     private AudioStream _musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
-    private AudioStream _musicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
+    protected  AudioStream MusicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
 
-    private bool isProjectileStart = false;
+    protected bool IsProjectileStart = false;
 
     protected GameWorld GameWorld;
 
-    public void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget)
+
+    public virtual void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget, Vector2 defaultTargetPosition)
     {
         GameWorld = (GameWorld)GetParent();
         Connect(nameof(ProjectileDamageSignal), GameWorld, "_onDamageCalculation");
@@ -48,9 +49,10 @@ public class Projectile : RayCast2D
         Rotation = direction.Angle();
         Velocity = direction * Speed;
 
-        acceleration = new Vector2();
+        Acceleration = new Vector2();
 
-        target = inTarget;
+        Target = inTarget;
+
         Source = inSource;
         SourceTeam = sourceTeam;
 
@@ -58,8 +60,8 @@ public class Projectile : RayCast2D
         timer.WaitTime = Lifetime;
         timer.Start();
 
-        isProjectileStart = true;
-        Enabled = isProjectileStart;
+        IsProjectileStart = true;
+        Enabled = IsProjectileStart;
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(_musicClip);
@@ -71,41 +73,42 @@ public class Projectile : RayCast2D
         return SourceTeam.CurrentTeamCode;
     }
 
-    private Vector2 seek()
+    protected virtual Vector2 Seek()
     {
-        Vector2 desired = (target.Position - Position).Normalized() * Speed;
-        Vector2 steer = (desired - Velocity).Normalized() * steer_force;
+        Vector2 desired = (Target.Position - Position).Normalized() * Speed;
+        Vector2 steer = (desired - Velocity).Normalized() * SteerForce;
+
         return steer;
     }
 
     public override void _PhysicsProcess(float delta)
     {
-        if (isProjectileStart)
+        if (IsProjectileStart)
         {
             // Validate if target is available or is freed up (maybe no longer in scene)
-            if (target != null && IsInstanceValid(target))
+            if (Target != null && !IsInstanceValid(Target))
             {
-                target = null;
+                Target = null;
             }
 
-            if (target != null)
+            if (Target != null)
             {
-                acceleration += seek();
-                Velocity += acceleration * delta;
+                Acceleration += Seek();
+                Velocity += Acceleration * delta;
                 Rotation = Velocity.Angle();
             }
 
             if (IsColliding())
             {
-                isProjectileStart = false;
-                Enabled = isProjectileStart;
+                IsProjectileStart = false;
+                Enabled = IsProjectileStart;
 
                 ComputeDamage();
 
                 Explode();
 
                 AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-                audioManager.playSoundEffect(_musicHitClip);
+                audioManager.playSoundEffect(MusicHitClip);
             }
 
             GlobalPosition += Transform.x * Speed * delta;
@@ -121,8 +124,8 @@ public class Projectile : RayCast2D
 
     public virtual void Explode()
     {
-        isProjectileStart = false;
-        Enabled = isProjectileStart;
+        IsProjectileStart = false;
+        Enabled = IsProjectileStart;
 
         Velocity = new Vector2();
         Sprite sprite = (Sprite)GetNode("Sprite");
@@ -130,7 +133,7 @@ public class Projectile : RayCast2D
         AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
         explosion.Show();
         explosion.Play("smoke");
-        
+
     }
 
     private void _onLifetimeTimeout()
