@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://projectiles/Projectile.cs" type="Script" id=1]
-[ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=2]
 [ext_resource path="res://projectiles/ProjectileArea2D.cs" type="Script" id=3]
 
 [node name="Projectile" type="RayCast2D"]
@@ -15,15 +14,10 @@ region_rect = Rect2( 1098, 442, 27, 17 )
 [node name="Lifetime" type="Timer" parent="."]
 wait_time = 10.0
 
-[node name="Explosion" parent="." instance=ExtResource( 2 )]
-visible = false
-scale = Vector2( 0.5, 0.5 )
-
 [node name="ProjectileArea2D" type="Area2D" parent="."]
 script = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileArea2D"]
 
 [connection signal="timeout" from="Lifetime" to="." method="_onLifetimeTimeout"]
-[connection signal="animation_finished" from="Explosion" to="." method="_OnExplosionAnimationFinished"]
 [connection signal="area_entered" from="ProjectileArea2D" to="ProjectileArea2D" method="_onProjectileAreaEntered"]

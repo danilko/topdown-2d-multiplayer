@@ -32,7 +32,7 @@ public class Projectile : RayCast2D
 
     // https://gamesounds.xyz/?dir=FXHome
     private AudioStream _musicClip = (AudioStream)GD.Load("res://assets/sounds/Future Weapons 2 - Energy Gun - shot_single_2.wav");
-    protected  AudioStream MusicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
+    protected AudioStream MusicHitClip = (AudioStream)GD.Load("res://assets/sounds/Bullet Impact 22.wav");
 
     protected bool IsProjectileStart = false;
 
@@ -106,9 +106,6 @@ public class Projectile : RayCast2D
                 ComputeDamage();
 
                 Explode();
-
-                AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-                audioManager.playSoundEffect(MusicHitClip);
             }
 
             GlobalPosition += Transform.x * Speed * delta;
@@ -127,13 +124,10 @@ public class Projectile : RayCast2D
         IsProjectileStart = false;
         Enabled = IsProjectileStart;
 
-        Velocity = new Vector2();
+        Velocity = Vector2.Zero;
+
         Sprite sprite = (Sprite)GetNode("Sprite");
         sprite.Hide();
-        AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
-        explosion.Show();
-        explosion.Play("smoke");
-
     }
 
     private void _onLifetimeTimeout()
@@ -141,7 +135,7 @@ public class Projectile : RayCast2D
         Explode();
     }
 
-    private void _OnExplosionAnimationFinished()
+    protected void _OnExplosionAnimationFinished()
     {
         QueueFree();
     }

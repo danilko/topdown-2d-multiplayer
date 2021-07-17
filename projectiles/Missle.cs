@@ -14,6 +14,16 @@ public class Missle : Projectile
         base._Ready();
     }
 
+    public override void Explode()
+    {
+        base.Explode();
+
+        AgentExplosionParticle explosion = (AgentExplosionParticle)GetNode("AgentExplosionParticle");
+        explosion.SetTrigger(true);
+
+        AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+        audioManager.playSoundEffect(MusicHitClip);
+    }
 
     protected override void ComputeDamage()
     {

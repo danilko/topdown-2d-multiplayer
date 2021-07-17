@@ -4,10 +4,8 @@ using System;
 public class RifileBullet : Projectile
 {
 
-    private Trail trail;
     public override void _Ready()
     {
-        trail = (Trail)GetNode("Trail");
         base._Ready();
     }
 
@@ -18,7 +16,14 @@ public class RifileBullet : Projectile
 
     public override void Explode()
     {
-        trail.Stop();
         base.Explode();
+        
+        ((Trail)GetNode("LineTrail")).Stop();
+
+        Sprite sprite = (Sprite)GetNode("Sprite");
+        sprite.Hide();
+        AnimatedSprite explosion = (AnimatedSprite)GetNode("Explosion");
+        explosion.Show();
+        explosion.Play("smoke");
     }
 }

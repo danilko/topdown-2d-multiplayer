@@ -4,8 +4,8 @@
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://assets/spr_smoke_strip24.png" type="Texture" id=3]
 [ext_resource path="res://projectiles/Missle.cs" type="Script" id=4]
-[ext_resource path="res://effects/Trail.tscn" type="PackedScene" id=5]
 [ext_resource path="res://effects/BoosterTrail.tscn" type="PackedScene" id=6]
+[ext_resource path="res://effects/AgentExplosionParticle.tscn" type="PackedScene" id=7]
 
 [sub_resource type="CanvasItemMaterial" id=1]
 resource_local_to_scene = true
@@ -34,8 +34,8 @@ blend_mode = 1
 
 [node name="Missle" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
-Speed = 2000
-Damage = 1
+Speed = 1500
+Damage = 5
 Lifetime = 20.0
 
 [node name="Sprite" parent="." index="0"]
@@ -45,13 +45,10 @@ texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 361, 39, 36, 24 )
 
-[node name="Explosion" parent="." index="2"]
-scale = Vector2( 5, 5 )
-
-[node name="ProjectileArea2D" parent="." index="3"]
+[node name="ProjectileArea2D" parent="." index="2"]
 visible = false
 
-[node name="Trail" type="Particles2D" parent="." index="4"]
+[node name="ParticleTrail" type="Particles2D" parent="." index="3"]
 self_modulate = Color( 6, 3, 0, 1 )
 show_behind_parent = true
 material = SubResource( 1 )
@@ -62,10 +59,11 @@ local_coords = false
 process_material = SubResource( 4 )
 texture = ExtResource( 3 )
 
-[node name="Trail2" parent="." index="5" instance=ExtResource( 5 )]
-_length = 20
+[node name="AgentExplosionParticle" parent="." index="4" instance=ExtResource( 7 )]
 
-[node name="BoosterTrail" parent="." index="6" instance=ExtResource( 6 )]
+[node name="BoosterTrail" parent="." index="5" instance=ExtResource( 6 )]
 visible = false
 material = SubResource( 5 )
 rotation = 3.14159
+
+[connection signal="EffectCompleteSignal" from="AgentExplosionParticle" to="." method="_OnExplosionAnimationFinished"]

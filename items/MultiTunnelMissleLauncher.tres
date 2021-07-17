@@ -14,7 +14,7 @@ script = ExtResource( 1 )
 CurrentItemType = 0
 ItemID = "SYC-310"
 Name = "Multi - Tunnel Missle Launcher"
-Description = "Multi Tunnel Missle Launcher(ATTACK = 20 x 2)"
+Description = "Multi Tunnel Missle Launcher(ATTACK = 10 x 2)"
 Price = 50
 Stackable = false
 MaxStackableCount = 0
