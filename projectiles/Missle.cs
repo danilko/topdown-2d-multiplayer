@@ -4,7 +4,7 @@ using System;
 public class Missle : Projectile
 {
     [Export]
-    protected int DamageRayCount = 100;
+    protected int DamageRayCount = 200;
 
     [Export]
     protected float DamageRayRadius = 100;
