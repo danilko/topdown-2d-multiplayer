@@ -51,6 +51,7 @@ public class AIAgent : Agent
 
     protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
+        base.DisconnectWeapon(currentWeapon, weaponOrder);
         if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
             // Deregister weapon with ai
@@ -66,6 +67,8 @@ public class AIAgent : Agent
 
     protected override void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
+        base.ConnectWeapon(currentWeapon, weaponOrder);
+
         if (currentWeapon != null && _agentAI != null && IsInstanceValid(_agentAI))
         {
             // Register weapon with AI

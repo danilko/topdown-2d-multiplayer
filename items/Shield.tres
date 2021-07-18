@@ -13,9 +13,9 @@ region = Rect2( 690, 258, 34, 103 )
 script = ExtResource( 1 )
 CurrentItemType = 0
 ItemID = "SYC-600"
-Name = "ELECTRIC SHIELD"
-Description = "Utilize specialized material and electricty to spread out attack. It cannot block attack when player move foward (need to pull back to fully utilized). (BLOCK = 200)"
-Price = 10
+Name = "ELECTRICIFY SPREAD MATERIAL SHIELD"
+Description = "Utilize speical electricify material to spread out certain degree of attack. (BLOCK = 100)"
+Price = 20
 Stackable = false
 MaxStackableCount = 0
 ReferencePackedScene = ExtResource( 3 )

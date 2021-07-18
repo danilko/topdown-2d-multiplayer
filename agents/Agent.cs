@@ -163,8 +163,6 @@ public class Agent : KinematicBody2D
         if (currentWeapon != null)
         {
             DisconnectWeapon(currentWeapon, weaponOrder);
-
-            currentWeapon.Hide();
         }
 
         CurrentWeaponIndex[weaponOrder] = weaponIndex % weapons.Count;
@@ -173,8 +171,6 @@ public class Agent : KinematicBody2D
 
         if (currentWeapon != null)
         {
-            currentWeapon.Show();
-
             ConnectWeapon(currentWeapon, weaponOrder);
 
             EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, weaponIndex)], weaponOrder);
@@ -188,18 +184,29 @@ public class Agent : KinematicBody2D
         }
     }
 
-    protected virtual void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder) { }
+    protected virtual void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
+    {
+        if (currentWeapon != null)
+        {
+            currentWeapon.EquipWeapon(false);
+            currentWeapon.Hide();
+        }
+    }
 
     protected virtual void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
         if (currentWeapon != null)
         {
+            currentWeapon.EquipWeapon(true);
+
             // If the current weapon ammo is 0, then notify about out of ammo
             if (currentWeapon.GetAmmo() == 0)
             {
                 currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal), weaponOrder);
             }
         }
+
+        currentWeapon.Show();
     }
 
     public Boolean HasReachedPosition(Vector2 targetPosition)
@@ -387,7 +394,7 @@ public class Agent : KinematicBody2D
 
         GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation = rightWeaponRotation;
         GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation = leftWeaponRotation;
-        
+
         Fire(Weapon.WeaponOrder.Right, rightWeapon);
         Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
@@ -421,7 +428,7 @@ public class Agent : KinematicBody2D
                 {
                     Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation).Normalized();
 
-                    if(weapon.KnockbackForce > 0)
+                    if (weapon.KnockbackForce > 0)
                     {
                         ApplyKnockBackForce(-1.0f * dir * weapon.KnockbackForce);
                     }
@@ -438,7 +445,7 @@ public class Agent : KinematicBody2D
         // 100 is the tweak effect to have a nice knocback
         MoveAndSlide(force * 100);
 
-        if(isCurrentPlayer)
+        if (isCurrentPlayer)
         {
             _gameWorld.StartScreenShake();
         }

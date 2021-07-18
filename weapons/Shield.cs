@@ -46,6 +46,24 @@ public class Shield : Weapon
         base.Deinitialize();
     }
 
+    public override void EquipWeapon(bool equip)
+    {
+        base.EquipWeapon(equip);
+
+        if(equip)
+        {
+            if (GetAmmo() > 0)
+            {
+                _toggleShield(true);
+            }
+        }
+        else
+        {
+                _toggleShield(false);
+        }
+        
+    }
+
     public override bool Fire(Agent targetAgent)
     {
         if (Cooldown)

@@ -93,6 +93,8 @@ public class Player : Agent
 
     protected override void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
+        base.DisconnectWeapon(currentWeapon, weaponOrder);
+
         if (currentWeapon != null && _hud != null)
         {
             // Deregister weapon from UI if connected
@@ -107,6 +109,8 @@ public class Player : Agent
 
     protected override void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
+        base.ConnectWeapon(currentWeapon, weaponOrder);
+
         if (currentWeapon != null && _hud != null)
         {
             // Register new weapon with UI if not connect (as cannot connect again)

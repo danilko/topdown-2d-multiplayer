@@ -113,6 +113,9 @@ public class Weapon : Node2D
         return !ReloadTimer.IsStopped();
     }
 
+    public virtual void EquipWeapon(bool equip)
+    {}
+
     public virtual bool Fire(Agent targetAgent)
     {
         if (Cooldown && Ammo != 0)
