@@ -18,6 +18,7 @@ glow_levels/1 = true
 glow_levels/2 = true
 glow_levels/4 = true
 glow_intensity = 1.0
+glow_bloom = 0.05
 glow_blend_mode = 1
 
 [node name="Map" type="Node2D"]
@@ -28,6 +29,7 @@ script = ExtResource( 3 )
 [node name="PostProcess" parent="." instance=ExtResource( 11 )]
 
 [node name="Ground" type="TileMap" parent="."]
+modulate = Color( 0.662745, 0.760784, 0.815686, 1 )
 light_mask = -2147483647
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 128, 128 )

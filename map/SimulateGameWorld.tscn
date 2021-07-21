@@ -16,6 +16,7 @@ glow_levels/1 = true
 glow_levels/2 = true
 glow_levels/4 = true
 glow_intensity = 1.0
+glow_bloom = 0.05
 glow_blend_mode = 1
 
 [node name="Map" type="Node2D"]
