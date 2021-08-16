@@ -13,7 +13,6 @@ public class ScreenIndicator : Node2D
 
     private Node2D _agentMarker;
 
-    private Godot.Collections.Dictionary<String, Team.TeamCode> _targetAgents;
     private Agent _agent = null;
 
     public override void _Ready()
@@ -26,18 +25,8 @@ public class ScreenIndicator : Node2D
         _agent = agent;
         _agents = new Godot.Collections.Dictionary<String, Agent>();
         _agentMarkers = new Godot.Collections.Dictionary<String, Node2D>();
-        _targetAgents = new Godot.Collections.Dictionary<String, Team.TeamCode>();
     }
 
-    public void SetPlayer(Agent agent)
-    {
-        _player = agent;
-    }
-
-    public void RemovePlayer()
-    {
-        _player = null;
-    }
 
     public void AddAgent(Agent agent)
     {
@@ -62,15 +51,20 @@ public class ScreenIndicator : Node2D
 
     public void RemoveAgent(Agent agent)
     {
-        if (_agents.ContainsKey(agent.GetUnitName()))
+        _removeAgent(agent.GetUnitName());
+    }
+
+    private void _removeAgent(String agentUnitName)
+    {
+        if (_agents.ContainsKey(agentUnitName))
         {
             // Add agent to dictonary
-            _agents.Remove(agent.GetUnitName());
+            _agents.Remove(agentUnitName);
 
-            Node2D agentMarker = _agentMarkers[agent.GetUnitName()];
+            Node2D agentMarker = _agentMarkers[agentUnitName];
 
             // Add marker to dictionary
-            _agentMarkers.Remove(agent.GetUnitName());
+            _agentMarkers.Remove(agentUnitName);
 
             agentMarker.QueueFree();
         }
@@ -78,13 +72,17 @@ public class ScreenIndicator : Node2D
 
     public override void _Process(float delta)
     {
-        if(_agent == null || ! IsInstanceValid(_agent))
+        if (_agent == null || !IsInstanceValid(_agent))
         {
             return;
         }
-        
-        foreach (Agent agent in _agents.Values)
+
+        Godot.Collections.Array<String> removeTargetList = new Godot.Collections.Array<String>();
+
+
+        foreach (String agentUnitName in _agents.Keys)
         {
+            Agent agent = _agents[agentUnitName];
             if (agent != null && IsInstanceValid(agent))
             {
                 Node2D agentMarker = _agentMarkers[agent.GetUnitName()];
@@ -95,26 +93,34 @@ public class ScreenIndicator : Node2D
                 float distance = agentMarker.GlobalPosition.DistanceTo(agent.GlobalPosition);
                 ((Label)agentMarker.GetNode("Text")).Text = agent.GetUnitName() + " " + distance;
             }
+            else
+            {
+                removeTargetList.Add(agentUnitName);
+            }
         }
-    }
 
-
-    private void _onDetectionZoneBodyEntered(Node body)
-    {
-
-        if (body.HasMethod(nameof(Agent.GetCurrentTeam)) && body != _agent)
+        // Clean up the list
+        foreach (String targetAgentUnitName in removeTargetList)
         {
-            AddAgent((Agent)body);
+            _removeAgent(targetAgentUnitName);
         }
     }
 
-    private void _onDetectionZoneBodyExited(Node body)
+
+    private void _onAgentEntered(Agent agent)
     {
-        if (body.HasMethod(nameof(Agent.GetCurrentTeam)) && body != _agent)
+        if (agent != null && IsInstanceValid(agent))
         {
-            RemoveAgent((Agent)body);
+            AddAgent(agent);
+
         }
     }
 
-
+    private void _onAgentExited(Agent agent)
+    {
+        if (agent != null && IsInstanceValid(agent))
+        {
+            RemoveAgent(agent);
+        }
+    }
 }

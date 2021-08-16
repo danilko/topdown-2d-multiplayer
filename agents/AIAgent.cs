@@ -40,7 +40,7 @@ public class AIAgent : Agent
         base.Initialize(gameWorld, unitName, displayName, teamMapAI, pathFinding);
         if (GetTree().IsNetworkServer())
         {
-            _agentAI.Initialize(_gameWorld, this, pathFinding, DetectRadius);
+            _agentAI.Initialize(_gameWorld, this, pathFinding, DetectionZone);
         }
     }
 

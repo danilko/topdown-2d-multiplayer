@@ -373,10 +373,10 @@ __meta__ = {
 }
 
 [node name="MiniMap" parent="controlGame" instance=ExtResource( 8 )]
-margin_left = 744.189
-margin_top = 96.4272
-margin_right = 999.19
-margin_bottom = 351.427
+margin_left = 773.698
+margin_top = 95.0572
+margin_right = 973.698
+margin_bottom = 295.057
 
 [node name="InventoryUI" parent="controlGame" instance=ExtResource( 11 )]
 

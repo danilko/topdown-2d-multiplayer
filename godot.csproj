@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="agents\GameCamera.cs" />
+    <Compile Include="ai\DetectionZone.cs" />
     <Compile Include="ai\PathFinding.cs" />
     <Compile Include="ai\AI.cs" />
     <Compile Include="ai\TeamMapAI.cs" />

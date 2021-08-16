@@ -35,8 +35,6 @@ public class Trail : Node
 
         _random = new Godot.RandomNumberGenerator();
 
-        _tween = (Tween)GetNode("Decray");
-
         _line.GlobalPosition = Vector2.Zero;
         _line.GlobalRotation = 0;
         _line.Width = _width;
@@ -54,8 +52,6 @@ public class Trail : Node
 
     public void Stop()
     {
-        _tween.InterpolateProperty(_line, "modulate", 1.0f, 0.0f, _random.RandfRange(_lifetime[0], _lifetime[1]), Tween.TransitionType.Circ, Tween.EaseType.Out);
-        _tween.Start();
     }
 
     public void _onTweenAllCompleted()

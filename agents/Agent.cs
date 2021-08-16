@@ -32,6 +32,9 @@ public class Agent : KinematicBody2D
     [Export]
     protected int MaxEnergy;
 
+    [Export]
+    protected float DetectionRadius = 1500.0f;
+
     public Vector2 Velocity;
     protected Boolean Alive = true;
 
@@ -85,6 +88,8 @@ public class Agent : KinematicBody2D
 
     protected Sprite Body;
 
+    protected DetectionZone DetectionZone;
+
     protected bool isCurrentPlayer = false;
 
     // Called when the node enters the scene tree for the first time.
@@ -111,6 +116,13 @@ public class Agent : KinematicBody2D
 
         EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
         EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
+
+        DetectionZone = (DetectionZone)(GetNode("DetectionZone"));
+    }
+
+    public DetectionZone GetDetectionZone()
+    {
+        return DetectionZone;
     }
 
     public Inventory GetInventory()
@@ -135,6 +147,8 @@ public class Agent : KinematicBody2D
 
         _initializeWeapon(LeftWeapons);
         _initializeWeapon(RightWeapons);
+
+        DetectionZone.Initialize(gameWorld, this, DetectionRadius);
     }
 
     private void _initializeWeapon(Godot.Collections.Array<Weapon> weapons)
@@ -304,6 +318,8 @@ public class Agent : KinematicBody2D
     private void _setUnitDisplay()
     {
         ((Label)(GetNode("UnitDisplay/Name"))).Text = _displayName + "(" + _team.CurrentTeamCode + ")";
+        //Set team indicator
+        ((Sprite)(GetNode("TeamIndicator"))).Modulate = new Color(_team.getTeamColor(_team.CurrentTeamCode), 0.5f);
     }
 
     public Team.TeamCode GetCurrentTeam()

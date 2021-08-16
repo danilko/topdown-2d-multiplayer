@@ -78,6 +78,9 @@ public class Player : Agent
         ScreenIndicator screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
         AddChild(screenIndicator);
         screenIndicator.Initialize(this);
+        DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), screenIndicator, "_onAgentEntered");
+        DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), screenIndicator, "_onAgentExited");
+        
 
         // Setup Inventory UI
         _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");

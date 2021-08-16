@@ -1,22 +1,27 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://assets/ui/grey_sliderUp.png" type="Texture" id=1]
 [ext_resource path="res://ui/ScreenIndicator.cs" type="Script" id=2]
+[ext_resource path="res://assets/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://assets/onscreen_game_indicator.png" type="Texture" id=4]
+[ext_resource path="res://assets/ui/red_button00.png" type="Texture" id=5]
 
-[sub_resource type="CircleShape2D" id=1]
-radius = 2000.0
+[sub_resource type="DynamicFont" id=1]
+size = 50
+font_data = ExtResource( 3 )
 
 [node name="ScreenIndicator" type="Node2D"]
 script = ExtResource( 2 )
 
 [node name="AgentMarker" type="Node2D" parent="."]
-visible = false
 
 [node name="Indicator" type="TextureRect" parent="AgentMarker"]
-margin_left = 300.0
-margin_right = 340.0
+self_modulate = Color( 1, 1, 1, 0.392157 )
+margin_left = 1000.0
+margin_right = 1040.0
 margin_bottom = 42.0
 rect_rotation = 90.0
+rect_scale = Vector2( 2, 2 )
 rect_pivot_offset = Vector2( 10, 0 )
 texture = ExtResource( 1 )
 __meta__ = {
@@ -24,21 +29,36 @@ __meta__ = {
 }
 
 [node name="Text" type="Label" parent="AgentMarker"]
-margin_left = 522.0
-margin_top = -4.0
-margin_right = 861.0
-margin_bottom = 10.0
+margin_left = 1042.98
+margin_top = -21.5756
+margin_right = 2133.98
+margin_bottom = 35.4244
+custom_fonts/font = SubResource( 1 )
 text = "500"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="DetectionZone" type="Area2D" parent="."]
-input_pickable = false
-collision_layer = 8
-collision_mask = 2
+[node name="CircleInfo" type="TextureRect" parent="."]
+self_modulate = Color( 1.24, 1.24, 1.24, 0.1 )
+margin_left = -1022.41
+margin_top = -1024.0
+margin_right = 1.58569
+rect_scale = Vector2( 2, 2 )
+texture = ExtResource( 4 )
+stretch_mode = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionZone"]
-shape = SubResource( 1 )
-[connection signal="body_entered" from="DetectionZone" to="." method="_onDetectionZoneBodyEntered"]
-[connection signal="body_exited" from="DetectionZone" to="." method="_onDetectionZoneBodyExited"]
+[node name="TextureRect2" type="TextureRect" parent="."]
+self_modulate = Color( 1, 1, 1, 0.392157 )
+margin_left = 200.0
+margin_top = -25.0
+margin_right = 6200.0
+margin_bottom = 25.0
+texture = ExtResource( 5 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
