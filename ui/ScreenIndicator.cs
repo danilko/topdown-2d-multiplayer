@@ -15,9 +15,15 @@ public class ScreenIndicator : Node2D
 
     private Agent _agent = null;
 
+    private TextureProgress _healthBar;
+
+    private Node2D _healthPanel;
+
     public override void _Ready()
     {
         _agentMarker = (Node2D)GetNode("AgentMarker");
+        _healthPanel = (Node2D)GetNode("HealthPanel");
+        _healthBar = (TextureProgress)_healthPanel.GetNode("HealthBar");
     }
 
     public void Initialize(Agent agent)
@@ -104,8 +110,19 @@ public class ScreenIndicator : Node2D
         {
             _removeAgent(targetAgentUnitName);
         }
+
+_healthPanel.GlobalRotation = 0;
     }
 
+    public void UpdateHealth(int value)
+    {
+        Tween tween = (Tween)GetNode("Tween");
+        tween.InterpolateProperty(_healthBar, "value", _healthBar.Value,
+        value, 0.2f,
+        Tween.TransitionType.Linear, Tween.EaseType.InOut);
+        tween.Start();
+        ((Label)_healthPanel.GetNode("HealthText")).Text = value + "%";
+    }
 
     private void _onAgentEntered(Agent agent)
     {
@@ -123,4 +140,5 @@ public class ScreenIndicator : Node2D
             RemoveAgent(agent);
         }
     }
+
 }

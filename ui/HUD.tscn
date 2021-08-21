@@ -148,6 +148,7 @@ margin_bottom = 49.0
 texture = ExtResource( 3 )
 
 [node name="HealthBar" type="TextureProgress" parent="controlGame/Margin/Container"]
+visible = false
 margin_right = 190.0
 margin_bottom = 49.0
 value = 75.0

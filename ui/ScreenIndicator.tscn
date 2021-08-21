@@ -1,19 +1,21 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/ui/grey_sliderUp.png" type="Texture" id=1]
 [ext_resource path="res://ui/ScreenIndicator.cs" type="Script" id=2]
 [ext_resource path="res://assets/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://assets/onscreen_game_indicator.png" type="Texture" id=4]
 [ext_resource path="res://assets/ui/red_button00.png" type="Texture" id=5]
+[ext_resource path="res://assets/wrench_white.png" type="Texture" id=6]
 
 [sub_resource type="DynamicFont" id=1]
-size = 50
+size = 60
 font_data = ExtResource( 3 )
 
 [node name="ScreenIndicator" type="Node2D"]
 script = ExtResource( 2 )
 
 [node name="AgentMarker" type="Node2D" parent="."]
+visible = false
 
 [node name="Indicator" type="TextureRect" parent="AgentMarker"]
 self_modulate = Color( 1, 1, 1, 0.392157 )
@@ -39,26 +41,52 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CircleInfo" type="TextureRect" parent="."]
-self_modulate = Color( 1.24, 1.24, 1.24, 0.1 )
-margin_left = -1022.41
-margin_top = -1024.0
-margin_right = 1.58569
-rect_scale = Vector2( 2, 2 )
-texture = ExtResource( 4 )
-stretch_mode = 5
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="TextureRect2" type="TextureRect" parent="."]
 self_modulate = Color( 1, 1, 1, 0.392157 )
-margin_left = 200.0
-margin_top = -25.0
-margin_right = 6200.0
-margin_bottom = 25.0
+margin_left = 201.68
+margin_top = -10.0
+margin_right = 6201.68
+margin_bottom = 10.0
 texture = ExtResource( 5 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Tween" type="Tween" parent="."]
+
+[node name="HealthPanel" type="Node2D" parent="."]
+
+[node name="HealthBar" type="TextureProgress" parent="HealthPanel"]
+margin_left = -1024.0
+margin_top = -1024.0
+rect_scale = Vector2( 2, 2 )
+value = 100.0
+allow_greater = true
+texture_under = ExtResource( 4 )
+texture_progress = ExtResource( 4 )
+fill_mode = 4
+tint_under = Color( 0.0509804, 0.0509804, 0.0509804, 0.235294 )
+tint_progress = Color( 1, 0.666667, 0, 0.384314 )
+radial_initial_angle = 20.0
+radial_fill_degrees = 320.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HealthText" type="Label" parent="HealthPanel"]
+modulate = Color( 1, 0.67033, 0, 1 )
+margin_left = -4.93237
+margin_top = -985.027
+margin_right = 299.068
+margin_bottom = -895.027
+custom_fonts/font = SubResource( 1 )
+text = "100"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Sprite" type="Sprite" parent="HealthPanel"]
+modulate = Color( 1, 0.663265, 0, 1 )
+position = Vector2( -70.3409, -954.841 )
+texture = ExtResource( 6 )

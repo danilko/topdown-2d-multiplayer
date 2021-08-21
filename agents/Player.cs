@@ -50,11 +50,6 @@ public class Player : Agent
         _hud = hud;
 
         Connect(nameof(Agent.WeaponChangeSignal), _hud, nameof(HUD.UpdateWeapon));
-        Connect(nameof(Agent.HealthChangedSignal), _hud, nameof(HUD.UpdateHealth));
-        Connect(nameof(Agent.DefeatedAgentChangedSignal), _hud, nameof(HUD.UpdateDefeatedAgent));
-
-        setHealth(MaxHealth);
-        setEnergy(MaxEnergy);
 
         for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
         {
@@ -78,6 +73,13 @@ public class Player : Agent
         ScreenIndicator screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
         AddChild(screenIndicator);
         screenIndicator.Initialize(this);
+        Connect(nameof(Agent.HealthChangedSignal), screenIndicator, nameof(ScreenIndicator.UpdateHealth));
+
+
+        setHealth(MaxHealth);
+        setEnergy(MaxEnergy);
+
+
         DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), screenIndicator, "_onAgentEntered");
         DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), screenIndicator, "_onAgentExited");
         

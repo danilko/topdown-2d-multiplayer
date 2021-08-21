@@ -12,6 +12,7 @@ MaxSpeed = 1200
 MaxHealth = 100
 RotationSpeed = 100.0
 MaxEnergy = 100
+DetectionRadius = 2000.0
 
 [node name="LeftHand" parent="." index="2"]
 region_rect = Rect2( 882, 250, 56, 89 )
@@ -22,6 +23,3 @@ region_rect = Rect2( 882, 250, 56, 89 )
 [node name="CollisionShape2D" parent="." index="18"]
 scale = Vector2( 1, 3.99872 )
 shape = SubResource( 1 )
-
-[node name="TeamIndicator" parent="." index="21"]
-visible = false
