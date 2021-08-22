@@ -1,10 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://assets/ui/grey_sliderUp.png" type="Texture" id=1]
 [ext_resource path="res://ui/ScreenIndicator.cs" type="Script" id=2]
 [ext_resource path="res://assets/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://assets/onscreen_game_indicator.png" type="Texture" id=4]
-[ext_resource path="res://assets/ui/red_button00.png" type="Texture" id=5]
+[ext_resource path="res://assets/aimassistant_dash.png" type="Texture" id=5]
 [ext_resource path="res://assets/wrench_white.png" type="Texture" id=6]
 [ext_resource path="res://assets/ammo_machinegun.png" type="Texture" id=7]
 
@@ -15,6 +15,134 @@ font_data = ExtResource( 3 )
 [sub_resource type="DynamicFont" id=2]
 size = 50
 font_data = ExtResource( 3 )
+
+[sub_resource type="Animation" id=3]
+resource_name = "FadeAnimation"
+length = 2.0
+loop = true
+tracks/0/type = "bezier"
+tracks/0/path = NodePath("HealthPanel/HealthText:modulate:r")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/1/type = "bezier"
+tracks/1/path = NodePath("HealthPanel/HealthText:modulate:g")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"points": PoolRealArray( 0.67033, -0.25, 0, 0.25, 0, 0.670588, -0.25, 0, 0.25, 0, 0.670588, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/2/type = "bezier"
+tracks/2/path = NodePath("HealthPanel/HealthText:modulate:b")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/3/type = "bezier"
+tracks/3/path = NodePath("HealthPanel/HealthText:modulate:a")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 0.509804, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/4/type = "bezier"
+tracks/4/path = NodePath("HealthPanel/Health:modulate:r")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/5/type = "bezier"
+tracks/5/path = NodePath("HealthPanel/Health:modulate:g")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"points": PoolRealArray( 0.663265, -0.25, 0, 0.25, 0, 0.662745, -0.25, 0, 0.25, 0, 0.662745, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/6/type = "bezier"
+tracks/6/path = NodePath("HealthPanel/Health:modulate:b")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/7/type = "bezier"
+tracks/7/path = NodePath("HealthPanel/Health:modulate:a")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 0.509804, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/8/type = "bezier"
+tracks/8/path = NodePath("AimAssistant:modulate:r")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/9/type = "bezier"
+tracks/9/path = NodePath("AimAssistant:modulate:g")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/10/type = "bezier"
+tracks/10/path = NodePath("AimAssistant:modulate:b")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+tracks/11/type = "bezier"
+tracks/11/path = NodePath("AimAssistant:modulate:a")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0, 0.509804, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1, 2 )
+}
+
+[sub_resource type="Gradient" id=4]
+colors = PoolColorArray( 1, 0.761719, 0, 1, 1, 1, 1, 0.117647 )
 
 [node name="ScreenIndicator" type="Node2D"]
 script = ExtResource( 2 )
@@ -36,24 +164,13 @@ __meta__ = {
 }
 
 [node name="Text" type="Label" parent="AgentMarker"]
+visible = false
 margin_left = 1042.98
 margin_top = -21.5756
 margin_right = 2133.98
 margin_bottom = 35.4244
 custom_fonts/font = SubResource( 1 )
 text = "500"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="TextureRect2" type="TextureRect" parent="."]
-self_modulate = Color( 1, 1, 1, 0.392157 )
-margin_left = 201.68
-margin_top = -10.0
-margin_right = 6201.68
-margin_bottom = 10.0
-texture = ExtResource( 5 )
-expand = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -82,7 +199,7 @@ __meta__ = {
 }
 
 [node name="HealthText" type="Label" parent="HealthPanel"]
-modulate = Color( 1, 0.67033, 0, 1 )
+modulate = Color( 1, 0.670588, 0, 1 )
 margin_left = 10.0
 margin_top = -900.0
 margin_right = 314.0
@@ -94,7 +211,7 @@ __meta__ = {
 }
 
 [node name="Health" type="Sprite" parent="HealthPanel"]
-modulate = Color( 1, 0.663265, 0, 1 )
+modulate = Color( 1, 0.662745, 0, 1 )
 position = Vector2( -70.341, -860 )
 texture = ExtResource( 6 )
 
@@ -185,3 +302,15 @@ __meta__ = {
 modulate = Color( 1, 0.663265, 0, 1 )
 position = Vector2( -59.4603, 0.161469 )
 texture = ExtResource( 7 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "FadeAnimation"
+anims/FadeAnimation = SubResource( 3 )
+
+[node name="AimAssistant" type="Line2D" parent="."]
+points = PoolVector2Array( 150, 0, 5000, 0 )
+width = 60.0
+default_color = Color( 1, 1, 1, 1 )
+gradient = SubResource( 4 )
+texture = ExtResource( 5 )
+texture_mode = 1
