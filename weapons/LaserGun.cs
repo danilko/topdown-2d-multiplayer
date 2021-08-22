@@ -29,7 +29,7 @@ public class LaserGun : Weapon
         }
     }
 
-    public override bool Fire(Agent targetAgent)
+    public override bool Fire(Agent targetAgent, Vector2 targetGlobalPosition)
     {
         if (Cooldown && Ammo != 0)
         {

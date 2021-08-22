@@ -174,10 +174,10 @@ public class AI : Node2D
                     }
 
                     // Chanse engaged agent closer if possible
-                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 600.0f)
-                    {
-                        _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition), delta);
-                    }
+                    // if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 600.0f)
+                    // {
+                    //    _agent.MoveToward(_agent.GlobalPosition.DirectionTo(_targetAgent.GlobalPosition), delta);
+                    // }
                 }
 
                 break;

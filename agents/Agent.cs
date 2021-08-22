@@ -390,7 +390,7 @@ public class Agent : KinematicBody2D
     }
 
 
-    public void Sync(Vector2 position, float rotation, int rightWeapon, float rightWeaponRotation, int leftWeapon, float leftWeaponRotation)
+    public void Sync(Vector2 position, float rotation, int rightWeapon, int leftWeapon)
     {
         // Move effect
         if (position != Position)
@@ -408,9 +408,6 @@ public class Agent : KinematicBody2D
         GlobalPosition = position;
         GlobalRotation = rotation;
 
-        GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation = rightWeaponRotation;
-        GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation = leftWeaponRotation;
-
         Fire(Weapon.WeaponOrder.Right, rightWeapon);
         Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
@@ -420,11 +417,6 @@ public class Agent : KinematicBody2D
     public void RotateToward(Vector2 location, float delta)
     {
         GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
-        Node2D weaponHolder = GetWeaponsHolder(Weapon.WeaponOrder.Right);
-        weaponHolder.GlobalRotation = Mathf.LerpAngle(weaponHolder.GlobalRotation, weaponHolder.GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
-
-        weaponHolder = GetWeaponsHolder(Weapon.WeaponOrder.Left);
-        weaponHolder.GlobalRotation = Mathf.LerpAngle(weaponHolder.GlobalRotation, weaponHolder.GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
     }
 
     public void Fire(Weapon.WeaponOrder weaponOrder, int weaponAction)
@@ -439,8 +431,11 @@ public class Agent : KinematicBody2D
             }
             else if (weaponAction == (int)GameStates.PlayerInput.InputAction.TRIGGER)
             {
+
+                Vector2 fireTarget = this.GlobalPosition + new Vector2(2000, 0).Rotated(GlobalRotation);
+
                 // knock back effect
-                if (weapon.Fire(target) && MaxSpeed != 0)
+                if (weapon.Fire(target, fireTarget) && MaxSpeed != 0)
                 {
                     Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation).Normalized();
 
@@ -582,7 +577,7 @@ public class Agent : KinematicBody2D
         EmitSignal(nameof(HealthChangedSignal), _health);
     }
 
-    public void Explode()
+    public virtual void Explode()
     {
         for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
         {
@@ -609,10 +604,6 @@ public class Agent : KinematicBody2D
 
         AgentExplosionParticle agentExplosionParticle = (AgentExplosionParticle)GetNode("AgentExplosionParticle");
         agentExplosionParticle.SetTrigger(true);
-
-        AnimatedSprite animatedSprite = (AnimatedSprite)GetNode("Explosion");
-        animatedSprite.Show();
-        animatedSprite.Play("fire");
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);

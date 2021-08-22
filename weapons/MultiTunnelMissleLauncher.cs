@@ -24,7 +24,7 @@ public class MultiTunnelMissleLauncher : Weapon
         }
     }
 
-    public override bool Fire(Agent targetAgent)
+    public override bool Fire(Agent targetAgent, Vector2 targetGlobalPosition)
     {
         if (Cooldown && Ammo != 0)
         {
@@ -44,10 +44,9 @@ public class MultiTunnelMissleLauncher : Weapon
         }
 
             // If no target set, utilze the default
-            Vector2 defaultTarget = ((new Vector2(1, 0)).Rotated(GlobalRotation) * 2000f) + GlobalPosition;
             foreach (Position2D triggerPoint in GetNode("TriggerPoint").GetChildren())
             {
-                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent, defaultTarget);
+                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent, targetGlobalPosition);
 
                 FireEffect();
             }

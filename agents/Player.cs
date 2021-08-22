@@ -7,6 +7,8 @@ public class Player : Agent
     private HUD _hud = null;
     private InventoryUI _inventoryUI = null;
 
+    private ScreenIndicator _screenIndicator = null;
+
     [Remote]
     public void serverGetPlayerInput(String inputData)
     {
@@ -46,7 +48,7 @@ public class Player : Agent
     public void SetHUD(HUD hud, InventoryManager _inventoryManager)
     {
         isCurrentPlayer = true;
-        
+
         _hud = hud;
 
         Connect(nameof(Agent.WeaponChangeSignal), _hud, nameof(HUD.UpdateWeapon));
@@ -70,19 +72,19 @@ public class Player : Agent
         }
 
         // Set up the player indicator screen
-        ScreenIndicator screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
-        AddChild(screenIndicator);
-        screenIndicator.Initialize(this);
-        Connect(nameof(Agent.HealthChangedSignal), screenIndicator, nameof(ScreenIndicator.UpdateHealth));
+        _screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
+        AddChild(_screenIndicator);
+        _screenIndicator.Initialize(this);
+        Connect(nameof(Agent.HealthChangedSignal), _screenIndicator, nameof(ScreenIndicator.UpdateHealth));
 
 
         setHealth(MaxHealth);
         setEnergy(MaxEnergy);
 
 
-        DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), screenIndicator, "_onAgentEntered");
-        DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), screenIndicator, "_onAgentExited");
-        
+        DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), _screenIndicator, "_onAgentEntered");
+        DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), _screenIndicator, "_onAgentExited");
+
 
         // Setup Inventory UI
         _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");
@@ -103,12 +105,18 @@ public class Player : Agent
         if (currentWeapon != null && _hud != null)
         {
             // Deregister weapon from UI if connected
-            if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
+            if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo)))
             {
-                currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
-                currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
-                currentWeapon.Disconnect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
+                currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));
             }
+            //     if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
+            //     {
+            //         currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));    
+            //         currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
+            //         currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
+            //         currentWeapon.Disconnect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
+            //     }
+            // }
         }
     }
 
@@ -119,12 +127,18 @@ public class Player : Agent
         if (currentWeapon != null && _hud != null)
         {
             // Register new weapon with UI if not connect (as cannot connect again)
-            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
+
+            if (!currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo)))
             {
-                currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
-                currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
-                currentWeapon.Connect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
+                currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));
             }
+            // if (!currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
+            // {
+            //     currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));     
+            //     currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
+            //     currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
+            //     currentWeapon.Connect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
+            // }
 
             base.ConnectWeapon(currentWeapon, weaponOrder);
         }
@@ -274,6 +288,16 @@ public class Player : Agent
             }
         }
     }
+
+    public override void Explode()
+    {
+
+        base.Explode();
+
+        _screenIndicator.Hide();
+
+    }
+
 
     public override void _PhysicsProcess(float delta)
     {

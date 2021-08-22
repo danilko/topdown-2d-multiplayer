@@ -86,8 +86,8 @@ public class PathFinding : Node2D
                 int tileID = getPointID((int)tile.x, (int)tile.y);
                 if (_aStar.HasPoint(tileID))
                 {
-                    _aStar.SetPointDisabled(tileID, true);
-                    _gridRects[tileID].Color = _disableColor;
+                    //_aStar.SetPointDisabled(tileID, true);
+                   // _gridRects[tileID].Color = _disableColor;
                 }
             }
         }

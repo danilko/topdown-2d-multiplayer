@@ -116,7 +116,7 @@ public class Weapon : Node2D
     public virtual void EquipWeapon(bool equip)
     {}
 
-    public virtual bool Fire(Agent targetAgent)
+    public virtual bool Fire(Agent targetAgent, Vector2 targetGlobalPosition)
     {
         if (Cooldown && Ammo != 0)
         {
@@ -126,21 +126,23 @@ public class Weapon : Node2D
 
             CooldownTimer.Start();
 
-            Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation);
+    
 
             Position2D triggerPoint = (Position2D)GetNode("TriggerPoint");
+
+            Vector2 dir = (targetGlobalPosition - triggerPoint.GlobalPosition).Normalized();
 
             if (Shot > 1)
             {
                 for (int i = 0; i < Shot; i++)
                 {
                     float a = -Spread + i * (2 * Spread) / (Shot - 1);
-                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), Agent, _team, targetAgent, Vector2.Zero);
+                    EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir.Rotated(a), Agent, _team, targetAgent, targetGlobalPosition);
                 }
             }
             else
             {
-                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent, Vector2.Zero);
+                EmitSignal(nameof(FireSignal), Bullet, triggerPoint.GlobalPosition, dir, Agent, _team, targetAgent, targetGlobalPosition);
             }
 
             FireEffect();

@@ -48,8 +48,6 @@ public class GameWorld : Node2D
         public float Rotation;
         public int RightWeapon;
         public int LeftWeapon;
-        public float RightWeaponRotation;
-        public float LeftWeaponRotation;
         public int RightWeaponIndex;
         public int LeftWeaponIndex;
     }
@@ -521,10 +519,6 @@ public class GameWorld : Node2D
         parseIndex++;
         clientData.LeftWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
-        clientData.RightWeaponRotation = float.Parse(encodedData.Split(";")[parseIndex]);
-        parseIndex++;
-        clientData.LeftWeaponRotation = float.Parse(encodedData.Split(";")[parseIndex]);
-        parseIndex++;
         clientData.RightWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
         parseIndex++;
         clientData.LeftWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
@@ -542,8 +536,6 @@ public class GameWorld : Node2D
         encodedData = encodedData + clientData.Rotation + ";";
         encodedData = encodedData + clientData.RightWeapon + ";";
         encodedData = encodedData + clientData.LeftWeapon + ";";
-        encodedData = encodedData + clientData.RightWeaponRotation + ";";
-        encodedData = encodedData + clientData.LeftWeaponRotation + ";";
         encodedData = encodedData + clientData.RightWeaponIndex + ";";
         encodedData = encodedData + clientData.LeftWeaponIndex + ";";
 
@@ -595,7 +587,7 @@ public class GameWorld : Node2D
         agent.changeWeapon(item.RightWeaponIndex, Weapon.WeaponOrder.Right);
         agent.changeWeapon(item.LeftWeaponIndex, Weapon.WeaponOrder.Left);
 
-        agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.RightWeaponRotation, item.LeftWeapon, item.LeftWeaponRotation);
+        agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.LeftWeapon);
         agent.setHealth(item.Health);
     }
 
@@ -814,8 +806,6 @@ public class GameWorld : Node2D
                     clientData.Rotation = playerNode.Rotation;
                     clientData.RightWeapon = rightWeapon;
                     clientData.LeftWeapon = leftWeapon;
-                    clientData.RightWeaponRotation = playerNode.GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation;
-                    clientData.LeftWeaponRotation = playerNode.GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation;
                     clientData.RightWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
                     clientData.LeftWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
                     clientData.Health = playerNode.getHealth();
@@ -883,8 +873,6 @@ public class GameWorld : Node2D
                 clientData.Health = enemyNode.getHealth();
                 clientData.RightWeapon = rightWeapon;
                 clientData.LeftWeapon = leftWeapon;
-                clientData.RightWeaponRotation = enemyNode.GetWeaponsHolder(Weapon.WeaponOrder.Right).Rotation;
-                clientData.LeftWeaponRotation = enemyNode.GetWeaponsHolder(Weapon.WeaponOrder.Left).Rotation;
                 clientData.RightWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
                 clientData.LeftWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
 

@@ -19,11 +19,26 @@ public class ScreenIndicator : Node2D
 
     private Node2D _healthPanel;
 
+
+    private Node2D _weaponPanel;
+
+    private Node2D _leftWeaponNote;
+
+    private Node2D _rightWeaponNote;
+
+    private Tween _tween;
+
     public override void _Ready()
     {
         _agentMarker = (Node2D)GetNode("AgentMarker");
         _healthPanel = (Node2D)GetNode("HealthPanel");
         _healthBar = (TextureProgress)_healthPanel.GetNode("HealthBar");
+
+_weaponPanel = (Node2D)GetNode("WeaponPanel");
+_leftWeaponNote = (Node2D)_weaponPanel.GetNode("LeftWeaponNote");
+_rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
+
+        _tween = (Tween)GetNode("Tween");
     }
 
     public void Initialize(Agent agent)
@@ -111,17 +126,29 @@ public class ScreenIndicator : Node2D
             _removeAgent(targetAgentUnitName);
         }
 
-_healthPanel.GlobalRotation = 0;
+        _healthPanel.GlobalRotation = 0;
+        _leftWeaponNote.GlobalRotation = 0;
+        _rightWeaponNote.GlobalRotation = 0;
     }
 
     public void UpdateHealth(int value)
     {
-        Tween tween = (Tween)GetNode("Tween");
-        tween.InterpolateProperty(_healthBar, "value", _healthBar.Value,
+
+        _tween.InterpolateProperty(_healthBar, "value", _healthBar.Value,
         value, 0.2f,
         Tween.TransitionType.Linear, Tween.EaseType.InOut);
-        tween.Start();
+        _tween.Start();
         ((Label)_healthPanel.GetNode("HealthText")).Text = value + "%";
+    }
+
+    public void UpdateWeaponAmmo(int current, int max, Weapon.WeaponOrder weaponOrder)
+    {
+
+        ((Label)_weaponPanel.GetNode(weaponOrder + "WeaponNote/WeaponText")).Text = current + "/" + max;
+
+        TextureProgress textureProgress = (TextureProgress)_weaponPanel.GetNode(weaponOrder + "WeaponBar");
+        textureProgress.MaxValue = max;
+        textureProgress.Value = current;
     }
 
     private void _onAgentEntered(Agent agent)

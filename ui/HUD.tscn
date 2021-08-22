@@ -189,6 +189,7 @@ __meta__ = {
 }
 
 [node name="lblLocalPlayer" type="Label" parent="controlGame"]
+visible = false
 margin_left = 27.3425
 margin_top = 83.4875
 margin_right = 172.343
@@ -226,6 +227,7 @@ __meta__ = {
 }
 
 [node name="LeftWeaponControl" type="Control" parent="controlGame"]
+visible = false
 margin_left = 705.0
 margin_top = 352.0
 margin_right = 992.0
@@ -268,6 +270,7 @@ __meta__ = {
 }
 
 [node name="lblWeaponAmmo" type="Label" parent="controlGame/LeftWeaponControl"]
+visible = false
 margin_left = 151.695
 margin_top = 49.7503
 margin_right = 256.695
@@ -300,6 +303,7 @@ __meta__ = {
 }
 
 [node name="RightWeaponControl" type="Control" parent="controlGame"]
+visible = false
 margin_left = 705.0
 margin_top = 453.117
 margin_right = 992.0
@@ -342,6 +346,7 @@ __meta__ = {
 }
 
 [node name="lblWeaponAmmo" type="Label" parent="controlGame/RightWeaponControl"]
+visible = false
 margin_left = 151.695
 margin_top = 49.7503
 margin_right = 256.695

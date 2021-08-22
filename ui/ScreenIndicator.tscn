@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://assets/ui/grey_sliderUp.png" type="Texture" id=1]
 [ext_resource path="res://ui/ScreenIndicator.cs" type="Script" id=2]
@@ -6,9 +6,14 @@
 [ext_resource path="res://assets/onscreen_game_indicator.png" type="Texture" id=4]
 [ext_resource path="res://assets/ui/red_button00.png" type="Texture" id=5]
 [ext_resource path="res://assets/wrench_white.png" type="Texture" id=6]
+[ext_resource path="res://assets/ammo_machinegun.png" type="Texture" id=7]
 
 [sub_resource type="DynamicFont" id=1]
 size = 60
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 50
 font_data = ExtResource( 3 )
 
 [node name="ScreenIndicator" type="Node2D"]
@@ -58,9 +63,11 @@ __meta__ = {
 [node name="HealthPanel" type="Node2D" parent="."]
 
 [node name="HealthBar" type="TextureProgress" parent="HealthPanel"]
-margin_left = -1024.0
-margin_top = -1024.0
-rect_scale = Vector2( 2, 2 )
+margin_left = -921.6
+margin_top = -921.6
+margin_right = 102.4
+margin_bottom = 102.4
+rect_scale = Vector2( 1.8, 1.8 )
 value = 100.0
 allow_greater = true
 texture_under = ExtResource( 4 )
@@ -76,17 +83,105 @@ __meta__ = {
 
 [node name="HealthText" type="Label" parent="HealthPanel"]
 modulate = Color( 1, 0.67033, 0, 1 )
-margin_left = -4.93237
-margin_top = -985.027
-margin_right = 299.068
-margin_bottom = -895.027
+margin_left = 10.0
+margin_top = -900.0
+margin_right = 314.0
+margin_bottom = -832.0
 custom_fonts/font = SubResource( 1 )
 text = "100"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Sprite" type="Sprite" parent="HealthPanel"]
+[node name="Health" type="Sprite" parent="HealthPanel"]
 modulate = Color( 1, 0.663265, 0, 1 )
-position = Vector2( -70.3409, -954.841 )
+position = Vector2( -70.341, -860 )
 texture = ExtResource( 6 )
+
+[node name="WeaponPanel" type="Node2D" parent="."]
+
+[node name="RightWeaponBar" type="TextureProgress" parent="WeaponPanel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -1075.2
+margin_top = -1075.2
+margin_right = -51.2
+margin_bottom = -51.2
+rect_scale = Vector2( 2.1, 2.1 )
+value = 100.0
+allow_greater = true
+texture_under = ExtResource( 4 )
+texture_progress = ExtResource( 4 )
+fill_mode = 5
+tint_under = Color( 0.0509804, 0.0509804, 0.0509804, 0.117647 )
+tint_progress = Color( 1, 0.666667, 0, 0.384314 )
+radial_initial_angle = 260.0
+radial_fill_degrees = 150.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LeftWeaponBar" type="TextureProgress" parent="WeaponPanel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -1075.2
+margin_top = 1075.2
+margin_right = -51.2
+margin_bottom = 2099.2
+rect_scale = Vector2( 2.1, -2.1 )
+value = 100.0
+allow_greater = true
+texture_under = ExtResource( 4 )
+texture_progress = ExtResource( 4 )
+fill_mode = 5
+tint_under = Color( 0.0509804, 0.0509804, 0.0509804, 0.117647 )
+tint_progress = Color( 1, 0.666667, 0, 0.384314 )
+radial_initial_angle = 260.0
+radial_fill_degrees = 150.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LeftWeaponNote" type="Node2D" parent="WeaponPanel"]
+position = Vector2( 1060, -130.042 )
+
+[node name="WeaponText" type="Label" parent="WeaponPanel/LeftWeaponNote"]
+modulate = Color( 1, 0.67033, 0, 1 )
+margin_left = 18.7979
+margin_top = -28.5551
+margin_right = 322.798
+margin_bottom = 33.4449
+custom_fonts/font = SubResource( 2 )
+text = "100"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Weapon" type="Sprite" parent="WeaponPanel/LeftWeaponNote"]
+modulate = Color( 1, 0.663265, 0, 1 )
+position = Vector2( -59.4603, 0.161469 )
+texture = ExtResource( 7 )
+
+[node name="RightWeaponNote" type="Node2D" parent="WeaponPanel"]
+position = Vector2( 1060, 130 )
+
+[node name="WeaponText" type="Label" parent="WeaponPanel/RightWeaponNote"]
+modulate = Color( 1, 0.67033, 0, 1 )
+margin_left = 18.7979
+margin_top = -28.5551
+margin_right = 322.798
+margin_bottom = 33.4449
+custom_fonts/font = SubResource( 2 )
+text = "100"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Weapon" type="Sprite" parent="WeaponPanel/RightWeaponNote"]
+modulate = Color( 1, 0.663265, 0, 1 )
+position = Vector2( -59.4603, 0.161469 )
+texture = ExtResource( 7 )
