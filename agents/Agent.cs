@@ -70,8 +70,6 @@ public class Agent : KinematicBody2D
     protected GameStates gameStates;
     protected Network network;
 
-    protected Agent target = null;
-
     protected GameWorld _gameWorld;
 
     private int defeatedAgentCount = 0;
@@ -91,6 +89,8 @@ public class Agent : KinematicBody2D
     protected DetectionZone DetectionZone;
 
     protected bool isCurrentPlayer = false;
+
+    protected Agent CurrentTargetAgent;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -118,6 +118,8 @@ public class Agent : KinematicBody2D
         EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
 
         DetectionZone = (DetectionZone)(GetNode("DetectionZone"));
+
+        CurrentTargetAgent = null;
     }
 
     public DetectionZone GetDetectionZone()
@@ -435,7 +437,7 @@ public class Agent : KinematicBody2D
                 Vector2 fireTarget = this.GlobalPosition + new Vector2(2000, 0).Rotated(GlobalRotation);
 
                 // knock back effect
-                if (weapon.Fire(target, fireTarget) && MaxSpeed != 0)
+                if (weapon.Fire(CurrentTargetAgent, fireTarget) && MaxSpeed != 0)
                 {
                     Vector2 dir = (new Vector2(1, 0)).Rotated(GlobalRotation).Normalized();
 
@@ -610,6 +612,11 @@ public class Agent : KinematicBody2D
 
 
 
+    }
+
+    public virtual void OnTargetAgentChange()
+    {
+        CurrentTargetAgent = DetectionZone.getTargetAgent();
     }
 
     private void _OnExplosionAnimationFinished()

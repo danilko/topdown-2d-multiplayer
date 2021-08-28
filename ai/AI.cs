@@ -245,9 +245,9 @@ public class AI : Node2D
         _patrolLocation = _patrolLocation + _patrolOrigin;
     }
 
-    private void _onTargetAgentChange()
+    public void OnTargetAgentChange(Agent agent)
     {
-        _targetAgent = _detectionZone.getTargetAgent();
+        _targetAgent = agent;
 
         if (_targetAgent != null && IsInstanceValid(_targetAgent))
         {

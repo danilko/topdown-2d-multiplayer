@@ -144,6 +144,16 @@ public class Player : Agent
         }
     }
 
+    public override void OnTargetAgentChange()
+    {
+        base.OnTargetAgentChange();
+
+        if(_screenIndicator != null)
+        {
+            _screenIndicator.setCurrentTargetAgent(CurrentTargetAgent);
+        }
+    }
+
 
     public void gatherInput(float delta)
     {

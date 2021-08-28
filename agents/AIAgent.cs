@@ -92,6 +92,13 @@ public class AIAgent : Agent
         }
     }
 
+    public override void OnTargetAgentChange()
+    {
+        base.OnTargetAgentChange();
+
+        _agentAI.OnTargetAgentChange(CurrentTargetAgent);
+    }
+
 
     public override void _PhysicsProcess(float delta)
     {

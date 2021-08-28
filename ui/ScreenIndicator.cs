@@ -28,6 +28,11 @@ public class ScreenIndicator : Node2D
 
     private Tween _tween;
 
+
+    private Agent _currentTargetAgnet;
+
+    private TextureRect _lockonIndicator;
+
     public override void _Ready()
     {
         _agentMarker = (Node2D)GetNode("AgentMarker");
@@ -39,6 +44,10 @@ _leftWeaponNote = (Node2D)_weaponPanel.GetNode("LeftWeaponNote");
 _rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
 
         _tween = (Tween)GetNode("Tween");
+
+        _currentTargetAgnet= null;
+
+        _lockonIndicator = (TextureRect)GetNode("LockOnIndicator");
     }
 
     public void Initialize(Agent agent)
@@ -48,6 +57,10 @@ _rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
         _agentMarkers = new Godot.Collections.Dictionary<String, Node2D>();
     }
 
+    public void setCurrentTargetAgent(Agent agent)
+    {
+        _currentTargetAgnet = agent;
+    }
 
     public void AddAgent(Agent agent)
     {
@@ -96,6 +109,18 @@ _rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
         if (_agent == null || !IsInstanceValid(_agent))
         {
             return;
+        }
+
+        if(_currentTargetAgnet != null && IsInstanceValid(_currentTargetAgnet))
+        {
+            _lockonIndicator.Visible = true;
+            // set the label position to the position of agent
+            _lockonIndicator.SetGlobalPosition(_currentTargetAgnet.GlobalPosition - new Vector2(_lockonIndicator.RectSize.x / 2, _lockonIndicator.RectSize.y / 2));
+        }
+        else
+        {
+            // Hide indicator if there is no target
+            _lockonIndicator.Visible = false;
         }
 
         Godot.Collections.Array<String> removeTargetList = new Godot.Collections.Array<String>();

@@ -23,5 +23,3 @@ default_color = Color( 0.952941, 0.235294, 0.0156863, 1 )
 
 [node name="CollisionShape2D" parent="." index="20"]
 shape = SubResource( 1 )
-
-[connection signal="TargetAgentChangeSignal" from="DetectionZone" to="AI" method="_onTargetAgentChange"]
