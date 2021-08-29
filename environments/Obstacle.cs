@@ -92,9 +92,10 @@ public class Obstacle : StaticBody2D
         animatedSprite.Show();
         animatedSprite.Play("fire");
 
-        RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
-        remainParticles.GlobalPosition = this.GlobalPosition;
-        GetParent().GetParent().GetNode("RemainEffectManager").AddChild(remainParticles);
+        // Disable remain for performance reason
+        //RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
+        //remainParticles.GlobalPosition = this.GlobalPosition;
+        //GetParent().GetParent().GetNode("RemainEffectManager").AddChild(remainParticles);
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);

@@ -50,7 +50,7 @@ colors = PoolColorArray( 3.67, 3.53, 0.92, 0.2, 3.76234, 0.851574, 0.670406, 0.5
 script = ExtResource( 3 )
 Speed = 4000
 Damage = 10
-Lifetime = 10.0
+Lifetime = 5.0
 
 [node name="Sprite" parent="." index="0"]
 visible = false

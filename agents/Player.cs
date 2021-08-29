@@ -109,14 +109,6 @@ public class Player : Agent
             {
                 currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));
             }
-            //     if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
-            //     {
-            //         currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));    
-            //         currentWeapon.Disconnect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
-            //         currentWeapon.Disconnect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
-            //         currentWeapon.Disconnect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
-            //     }
-            // }
         }
     }
 
@@ -132,14 +124,6 @@ public class Player : Agent
             {
                 currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));
             }
-            // if (!currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo)))
-            // {
-            //     currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo));     
-            //     currentWeapon.Connect(nameof(Weapon.AmmoChangeSignal), _hud, nameof(HUD.UpdateWeaponAmmo));
-            //     currentWeapon.Connect(nameof(Weapon.AmmoOutSignal), _hud, nameof(HUD.UpdateWeaponAmmoOut));
-            //     currentWeapon.Connect(nameof(Weapon.ReloadSignal), _hud, nameof(HUD.UpdateWeaponReload));
-            // }
-
             base.ConnectWeapon(currentWeapon, weaponOrder);
         }
     }

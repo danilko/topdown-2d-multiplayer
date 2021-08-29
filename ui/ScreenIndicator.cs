@@ -39,15 +39,13 @@ public class ScreenIndicator : Node2D
         _healthPanel = (Node2D)GetNode("HealthPanel");
         _healthBar = (TextureProgress)_healthPanel.GetNode("HealthBar");
 
-_weaponPanel = (Node2D)GetNode("WeaponPanel");
-_leftWeaponNote = (Node2D)_weaponPanel.GetNode("LeftWeaponNote");
-_rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
+        _weaponPanel = (Node2D)GetNode("WeaponPanel");
+        _leftWeaponNote = (Node2D)_weaponPanel.GetNode("LeftWeaponNote");
+        _rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
 
         _tween = (Tween)GetNode("Tween");
 
-        _currentTargetAgnet= null;
-
-        _lockonIndicator = (TextureRect)GetNode("LockOnIndicator");
+        _currentTargetAgnet = null;
     }
 
     public void Initialize(Agent agent)
@@ -55,6 +53,8 @@ _rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
         _agent = agent;
         _agents = new Godot.Collections.Dictionary<String, Agent>();
         _agentMarkers = new Godot.Collections.Dictionary<String, Node2D>();
+
+        _lockonIndicator = (TextureRect)agent.GetGameWorld().GetNode("LockOnIndicator");
     }
 
     public void setCurrentTargetAgent(Agent agent)
@@ -111,7 +111,7 @@ _rightWeaponNote = (Node2D)_weaponPanel.GetNode("RightWeaponNote");
             return;
         }
 
-        if(_currentTargetAgnet != null && IsInstanceValid(_currentTargetAgnet))
+        if (_currentTargetAgnet != null && IsInstanceValid(_currentTargetAgnet))
         {
             _lockonIndicator.Visible = true;
             // set the label position to the position of agent

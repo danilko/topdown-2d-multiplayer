@@ -153,6 +153,11 @@ public class Agent : KinematicBody2D
         DetectionZone.Initialize(gameWorld, this, DetectionRadius);
     }
 
+    public GameWorld GetGameWorld()
+    {
+        return _gameWorld;
+    }
+
     private void _initializeWeapon(Godot.Collections.Array<Weapon> weapons)
     {
         for (int index = 0; index < MaxWeaponCount; index++)
@@ -600,9 +605,10 @@ public class Agent : KinematicBody2D
         Sprite body = (Sprite)GetNode("Body");
         body.Hide();
 
-        RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
-        remainParticles.GlobalPosition = this.GlobalPosition;
-        _gameWorld.GetNode("RemainEffectManager").AddChild(remainParticles);
+        // Disable remain for performance reason
+        //RemainParticles remainParticles = (RemainParticles)((PackedScene)GD.Load("res://effects/RemainParticles.tscn")).Instance();
+        //remainParticles.GlobalPosition = this.GlobalPosition;
+        //_gameWorld.GetNode("RemainEffectManager").AddChild(remainParticles);
 
         AgentExplosionParticle agentExplosionParticle = (AgentExplosionParticle)GetNode("AgentExplosionParticle");
         agentExplosionParticle.SetTrigger(true);

@@ -4,7 +4,6 @@ using System;
 public class MultiTunnelMissle : Missle
 {
 
-    private bool _noTarget = false;
     private Vector2 _noTargetApproxDestination;
     private Vector2 _initialPosition;
 
@@ -21,12 +20,6 @@ public class MultiTunnelMissle : Missle
     public override void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget, Vector2 defaultTargetPosition)
     {
         base.Initialize(position, direction, inSource, sourceTeam, inTarget, defaultTargetPosition);
-
-        if (inTarget == null || IsInstanceValid(inTarget))
-        {
-            _noTarget = true;
-
-        }
 
         // Fire off to a position 500f from current position if no target set
         _noTargetApproxDestination = defaultTargetPosition;
@@ -56,16 +49,9 @@ public class MultiTunnelMissle : Missle
                     Target = null;
                 }
 
-                if (Target != null)
-                {
-                    this.LookAt(Target.GlobalPosition);
-                    Acceleration.Rotated(Acceleration.AngleTo(Target.GlobalPosition));
-                }
-                else
-                {
-                    this.LookAt(_noTargetApproxDestination);
-                    Acceleration.Rotated(Acceleration.AngleTo(_noTargetApproxDestination));
-                }
+                this.LookAt(_noTargetApproxDestination);
+                Acceleration.Rotated(Acceleration.AngleTo(_noTargetApproxDestination));
+
 
                 isInitialProjectileStart = false;
                 // Enable Physics

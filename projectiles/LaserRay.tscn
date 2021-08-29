@@ -55,7 +55,7 @@ cast_to = Vector2( 1500, 0 )
 collision_mask = 7
 collide_with_areas = true
 script = ExtResource( 1 )
-Damage = 60
+Damage = 10
 
 [node name="Line2D" type="Line2D" parent="."]
 material = SubResource( 1 )

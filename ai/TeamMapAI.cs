@@ -43,6 +43,8 @@ public class TeamMapAI : Node2D
     [Export]
     private Boolean _autoSpawnMember = true;
 
+    private  Godot.RandomNumberGenerator _randomNumberGenerator;
+
     public override void _Ready()
     {
         _team = (Team)GetNode("Team");
@@ -52,6 +54,8 @@ public class TeamMapAI : Node2D
 
         _advancedTimer = (Timer)GetNode("AdvancedTimer");
         _advancedTimer.WaitTime = _advancedWaitInterval;
+
+        _randomNumberGenerator =  new Godot.RandomNumberGenerator();
     }
 
     public Boolean GetAutoSpawnMember()
@@ -109,14 +113,14 @@ public class TeamMapAI : Node2D
 
     public void SyncTeamMapAICurrentUnitAmount(int rpcId)
     {
-            if (rpcId != -1)
-            {
-                RpcId(rpcId, nameof(_clientSetAmount), _currentUnitUsageAmount);
-            }
-            else
-            {
-                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
-            }
+        if (rpcId != -1)
+        {
+            RpcId(rpcId, nameof(_clientSetAmount), _currentUnitUsageAmount);
+        }
+        else
+        {
+            Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+        }
     }
 
     [Remote]
@@ -279,7 +283,14 @@ public class TeamMapAI : Node2D
 
         ChargeAmount(_unitCost);
 
-        _assignDefaultWeapon(unit);
+        if (!enableAI)
+        {
+            _assignDefaultWeapon(unit);
+        }
+        else
+        {
+            _assignDefaultAIRandomCombine(unit);
+        }
 
         return unit;
     }
@@ -298,6 +309,69 @@ public class TeamMapAI : Node2D
             _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-200"), Weapon.WeaponOrder.Left, 1);
         }
     }
+
+    private void _assignDefaultAIRandomCombine(Agent agent)
+    {
+        if (GetTree().NetworkPeer == null || IsNetworkMaster())
+        {
+            int weaponCombine = _randomNumberGenerator.RandiRange(0 , 5);
+
+            
+
+            if (weaponCombine == 0)
+            {
+                // Add Laser weapon
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-1000"), agent.GetInventory());
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-1000"), Weapon.WeaponOrder.Left, 0);
+             }
+            if (weaponCombine == 1)
+            {
+                // Add missle launcher + sheild
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-300"), agent.GetInventory());
+
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-300"), Weapon.WeaponOrder.Left, 0);
+             }
+            if (weaponCombine == 2)
+            {
+                // Add multi missle launcher + shield
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
+
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
+             }
+            if (weaponCombine == 3)
+            {
+                // Add multi missle launcher + shield
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
+
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Right, 0);
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
+             }
+            if (weaponCombine == 4)
+            {
+                // Add multi missle launcher + shield
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Right, 0);
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
+             }
+            if (weaponCombine == 5)
+            {
+                // Add rifile + sheild
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
+                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
+            }
+        }
+    }
+
 
     public void RemoveUnit(String unitID)
     {

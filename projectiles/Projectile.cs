@@ -93,7 +93,7 @@ public class Projectile : RayCast2D
 
             if (Target != null)
             {
-                Acceleration += Seek();
+                Acceleration +=  (Target.Position - Position).Normalized() * Speed;
                 Velocity += Acceleration * delta;
                 Rotation = Velocity.Angle();
             }

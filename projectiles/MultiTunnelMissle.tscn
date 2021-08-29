@@ -35,10 +35,10 @@ anim_speed = 1.0
 [node name="MultiTunnelMissle" instance=ExtResource( 1 )]
 cast_to = Vector2( 20, 0 )
 script = ExtResource( 4 )
-Speed = 2000
+Speed = 1000
 Damage = 10
-Lifetime = 100.0
-SteerForce = 100.0
+Lifetime = 10.0
+SteerForce = 50.0
 
 [node name="Sprite" parent="." index="0"]
 rotation = 3.14159
@@ -48,6 +48,7 @@ region_rect = Rect2( 480, 40, 36, 23 )
 
 [node name="ProjectileArea2D" parent="." index="2"]
 visible = false
+collision_layer = 7
 
 [node name="CollisionShape2D" parent="ProjectileArea2D" index="0"]
 visible = false

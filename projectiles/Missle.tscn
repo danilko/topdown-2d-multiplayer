@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://projectiles/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
@@ -6,6 +6,9 @@
 [ext_resource path="res://projectiles/Missle.cs" type="Script" id=4]
 [ext_resource path="res://effects/BoosterTrail.tscn" type="PackedScene" id=6]
 [ext_resource path="res://effects/AgentExplosionParticle.tscn" type="PackedScene" id=7]
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 39.984, 20.7635 )
 
 [sub_resource type="CanvasItemMaterial" id=1]
 resource_local_to_scene = true
@@ -36,7 +39,7 @@ blend_mode = 1
 script = ExtResource( 4 )
 Speed = 1500
 Damage = 5
-Lifetime = 20.0
+Lifetime = 10.0
 
 [node name="Sprite" parent="." index="0"]
 rotation = 3.14159
@@ -47,6 +50,10 @@ region_rect = Rect2( 361, 39, 36, 24 )
 
 [node name="ProjectileArea2D" parent="." index="2"]
 visible = false
+collision_layer = 7
+
+[node name="CollisionShape2D" parent="ProjectileArea2D" index="0"]
+shape = SubResource( 6 )
 
 [node name="ParticleTrail" type="Particles2D" parent="." index="3"]
 self_modulate = Color( 6, 3, 0, 1 )
