@@ -75,6 +75,7 @@ public class Player : Agent
         _screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
         AddChild(_screenIndicator);
         _screenIndicator.Initialize(this);
+        _screenIndicator.SetActivate(true);
         Connect(nameof(Agent.HealthChangedSignal), _screenIndicator, nameof(ScreenIndicator.UpdateHealth));
 
 
@@ -288,7 +289,10 @@ public class Player : Agent
 
         base.Explode();
 
-        _screenIndicator.Hide();
+        if(_screenIndicator != null)
+        {
+            _screenIndicator.SetActivate(false);
+        }
 
     }
 

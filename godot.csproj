@@ -29,10 +29,13 @@
     <Compile Include="environments\CapaturableBaseManager.cs" />
     <Compile Include="environments\CapturableBase.cs" />
     <Compile Include="environments\ObstacleManager.cs" />
+    <Compile Include="Funnel.cs" />
     <Compile Include="inventory\Inventory.cs" />
     <Compile Include="inventory\InventoryManager.cs" />
     <Compile Include="items\ItemResource.cs" />
     <Compile Include="map\SimulateGameWorld.cs" />
+    <Compile Include="network\Lobby.cs" />
+    <Compile Include="network\WaitingRoom.cs" />
     <Compile Include="PostProcess\PostProcess.cs" />
     <Compile Include="PostProcess\TestScene.cs" />
     <Compile Include="projectiles\ExplosionRay.cs" />
@@ -57,6 +60,8 @@
     <Compile Include="ui\ScreenIndicator.cs" />
     <Compile Include="ui\TeamSettingPanel.cs" />
     <Compile Include="ui\WeaponSlotPanel.cs" />
+    <Compile Include="weapons\RemoteWeapon.cs" />
+    <Compile Include="weapons\RemoteWeaponController.cs" />
     <Compile Include="weapons\MultiTunnelMissleLauncher.cs" />
     <Compile Include="weapons\Shield.cs" />
     <Compile Include="singletons\audios\AudioManager.cs" />

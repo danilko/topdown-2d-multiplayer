@@ -173,7 +173,7 @@ public class DetectionZone : Area2D
         if (targetAgent != null)
         {
             _targetAgent = targetAgent;
-            EmitSignal(nameof(TargetAgentChangeSignal), _targetAgent);
+            EmitSignal(nameof(TargetAgentChangeSignal));
         }
     }
 

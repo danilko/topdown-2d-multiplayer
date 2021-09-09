@@ -15,11 +15,19 @@ public class AgentExplosionParticle : Node2D
         {
             _trigger = trigger;
 
-                foreach (Particles2D particle in GetChildren())
+                foreach (CPUParticles2D particle in GetNode("Particles").GetChildren())
                 {
                     particle.Emitting = _trigger;
                 }
+
+                if(_trigger) {
+    Timer timer =  (Timer)GetNode("Timer");
+    timer.Start();
+}
         }
+
+
+
     }
 
     public Boolean GetTrigger(Boolean trigger)
@@ -34,7 +42,7 @@ public class AgentExplosionParticle : Node2D
         {
             Boolean complete = true;
 
-            foreach (Particles2D particle in GetChildren())
+            foreach (CPUParticles2D particle in GetNode("Particles").GetChildren())
             {
                 if (particle.Emitting)
                 {
@@ -45,8 +53,7 @@ public class AgentExplosionParticle : Node2D
 
             if (complete)
             {
-                EmitSignal(nameof(EffectCompleteSignal));
-                _trigger = false;
+                EffectTimeout();
             }
         }
     }
@@ -56,5 +63,14 @@ public class AgentExplosionParticle : Node2D
         _checkEmitting();
     }
 
+/**
+* Force the timeout in case somehow particle is stuck
+**/
+    public void EffectTimeout()
+    {
+        EmitSignal(nameof(EffectCompleteSignal));
+         _trigger = false;
+         QueueFree();
+    }
 
 }

@@ -1,0 +1,477 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/ui/grey_box.png" type="Texture" id=1]
+[ext_resource path="res://ui/TeamSettingPanel.cs" type="Script" id=2]
+[ext_resource path="res://network/Lobby.cs" type="Script" id=3]
+[ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=4]
+[ext_resource path="res://network/WaitingRoom.tscn" type="PackedScene" id=5]
+
+[sub_resource type="DynamicFont" id=1]
+size = 20
+font_data = ExtResource( 4 )
+
+[node name="Lobby" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.239216, 0.227451, 0.270588, 1 )
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_left = 379.0
+margin_top = 218.0
+margin_right = 644.0
+margin_bottom = 381.0
+custom_constants/separation = 15
+
+[node name="Lobby" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_right = 265.0
+margin_bottom = 25.0
+custom_fonts/font = SubResource( 1 )
+text = "LOBBY"
+align = 1
+uppercase = true
+
+[node name="CreateServer" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 265.0
+margin_bottom = 71.0
+custom_fonts/font = SubResource( 1 )
+text = "CREATE SERVER"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="JoinServer" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 86.0
+margin_right = 265.0
+margin_bottom = 117.0
+custom_fonts/font = SubResource( 1 )
+text = "JOIN SERVER"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cancel" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 265.0
+margin_bottom = 163.0
+custom_fonts/font = SubResource( 1 )
+text = "Exit Lobby"
+
+[node name="Host" type="Popup" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ColorRect" type="ColorRect" parent="Host"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.239216, 0.227451, 0.270588, 1 )
+
+[node name="txtServerName" type="LineEdit" parent="Host"]
+margin_left = 72.2493
+margin_top = 62.8264
+margin_right = 275.249
+margin_bottom = 86.8264
+text = "127.0.0.1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Host"]
+margin_left = 74.0101
+margin_top = 46.1709
+margin_right = 152.01
+margin_bottom = 60.1709
+text = "ServerName"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="Host"]
+margin_left = 71.1901
+margin_top = 94.2686
+margin_right = 141.19
+margin_bottom = 108.269
+text = "Server Port"
+
+[node name="txtServerPort" type="LineEdit" parent="Host"]
+margin_left = 77.1052
+margin_top = 114.263
+margin_right = 135.105
+margin_bottom = 138.263
+text = "31400"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txtMaxPlayers" type="SpinBox" parent="Host"]
+margin_left = 168.411
+margin_top = 111.168
+margin_right = 242.411
+margin_bottom = 135.168
+value = 10.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label3" type="Label" parent="Host"]
+margin_left = 168.519
+margin_top = 93.9242
+margin_right = 277.519
+margin_bottom = 107.924
+text = "Max Connections"
+
+[node name="btServerCancel" type="Button" parent="Host"]
+margin_left = 528.0
+margin_top = 112.0
+margin_right = 662.0
+margin_bottom = 143.0
+custom_fonts/font = SubResource( 1 )
+text = "Cancel"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="btServerCreate" type="Button" parent="Host"]
+margin_left = 357.357
+margin_top = 111.067
+margin_right = 410.357
+margin_bottom = 131.067
+custom_fonts/font = SubResource( 1 )
+text = "Create"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblCreateServer" type="Label" parent="Host"]
+margin_left = 15.4126
+margin_top = 9.5559
+margin_right = 840.413
+margin_bottom = 23.5559
+custom_fonts/font = SubResource( 1 )
+text = "Create Server"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelTeamSettings" type="Label" parent="Host"]
+margin_left = 15.4126
+margin_top = 170.167
+margin_right = 840.413
+margin_bottom = 184.167
+custom_fonts/font = SubResource( 1 )
+text = "Team Setting"
+uppercase = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelTeamSetting" type="Panel" parent="Host"]
+visible = false
+margin_right = 767.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 767, 50 )
+script = ExtResource( 2 )
+
+[node name="TextrectTeam" type="TextureRect" parent="Host/PanelTeamSetting"]
+margin_left = 27.7983
+margin_top = 10.1763
+margin_right = 65.7983
+margin_bottom = 46.1763
+rect_scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 1 )
+stretch_mode = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelTeamName" type="Label" parent="Host/PanelTeamSetting"]
+margin_left = 59.8463
+margin_top = 13.8591
+margin_right = 136.846
+margin_bottom = 27.8591
+text = "TEAM NAME"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelBugdet" type="Label" parent="Host/PanelTeamSetting"]
+margin_left = 219.226
+margin_top = 13.8591
+margin_right = 319.226
+margin_bottom = 27.8591
+rect_pivot_offset = Vector2( 30.2927, 7 )
+text = "BUDGETS:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelAutoSapwnMembers" type="Label" parent="Host/PanelTeamSetting"]
+margin_left = 525.0
+margin_top = 14.0
+margin_right = 683.0
+margin_bottom = 28.0
+rect_pivot_offset = Vector2( 30.2927, 7 )
+text = "AUTO SPAWN MEMBERS:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SpinBoxTeamBudget" type="SpinBox" parent="Host/PanelTeamSetting"]
+margin_left = 330.415
+margin_top = 8.0
+margin_right = 497.415
+margin_bottom = 32.0
+max_value = 100000.0
+value = 10000.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CheckBoxAutoSapwnMembers" type="CheckBox" parent="Host/PanelTeamSetting"]
+margin_left = 700.516
+margin_top = 7.90778
+margin_right = 724.516
+margin_bottom = 31.9078
+pressed = true
+
+[node name="MarginContainerTeamManagement" type="MarginContainer" parent="Host"]
+margin_left = 32.0
+margin_top = 197.0
+margin_right = 933.0
+margin_bottom = 516.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScrollContainerTeamManagement" type="ScrollContainer" parent="Host/MarginContainerTeamManagement"]
+margin_right = 901.0
+margin_bottom = 319.0
+scroll_horizontal_enabled = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GridContainerTeamManagement" type="GridContainer" parent="Host/MarginContainerTeamManagement/ScrollContainerTeamManagement"]
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Join" type="Popup" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Join"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.239216, 0.227451, 0.270588, 1 )
+
+[node name="Label" type="Label" parent="Join"]
+margin_left = 19.0
+margin_top = 8.0
+margin_right = 847.0
+margin_bottom = 22.0
+text = "Join Server"
+
+[node name="Label2" type="Label" parent="Join"]
+margin_left = 34.0463
+margin_top = 37.9151
+margin_right = 80.0463
+margin_bottom = 51.9151
+text = "IP"
+
+[node name="Label3" type="Label" parent="Join"]
+margin_left = 161.72
+margin_top = 32.4987
+margin_right = 199.72
+margin_bottom = 46.4987
+text = "Port"
+
+[node name="txtJoinIp" type="LineEdit" parent="Join"]
+margin_left = 25.0
+margin_top = 58.0
+margin_right = 95.0
+margin_bottom = 82.0
+text = "127.0.0.1"
+
+[node name="txtJoinPort" type="LineEdit" parent="Join"]
+margin_left = 157.077
+margin_top = 54.9382
+margin_right = 215.077
+margin_bottom = 78.9382
+text = "31400"
+
+[node name="btnJoin" type="Button" parent="Join"]
+margin_left = 33.2725
+margin_top = 109.876
+margin_right = 68.2725
+margin_bottom = 129.876
+text = "Join"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="btJoinCancel" type="Button" parent="Join"]
+margin_left = 128.054
+margin_top = 110.82
+margin_right = 190.054
+margin_bottom = 130.82
+text = "Cancel"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NetworkError" type="Popup" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ColorRect" type="ColorRect" parent="NetworkError"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.239216, 0.227451, 0.270588, 1 )
+
+[node name="CenterContainer" type="CenterContainer" parent="NetworkError"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NetworkError/CenterContainer"]
+margin_left = 256.0
+margin_top = 232.0
+margin_right = 768.0
+margin_bottom = 367.0
+rect_min_size = Vector2( 512, 0 )
+custom_constants/separation = 15
+alignment = 1
+
+[node name="RichTextLabelMessage" type="RichTextLabel" parent="NetworkError/CenterContainer/VBoxContainer"]
+margin_right = 512.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 0, 100 )
+text = "TEST MESSAGE"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ButtonClose" type="Button" parent="NetworkError/CenterContainer/VBoxContainer"]
+margin_top = 115.0
+margin_right = 512.0
+margin_bottom = 135.0
+text = "CLOSE"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Player" type="Popup" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Player"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.239216, 0.227451, 0.270588, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Player"]
+margin_left = 51.3837
+margin_top = 71.4943
+margin_right = 132.384
+margin_bottom = 85.4943
+text = "Player Name"
+
+[node name="txtPlayerName" type="LineEdit" parent="Player"]
+margin_left = 46.9526
+margin_top = 89.9221
+margin_right = 156.953
+margin_bottom = 113.922
+text = "Player"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lblPlayerTeam" type="Label" parent="Player"]
+margin_left = 223.998
+margin_top = 72.4894
+margin_right = 337.998
+margin_bottom = 90.4894
+text = "Player Team"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="spritePlayerIcon" type="Sprite" parent="Player"]
+
+[node name="btPlayerConfirm" type="Button" parent="Player"]
+margin_left = 226.885
+margin_top = 151.467
+margin_right = 288.885
+margin_bottom = 171.467
+text = "Confirm"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="btPlayerCancel" type="Button" parent="Player"]
+margin_left = 314.192
+margin_top = 151.467
+margin_right = 376.192
+margin_bottom = 171.467
+text = "Cancel"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="optPlayerTeam" type="OptionButton" parent="Player"]
+margin_left = 253.171
+margin_top = 90.042
+margin_right = 412.171
+margin_bottom = 110.042
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="optTextrect" type="TextureRect" parent="Player"]
+margin_left = 225.924
+margin_top = 90.7491
+margin_right = 263.924
+margin_bottom = 126.749
+rect_scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 1 )
+stretch_mode = 1
+
+[node name="WaitingRoom" parent="." instance=ExtResource( 5 )]
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/CreateServer" to="." method="_onCreateServerSettingPressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/JoinServer" to="." method="_onJoinServerSettingPressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Cancel" to="." method="_onExitLobbyPressed"]
+[connection signal="pressed" from="Host/btServerCancel" to="." method="_hideAllPopup"]
+[connection signal="pressed" from="Host/btServerCreate" to="." method="_onCreateServerPressed"]
+[connection signal="pressed" from="Join/btnJoin" to="." method="_onJoinServerPressed"]
+[connection signal="pressed" from="Join/btJoinCancel" to="." method="_hideAllPopup"]
+[connection signal="pressed" from="NetworkError/CenterContainer/VBoxContainer/ButtonClose" to="." method="_hideAllPopup"]
+[connection signal="pressed" from="Player/btPlayerConfirm" to="." method="_onPlayerConfirmPressed"]
+[connection signal="pressed" from="Player/btPlayerCancel" to="." method="_hideAllPopup"]

@@ -95,7 +95,7 @@ public class Projectile : RayCast2D
             {
                 Acceleration +=  (Target.Position - Position).Normalized() * Speed;
                 Velocity += Acceleration * delta;
-                Rotation = Velocity.Angle();
+                Rotation = ((Target.Position - Position).Normalized() * Speed).Angle();
             }
 
             if (IsColliding())

@@ -11,7 +11,7 @@ public class GameStates : Node
     public float updateRate = 60;
     public float updateDelta = 0;
 
-    public String[] levels = { "res://ui/TitleScreen.tscn", "res://map/GameWorld.tscn" };
+    public String[] levels = { "res://ui/TitleScreen.tscn", "res://network/Lobby.tscn", "res://map/GameWorld.tscn" };
 
     public String endResultScreen = "res://ui/EndGameScreen.tscn";
 
@@ -111,6 +111,24 @@ public class GameStates : Node
     public void restart()
     {
         current_level = 0;
+        GetTree().ChangeScene(levels[current_level]);
+    }
+
+    public void EnterLobbyScreen()
+    {
+        current_level = 1;
+        GetTree().ChangeScene(levels[current_level]);
+    }
+
+    public void EnterTitleScreen()
+    {
+        current_level = 0;
+        GetTree().ChangeScene(levels[current_level]);
+    }
+
+    public void EnterNetworkLevel()
+    {
+        current_level = 2;
         GetTree().ChangeScene(levels[current_level]);
     }
 

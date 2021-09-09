@@ -133,7 +133,7 @@ public class LaserRay : RayCast2D
     public void appear()
     {
         tween.StopAll();
-        tween.InterpolateProperty(line2DLaser, "width", 0.0f, 10.0f, 0.2f);
+        tween.InterpolateProperty(line2DLaser, "width", 0.0f, 20.0f, 0.2f);
         tween.Start();
     }
 
@@ -141,7 +141,7 @@ public class LaserRay : RayCast2D
     public void disappear()
     {
         tween.StopAll();
-        tween.InterpolateProperty(line2DLaser, "width", 10.0f, 0.0f, 0.1f);
+        tween.InterpolateProperty(line2DLaser, "width", 20.0f, 0.0f, 0.1f);
         tween.Start();
     }
 

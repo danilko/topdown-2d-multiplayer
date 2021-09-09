@@ -1,11 +1,9 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://map/SimulateGameWorld.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
-[ext_resource path="res://assets/ui/grey_box.png" type="Texture" id=5]
-[ext_resource path="res://ui/TeamSettingPanel.cs" type="Script" id=6]
 
 [sub_resource type="DynamicFont" id=1]
 size = 86
@@ -15,19 +13,7 @@ font_data = ExtResource( 1 )
 size = 50
 font_data = ExtResource( 1 )
 
-[sub_resource type="Animation" id=3]
-tracks/0/type = "bezier"
-tracks/0/path = NodePath("CanvasLayer/Title:percent_visible")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
-"times": PoolRealArray( 0, 1 )
-}
-
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=3]
 size = 20
 font_data = ExtResource( 3 )
 
@@ -100,10 +86,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer"]
-autoplay = "start"
-anims/start = SubResource( 3 )
-
 [node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer"]
 margin_left = 35.0
 margin_top = 355.0
@@ -133,400 +115,34 @@ margin_left = 765.998
 margin_top = 416.631
 margin_right = 968.998
 margin_bottom = 447.631
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 3 )
+disabled = true
 text = "NEW GAME"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btnJoinServer" type="Button" parent="CanvasLayer"]
+[node name="Lobby" type="Button" parent="CanvasLayer"]
 margin_left = 767.0
-margin_top = 468.968
-margin_right = 973.0
-margin_bottom = 499.968
-custom_fonts/font = SubResource( 4 )
-text = "JOIN GAME"
+margin_top = 469.0
+margin_right = 970.0
+margin_bottom = 500.0
+custom_fonts/font = SubResource( 3 )
+text = "LOBBY"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="btnExit" type="Button" parent="CanvasLayer"]
+[node name="Exit" type="Button" parent="CanvasLayer"]
 margin_left = 767.0
 margin_top = 526.99
 margin_right = 973.0
 margin_bottom = 557.99
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 3 )
 text = "EXIT"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelPlayer" type="Panel" parent="CanvasLayer"]
-visible = false
-margin_left = 18.0
-margin_top = 22.0
-margin_right = 998.0
-margin_bottom = 581.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="CanvasLayer/PanelPlayer"]
-margin_left = 9.43109
-margin_top = 2.57213
-margin_right = 90.4311
-margin_bottom = 16.5721
-text = "Player Name"
-
-[node name="txtPlayerName" type="LineEdit" parent="CanvasLayer/PanelPlayer"]
-margin_left = 5.0
-margin_top = 21.0
-margin_right = 115.0
-margin_bottom = 45.0
-text = "Player"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblPlayerTeam" type="Label" parent="CanvasLayer/PanelPlayer"]
-margin_left = 182.045
-margin_top = 3.56729
-margin_right = 296.045
-margin_bottom = 21.5673
-text = "Player Team"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="spritePlayerIcon" type="Sprite" parent="CanvasLayer/PanelPlayer"]
-
-[node name="btPlayerConfirm" type="Button" parent="CanvasLayer/PanelPlayer"]
-margin_left = 184.932
-margin_top = 82.5449
-margin_right = 246.932
-margin_bottom = 102.545
-text = "Confirm"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="btPlayerCancel" type="Button" parent="CanvasLayer/PanelPlayer"]
-margin_left = 272.239
-margin_top = 82.5449
-margin_right = 334.239
-margin_bottom = 102.545
-text = "Cancel"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="optPlayerTeam" type="OptionButton" parent="CanvasLayer/PanelPlayer"]
-margin_left = 211.218
-margin_top = 21.1199
-margin_right = 370.218
-margin_bottom = 41.1199
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="optTextrect" type="TextureRect" parent="CanvasLayer/PanelPlayer"]
-margin_left = 183.971
-margin_top = 21.827
-margin_right = 221.971
-margin_bottom = 57.827
-rect_scale = Vector2( 0.5, 0.5 )
-texture = ExtResource( 5 )
-stretch_mode = 1
-
-[node name="PanelHost" type="Panel" parent="CanvasLayer"]
-visible = false
-margin_left = 29.0
-margin_top = 23.0
-margin_right = 997.0
-margin_bottom = 579.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="txtServerName" type="LineEdit" parent="CanvasLayer/PanelHost"]
-margin_left = 72.2493
-margin_top = 62.8264
-margin_right = 275.249
-margin_bottom = 86.8264
-text = "127.0.0.1"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="CanvasLayer/PanelHost"]
-margin_left = 74.0101
-margin_top = 46.1709
-margin_right = 152.01
-margin_bottom = 60.1709
-text = "ServerName"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label2" type="Label" parent="CanvasLayer/PanelHost"]
-margin_left = 71.1901
-margin_top = 94.2686
-margin_right = 141.19
-margin_bottom = 108.269
-text = "Server Port"
-
-[node name="txtServerPort" type="LineEdit" parent="CanvasLayer/PanelHost"]
-margin_left = 77.1052
-margin_top = 114.263
-margin_right = 135.105
-margin_bottom = 138.263
-text = "31400"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="txtMaxPlayers" type="SpinBox" parent="CanvasLayer/PanelHost"]
-margin_left = 168.411
-margin_top = 111.168
-margin_right = 242.411
-margin_bottom = 135.168
-value = 10.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label3" type="Label" parent="CanvasLayer/PanelHost"]
-margin_left = 168.519
-margin_top = 93.9242
-margin_right = 277.519
-margin_bottom = 107.924
-text = "Max Connections"
-
-[node name="btServerCancel" type="Button" parent="CanvasLayer/PanelHost"]
-margin_left = 438.687
-margin_top = 111.738
-margin_right = 500.687
-margin_bottom = 131.738
-text = "Cancel"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="btServerCreate" type="Button" parent="CanvasLayer/PanelHost"]
-margin_left = 357.357
-margin_top = 111.067
-margin_right = 410.357
-margin_bottom = 131.067
-text = "Create"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblCreateServer" type="Label" parent="CanvasLayer/PanelHost"]
-margin_left = 15.4126
-margin_top = 9.5559
-margin_right = 840.413
-margin_bottom = 23.5559
-text = "Create Server"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="LabelTeamSettings" type="Label" parent="CanvasLayer/PanelHost"]
-margin_left = 15.4126
-margin_top = 170.167
-margin_right = 840.413
-margin_bottom = 184.167
-text = "Team Setting"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PanelTeamSetting" type="Panel" parent="CanvasLayer/PanelHost"]
-visible = false
-margin_right = 767.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 767, 50 )
-script = ExtResource( 6 )
-
-[node name="TextrectTeam" type="TextureRect" parent="CanvasLayer/PanelHost/PanelTeamSetting"]
-margin_left = 27.7983
-margin_top = 10.1763
-margin_right = 65.7983
-margin_bottom = 46.1763
-rect_scale = Vector2( 0.5, 0.5 )
-texture = ExtResource( 5 )
-stretch_mode = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="LabelTeamName" type="Label" parent="CanvasLayer/PanelHost/PanelTeamSetting"]
-margin_left = 59.8463
-margin_top = 13.8591
-margin_right = 136.846
-margin_bottom = 27.8591
-text = "TEAM NAME"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="LabelBugdet" type="Label" parent="CanvasLayer/PanelHost/PanelTeamSetting"]
-margin_left = 219.226
-margin_top = 13.8591
-margin_right = 319.226
-margin_bottom = 27.8591
-rect_pivot_offset = Vector2( 30.2927, 7 )
-text = "BUDGETS:"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="LabelAutoSapwnMembers" type="Label" parent="CanvasLayer/PanelHost/PanelTeamSetting"]
-margin_left = 525.0
-margin_top = 14.0
-margin_right = 683.0
-margin_bottom = 28.0
-rect_pivot_offset = Vector2( 30.2927, 7 )
-text = "AUTO SPAWN MEMBERS:"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="SpinBoxTeamBudget" type="SpinBox" parent="CanvasLayer/PanelHost/PanelTeamSetting"]
-margin_left = 330.415
-margin_top = 8.0
-margin_right = 497.415
-margin_bottom = 32.0
-max_value = 100000.0
-value = 10000.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="CheckBoxAutoSapwnMembers" type="CheckBox" parent="CanvasLayer/PanelHost/PanelTeamSetting"]
-margin_left = 700.516
-margin_top = 7.90778
-margin_right = 724.516
-margin_bottom = 31.9078
-pressed = true
-
-[node name="MarginContainerTeamManagement" type="MarginContainer" parent="CanvasLayer/PanelHost"]
-margin_left = 32.0
-margin_top = 197.0
-margin_right = 933.0
-margin_bottom = 516.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ScrollContainerTeamManagement" type="ScrollContainer" parent="CanvasLayer/PanelHost/MarginContainerTeamManagement"]
-margin_right = 901.0
-margin_bottom = 319.0
-scroll_horizontal_enabled = false
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="GridContainerTeamManagement" type="GridContainer" parent="CanvasLayer/PanelHost/MarginContainerTeamManagement/ScrollContainerTeamManagement"]
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PanelJoin" type="Panel" parent="CanvasLayer"]
-visible = false
-margin_left = 24.0
-margin_top = 20.0
-margin_right = 994.0
-margin_bottom = 581.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="CanvasLayer/PanelJoin"]
-margin_left = 19.0
-margin_top = 8.0
-margin_right = 847.0
-margin_bottom = 22.0
-text = "Join Server"
-
-[node name="Label2" type="Label" parent="CanvasLayer/PanelJoin"]
-margin_left = 34.0463
-margin_top = 37.9151
-margin_right = 80.0463
-margin_bottom = 51.9151
-text = "IP"
-
-[node name="Label3" type="Label" parent="CanvasLayer/PanelJoin"]
-margin_left = 161.72
-margin_top = 32.4987
-margin_right = 199.72
-margin_bottom = 46.4987
-text = "Port"
-
-[node name="txtJoinIp" type="LineEdit" parent="CanvasLayer/PanelJoin"]
-margin_left = 25.0
-margin_top = 58.0
-margin_right = 95.0
-margin_bottom = 82.0
-text = "127.0.0.1"
-
-[node name="txtJoinPort" type="LineEdit" parent="CanvasLayer/PanelJoin"]
-margin_left = 157.077
-margin_top = 54.9382
-margin_right = 215.077
-margin_bottom = 78.9382
-text = "31400"
-
-[node name="btnJoin" type="Button" parent="CanvasLayer/PanelJoin"]
-margin_left = 33.2725
-margin_top = 109.876
-margin_right = 68.2725
-margin_bottom = 129.876
-text = "Join"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="btJoinCancel" type="Button" parent="CanvasLayer/PanelJoin"]
-margin_left = 128.054
-margin_top = 110.82
-margin_right = 190.054
-margin_bottom = 130.82
-text = "Cancel"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="NetworkErrorMessage" type="PopupDialog" parent="CanvasLayer"]
-margin_left = 420.0
-margin_top = 252.0
-margin_right = 831.0
-margin_bottom = 451.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ButtonClose" type="Button" parent="CanvasLayer/NetworkErrorMessage"]
-margin_left = 153.507
-margin_top = 140.826
-margin_right = 247.507
-margin_bottom = 168.826
-text = "CLOSE"
-
-[node name="RichTextLabelMessage" type="RichTextLabel" parent="CanvasLayer/NetworkErrorMessage"]
-margin_left = 25.0
-margin_top = 25.0
-margin_right = 393.0
-margin_bottom = 104.0
-
-[connection signal="pressed" from="CanvasLayer/btnCreateServer" to="." method="_onbtnCreateServerPanel"]
-[connection signal="pressed" from="CanvasLayer/btnJoinServer" to="." method="_onbtnJoinServerPanel"]
-[connection signal="pressed" from="CanvasLayer/btnExit" to="." method="_onbtnExit"]
-[connection signal="pressed" from="CanvasLayer/PanelPlayer/btPlayerConfirm" to="." method="_onbtPlayerConfirmPressed"]
-[connection signal="pressed" from="CanvasLayer/PanelPlayer/btPlayerCancel" to="." method="_onbtCancelPressed"]
-[connection signal="pressed" from="CanvasLayer/PanelHost/btServerCancel" to="." method="_onbtCancelPressed"]
-[connection signal="pressed" from="CanvasLayer/PanelHost/btServerCreate" to="." method="_onbtCreatePressed"]
-[connection signal="pressed" from="CanvasLayer/PanelJoin/btnJoin" to="." method="_onbtJoinPressed"]
-[connection signal="pressed" from="CanvasLayer/PanelJoin/btJoinCancel" to="." method="_onbtCancelPressed"]
-[connection signal="pressed" from="CanvasLayer/NetworkErrorMessage/ButtonClose" to="." method="_closeNetworkFail"]
+[connection signal="pressed" from="CanvasLayer/Lobby" to="." method="_onLobbyPressed"]
+[connection signal="pressed" from="CanvasLayer/Exit" to="." method="_onExitPressed"]

@@ -33,6 +33,14 @@ public class ScreenIndicator : Node2D
 
     private TextureRect _lockonIndicator;
 
+
+    public void SetActivate(Boolean activate)
+    {
+        this.Visible = activate;
+        _lockonIndicator.Visible = false;
+    }
+
+
     public override void _Ready()
     {
         _agentMarker = (Node2D)GetNode("AgentMarker");
