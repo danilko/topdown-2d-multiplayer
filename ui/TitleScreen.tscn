@@ -120,7 +120,6 @@ __meta__ = {
 }
 
 [node name="Settings" parent="CanvasLayer" instance=ExtResource( 5 )]
-visible = false
 
 [connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Lobby" to="." method="_onLobbyPressed"]
 [connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Settings" to="." method="_onSettingsPressed"]
