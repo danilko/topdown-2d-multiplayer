@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/ui/grey_box.png" type="Texture" id=1]
 [ext_resource path="res://ui/TeamSettingPanel.cs" type="Script" id=2]
@@ -6,7 +6,11 @@
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://network/WaitingRoom.tscn" type="PackedScene" id=5]
 
-[sub_resource type="DynamicFont" id=1]
+[sub_resource type="DynamicFont" id=4]
+size = 20
+font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=3]
 size = 20
 font_data = ExtResource( 4 )
 
@@ -40,7 +44,7 @@ custom_constants/separation = 15
 [node name="Lobby" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 265.0
 margin_bottom = 25.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "LOBBY"
 align = 1
 uppercase = true
@@ -49,7 +53,7 @@ uppercase = true
 margin_top = 40.0
 margin_right = 265.0
 margin_bottom = 71.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "CREATE SERVER"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -59,7 +63,7 @@ __meta__ = {
 margin_top = 86.0
 margin_right = 265.0
 margin_bottom = 117.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "JOIN SERVER"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -69,7 +73,7 @@ __meta__ = {
 margin_top = 132.0
 margin_right = 265.0
 margin_bottom = 163.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "Exit Lobby"
 
 [node name="Host" type="Popup" parent="."]
@@ -140,7 +144,7 @@ margin_left = 528.0
 margin_top = 112.0
 margin_right = 662.0
 margin_bottom = 143.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "Cancel"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -151,7 +155,7 @@ margin_left = 357.357
 margin_top = 111.067
 margin_right = 410.357
 margin_bottom = 131.067
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "Create"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -162,7 +166,7 @@ margin_left = 15.4126
 margin_top = 9.5559
 margin_right = 840.413
 margin_bottom = 23.5559
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "Create Server"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -173,7 +177,7 @@ margin_left = 15.4126
 margin_top = 170.167
 margin_right = 840.413
 margin_bottom = 184.167
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 4 )
 text = "Team Setting"
 uppercase = true
 __meta__ = {
@@ -272,6 +276,7 @@ __meta__ = {
 }
 
 [node name="Join" type="Popup" parent="."]
+visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
@@ -288,51 +293,54 @@ margin_left = 19.0
 margin_top = 8.0
 margin_right = 847.0
 margin_bottom = 22.0
+custom_fonts/font = SubResource( 3 )
 text = "Join Server"
 
 [node name="Label2" type="Label" parent="Join"]
-margin_left = 34.0463
-margin_top = 37.9151
-margin_right = 80.0463
-margin_bottom = 51.9151
+margin_left = 33.0463
+margin_top = 53.4164
+margin_right = 79.0463
+margin_bottom = 67.4164
 text = "IP"
 
 [node name="Label3" type="Label" parent="Join"]
-margin_left = 161.72
-margin_top = 32.4987
-margin_right = 199.72
-margin_bottom = 46.4987
+margin_left = 160.72
+margin_top = 48.0
+margin_right = 198.72
+margin_bottom = 62.0
 text = "Port"
 
 [node name="txtJoinIp" type="LineEdit" parent="Join"]
-margin_left = 25.0
-margin_top = 58.0
-margin_right = 95.0
-margin_bottom = 82.0
+margin_left = 24.0
+margin_top = 73.5013
+margin_right = 94.0
+margin_bottom = 97.5013
 text = "127.0.0.1"
 
 [node name="txtJoinPort" type="LineEdit" parent="Join"]
-margin_left = 157.077
-margin_top = 54.9382
-margin_right = 215.077
-margin_bottom = 78.9382
+margin_left = 156.077
+margin_top = 70.4395
+margin_right = 214.077
+margin_bottom = 94.4395
 text = "31400"
 
 [node name="btnJoin" type="Button" parent="Join"]
-margin_left = 33.2725
-margin_top = 109.876
-margin_right = 68.2725
-margin_bottom = 129.876
-text = "Join"
+margin_left = 24.0
+margin_top = 128.0
+margin_right = 107.0
+margin_bottom = 159.0
+custom_fonts/font = SubResource( 3 )
+text = "JOIN"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="btJoinCancel" type="Button" parent="Join"]
-margin_left = 128.054
-margin_top = 110.82
-margin_right = 190.054
-margin_bottom = 130.82
+margin_left = 160.0
+margin_top = 128.0
+margin_right = 294.0
+margin_bottom = 159.0
+custom_fonts/font = SubResource( 3 )
 text = "Cancel"
 __meta__ = {
 "_edit_use_anchors_": false

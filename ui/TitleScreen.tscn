@@ -4,13 +4,10 @@
 [ext_resource path="res://map/SimulateGameWorld.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
+[ext_resource path="res://ui/Settings.tscn" type="PackedScene" id=5]
 
 [sub_resource type="DynamicFont" id=1]
 size = 86
-font_data = ExtResource( 1 )
-
-[sub_resource type="DynamicFont" id=2]
-size = 50
 font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFont" id=3]
@@ -65,56 +62,26 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PlayMessage" type="Label" parent="CanvasLayer"]
-visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -354.22
-margin_top = -7.28265
-margin_right = 355.78
-margin_bottom = 49.7173
-custom_fonts/font = SubResource( 2 )
-custom_colors/font_color = Color( 1, 1, 1, 1 )
-custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-custom_constants/shadow_offset_x = 3
-custom_constants/shadow_offset_y = 3
-text = "create/join server"
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
+margin_left = 680.0
+margin_top = 366.0
+margin_right = 992.0
+margin_bottom = 560.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer"]
-margin_left = 35.0
-margin_top = 355.0
-margin_right = 505.0
-margin_bottom = 641.0
-text = "CONTROL INSTRUCTIONS:
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/CenterContainer"]
+margin_left = 6.0
+margin_top = 5.0
+margin_right = 306.0
+margin_bottom = 189.0
+rect_min_size = Vector2( 300, 0 )
+custom_constants/separation = 20
 
-W/A/S/D - UP/RIGHT/DOWN/LEFT
-R - RELOAD
-1/2/3 - SWITCH LEFT WEAPON
-4/5/6 - SWITCH RIGHT WEAPON
-MOUSE - AIM
-MOUSE LEFT CLICK - LEFT WEAPON
-MOUSE RIGHT CLICK - RIGHT WEAPON
-
-B - ASSEMBLY/INVENTORY/STORE SYSTEM
-
-CURRENT WINNING/LOSING CONDITION:
-1. ALL ENEMY UNITS DEFEATED (AROUND 100  FROM EACH TEAM)
-2. ALL BASE CAPTURED + NO MORE CURRENT ENEMY UNITS"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="btnCreateServer" type="Button" parent="CanvasLayer"]
-margin_left = 765.998
-margin_top = 416.631
-margin_right = 968.998
-margin_bottom = 447.631
+[node name="NewGame" type="Button" parent="CanvasLayer/CenterContainer/VBoxContainer"]
+margin_right = 300.0
+margin_bottom = 31.0
 custom_fonts/font = SubResource( 3 )
 disabled = true
 text = "NEW GAME"
@@ -122,27 +89,39 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Lobby" type="Button" parent="CanvasLayer"]
-margin_left = 767.0
-margin_top = 469.0
-margin_right = 970.0
-margin_bottom = 500.0
+[node name="Lobby" type="Button" parent="CanvasLayer/CenterContainer/VBoxContainer"]
+margin_top = 51.0
+margin_right = 300.0
+margin_bottom = 82.0
 custom_fonts/font = SubResource( 3 )
 text = "LOBBY"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Exit" type="Button" parent="CanvasLayer"]
-margin_left = 767.0
-margin_top = 526.99
-margin_right = 973.0
-margin_bottom = 557.99
+[node name="Settings" type="Button" parent="CanvasLayer/CenterContainer/VBoxContainer"]
+margin_top = 102.0
+margin_right = 300.0
+margin_bottom = 133.0
+custom_fonts/font = SubResource( 3 )
+text = "SETTINGS"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Exit" type="Button" parent="CanvasLayer/CenterContainer/VBoxContainer"]
+margin_top = 153.0
+margin_right = 300.0
+margin_bottom = 184.0
 custom_fonts/font = SubResource( 3 )
 text = "EXIT"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[connection signal="pressed" from="CanvasLayer/Lobby" to="." method="_onLobbyPressed"]
-[connection signal="pressed" from="CanvasLayer/Exit" to="." method="_onExitPressed"]
+[node name="Settings" parent="CanvasLayer" instance=ExtResource( 5 )]
+visible = false
+
+[connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Lobby" to="." method="_onLobbyPressed"]
+[connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Settings" to="." method="_onSettingsPressed"]
+[connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Exit" to="." method="_onExitPressed"]

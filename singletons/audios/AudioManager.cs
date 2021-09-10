@@ -4,10 +4,22 @@ using System;
 public class AudioManager : Node
 {
 
+    private float _defaultVolumeDb = -50.0f;
+
     AudioStreamPlayer[] soundEffectPlayers = new AudioStreamPlayer[100];
 
     AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/bullethit.wav");
 
+
+    public void SetSoundVolumeDb(float volumeDb)
+    {
+        AudioServer.SetBusVolumeDb(AudioServer.GetBusIndex("Master"), volumeDb);
+    }
+
+    public float GetSoundVolumeDb()
+    {
+        return AudioServer.GetBusVolumeDb(AudioServer.GetBusIndex("Master"));
+    }
 
     public void playMusic(AudioStream musicClip)
     {
@@ -18,6 +30,7 @@ public class AudioManager : Node
 
     public override void _Ready()
     {
+        AudioServer.SetBusVolumeDb(AudioServer.GetBusIndex("Master"), _defaultVolumeDb);
 
         for (int index = 0; index < soundEffectPlayers.Length; index++)
         {

@@ -103,7 +103,7 @@ public class Player : Agent
     {
         base.DisconnectWeapon(currentWeapon, weaponOrder);
 
-        if (currentWeapon != null && _hud != null)
+        if (_screenIndicator != null && currentWeapon != null && _hud != null)
         {
             // Deregister weapon from UI if connected
             if (currentWeapon.IsConnected(nameof(Weapon.AmmoChangeSignal), _screenIndicator, nameof(ScreenIndicator.UpdateWeaponAmmo)))
@@ -117,7 +117,7 @@ public class Player : Agent
     {
         base.ConnectWeapon(currentWeapon, weaponOrder);
 
-        if (currentWeapon != null && _hud != null)
+        if (_screenIndicator != null && currentWeapon != null && _hud != null)
         {
             // Register new weapon with UI if not connect (as cannot connect again)
 
