@@ -61,13 +61,13 @@ public class Player : Agent
             {
                 ConnectWeapon(weapon, weaponOrder);
 
-                EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, GetCurrentWeaponIndex(weaponOrder))], weaponOrder);
+                EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, GetCurrentWeaponIndex(weaponOrder))], weaponOrder, index);
                 // Emit signal to update info
                 weapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), weapon.GetAmmo(), weapon.GetMaxAmmo(), weaponOrder);
             }
             else
             {
-                EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder);
+                EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder, index);
             }
         }
 
@@ -88,7 +88,7 @@ public class Player : Agent
 
 
         // Setup Inventory UI
-        _inventoryUI = (InventoryUI)_hud.GetNode("controlGame/InventoryUI");
+        _inventoryUI = (InventoryUI)_hud.GetNode("GameControl/InventoryUI");
         _inventoryUI.Initialize(_inventoryManager, CurrentInventory);
 
         if (!_teamMapAI.IsConnected(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount)))
@@ -144,14 +144,8 @@ public class Player : Agent
     {
         if (Input.IsActionJustReleased("inventory"))
         {
-            if (!_inventoryUI.Visible)
-            {
-                _inventoryUI.PopupCentered();
-            }
-            else
-            {
-                _inventoryUI.Hide();
-            }
+            // Show UI if UI is not visible, and also hide UI if UI is already visible 
+            _inventoryUI.Activate(! _inventoryUI.Visible);
         }
 
 

@@ -11,6 +11,7 @@ one_shot = true
 autostart = true
 
 [node name="PathLine" type="Line2D" parent="."]
+visible = false
 width = 2.0
 default_color = Color( 1, 0.4, 0.498039, 1 )
 

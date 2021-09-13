@@ -16,6 +16,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 145.0
+margin_bottom = 145.0
+color = Color( 0.266667, 0.266667, 0.266667, 0.470588 )
+
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 margin_left = 5.0
 margin_top = 5.0

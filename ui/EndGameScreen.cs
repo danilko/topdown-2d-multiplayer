@@ -27,6 +27,6 @@ public class EndGameScreen : Control
             network.closeServer();
         }
 
-        gameStates.next_level();
+        gameStates.EnterTitleScreen();
     }
 }

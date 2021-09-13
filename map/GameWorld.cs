@@ -135,8 +135,6 @@ public class GameWorld : Node2D
 
         InitializeHUD();
 
-        Input.SetCustomMouseCursor(GD.Load("res://assets/ui/blue_cross.png"), Input.CursorShape.Arrow, new Vector2(16, 16));
-
         _initializeNetwork();
         _initailizeGameTimer();
     }
@@ -155,7 +153,7 @@ public class GameWorld : Node2D
     protected void InitializeHUD()
     {
         _hud = (HUD)GetNode("HUD");
-        _miniMap = (MiniMap)_hud.GetNode("controlGame/MiniMap");
+        _miniMap = (MiniMap)_hud.GetNode("GameControl/MiniMap");
         _popUpMessage = (PopUpMessage)_hud.GetNode("PopUpMessage");
 
         _miniMap.Iniitialize(CapaturableBaseManager);
@@ -189,12 +187,8 @@ public class GameWorld : Node2D
         // Update network flow
         this.Connect(nameof(NeworkRateUpdateSignal), _hud, "_onNetworkRateUpdate");
         this.Connect(nameof(PlayerDefeatedSignal), _hud, nameof(HUD.OnPlayerDefeated));
-        this.Connect(nameof(Network.PlayerListChangedSignal), _hud, "onPlayerListChanged");
         this.Connect(nameof(WaitingPeriodSignal), _hud, "_onUpdateTimer");
         this.Connect(nameof(PlayerCreateSignal), _hud, nameof(HUD.OnPlayerCreated));
-
-        // Update playerlist
-        EmitSignal(nameof(Network.PlayerListChangedSignal));
     }
 
     private void _initailizeGameTimer()

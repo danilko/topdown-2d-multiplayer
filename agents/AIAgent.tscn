@@ -13,6 +13,7 @@ MaxSpeed = 300
 MaxHealth = 100
 RotationSpeed = 5.0
 MaxEnergy = 100
+DetectionRadius = 2000.0
 TurretSpeed = 10
 DetectRadius = 2000.0
 

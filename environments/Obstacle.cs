@@ -97,8 +97,8 @@ public class Obstacle : StaticBody2D
         //remainParticles.GlobalPosition = this.GlobalPosition;
         //GetParent().GetParent().GetNode("RemainEffectManager").AddChild(remainParticles);
 
-        AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        audioManager.playSoundEffect(explosionMusicClip);
+       //AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+       // audioManager.playSoundEffect(explosionMusicClip);
     }
 
     private void _OnExplosionAnimationFinished()

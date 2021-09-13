@@ -6,7 +6,7 @@ public class AudioManager : Node
 
     private float _defaultVolumeDb = -50.0f;
 
-    AudioStreamPlayer[] soundEffectPlayers = new AudioStreamPlayer[100];
+    AudioStreamPlayer[] soundEffectPlayers = new AudioStreamPlayer[1000];
 
     AudioStream musicHitClip = (AudioStream)GD.Load("res://assets/sounds/bullethit.wav");
 

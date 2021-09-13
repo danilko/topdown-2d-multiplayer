@@ -179,7 +179,9 @@ public class Agent : KinematicBody2D
         // Caculate actual index base on availble weapon
         weaponIndex = weaponIndex % weapons.Count;
 
-        Weapon currentWeapon = ((Weapon)weapons[CurrentWeaponIndex[weaponOrder]]);
+        int originalWeaponIndex = CurrentWeaponIndex[weaponOrder];
+
+        Weapon currentWeapon = ((Weapon)weapons[originalWeaponIndex]);
 
         if (currentWeapon != null)
         {
@@ -194,14 +196,23 @@ public class Agent : KinematicBody2D
         {
             ConnectWeapon(currentWeapon, weaponOrder);
 
-            EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, weaponIndex)], weaponOrder);
+            // This is re-click, no need to submit signal
+            if(originalWeaponIndex != weaponIndex)
+            {
+                EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, weaponIndex)], weaponOrder, weaponIndex);
+            }
 
             // Emit signal to update info
             currentWeapon.EmitSignal(nameof(Weapon.AmmoChangeSignal), currentWeapon.GetAmmo(), currentWeapon.GetMaxAmmo(), weaponOrder);
         }
         else
         {
-            EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder);
+
+            // This is re-click, no need to submit signal
+            if(originalWeaponIndex != weaponIndex)
+            {
+                EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder, weaponIndex);
+            }
         }
     }
 
@@ -296,24 +307,24 @@ public class Agent : KinematicBody2D
     /**
     Unequip weapon at given weapon order's given index
     **/
-    public void UnequipWeapon(Weapon.WeaponOrder weaponOrder, int index)
+    public void UnequipWeapon(Weapon.WeaponOrder weaponOrder, int weaponIndex)
     {
         Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
 
-        Weapon weapon = (Weapon)weapons[index];
+        Weapon weapon = (Weapon)weapons[weaponIndex];
 
         if (weapon != null)
         {
             Node2D weaponHolder = GetWeaponsHolder(weaponOrder);
             weaponHolder.RemoveChild(weapon);
             // Null the weapon
-            weapons[index] = null;
+            weapons[weaponIndex] = null;
             DisconnectWeapon(weapon, weaponOrder);
             // Empty out weapon
             weapon.Deinitialize();
         }
 
-        EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder);
+        EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder, weaponIndex);
     }
 
     public void SetCurrentTeam(Team.TeamCode inputTeamCode)

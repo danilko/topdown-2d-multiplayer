@@ -1,19 +1,21 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
-[ext_resource path="res://assets/ui/green_button00.png" type="Texture" id=2]
-[ext_resource path="res://assets/ui/green_circle.png" type="Texture" id=3]
-[ext_resource path="res://assets/ui/yellow_boxTick.png" type="Texture" id=4]
+[ext_resource path="res://ui/WeaponControl.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://assets/fonts/Kenney Pixel Square.ttf" type="DynamicFontData" id=6]
 [ext_resource path="res://assets/fonts/Kenney Rocket Square.ttf" type="DynamicFontData" id=7]
 [ext_resource path="res://ui/MiniMap.tscn" type="PackedScene" id=8]
 [ext_resource path="res://ui/PopUpMessage.tscn" type="PackedScene" id=9]
-[ext_resource path="res://assets/ui/grey_panel.png" type="Texture" id=10]
 [ext_resource path="res://ui/InventoryUI.tscn" type="PackedScene" id=11]
 
 [sub_resource type="DynamicFont" id=1]
-size = 20
+size = 15
 font_data = ExtResource( 7 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 10
+font_data = ExtResource( 3 )
 
 [sub_resource type="DynamicFont" id=2]
 size = 42
@@ -49,9 +51,9 @@ script = ExtResource( 1 )
 
 [node name="lblTimerStatus" type="Label" parent="."]
 margin_left = 25.0
-margin_top = 552.0
+margin_top = 565.0
 margin_right = 322.0
-margin_bottom = 577.0
+margin_bottom = 590.0
 custom_fonts/font = SubResource( 1 )
 custom_colors/font_color = Color( 0.588235, 1, 0.356863, 1 )
 __meta__ = {
@@ -60,48 +62,11 @@ __meta__ = {
 
 [node name="lblTeamUnitUsageAmount" type="Label" parent="."]
 margin_left = 447.0
-margin_top = 552.0
+margin_top = 567.0
 margin_right = 683.0
-margin_bottom = 577.0
-custom_fonts/font = SubResource( 1 )
+margin_bottom = 592.0
 custom_colors/font_color = Color( 0.588235, 1, 0.356863, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ControlPlayerList" type="Control" parent="."]
-visible = false
-margin_right = 40.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Panel" type="Panel" parent="ControlPlayerList"]
-margin_left = 63.0
-margin_top = 28.0
-margin_right = 979.0
-margin_bottom = 572.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblPlayerList" type="Label" parent="ControlPlayerList/Panel"]
-margin_left = 35.8394
-margin_top = 59.9213
-margin_right = 113.839
-margin_bottom = 90.9213
-text = "Player List
--------------------------------------------------------------"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="boxList" type="VBoxContainer" parent="ControlPlayerList/Panel"]
-margin_left = 18.3811
-margin_top = 95.3323
-margin_right = 899.381
-margin_bottom = 510.332
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -111,280 +76,10 @@ margin_left = 516.582
 margin_top = 580.087
 margin_right = 679.582
 margin_bottom = 595.087
+custom_fonts/font = SubResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="controlGame" type="Control" parent="."]
-margin_right = 40.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Margin" type="MarginContainer" parent="controlGame"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_right = 270.0
-margin_bottom = 49.0
-custom_constants/margin_right = 20
-custom_constants/margin_top = 20
-custom_constants/margin_left = 20
-custom_constants/margin_bottom = 20
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Container" type="HBoxContainer" parent="controlGame/Margin"]
-margin_left = 20.0
-margin_top = 20.0
-margin_right = 290.0
-margin_bottom = 69.0
-
-[node name="TextureRect" type="TextureRect" parent="controlGame/Margin/Container"]
-visible = false
-margin_right = 36.0
-margin_bottom = 49.0
-texture = ExtResource( 3 )
-
-[node name="HealthBar" type="TextureProgress" parent="controlGame/Margin/Container"]
-visible = false
-margin_right = 190.0
-margin_bottom = 49.0
-value = 75.0
-texture_progress = ExtResource( 2 )
-
-[node name="Tween" type="Tween" parent="controlGame/Margin/Container/HealthBar"]
-
-[node name="AmmoBar" type="TextureProgress" parent="controlGame/Margin/Container"]
-visible = false
-margin_left = 234.0
-margin_right = 270.0
-margin_bottom = 49.0
-value = 90.0
-texture_progress = ExtResource( 4 )
-fill_mode = 4
-radial_initial_angle = 270.0
-radial_fill_degrees = 180.0
-
-[node name="lblDefeatedAgentCountLabel" type="Label" parent="controlGame"]
-visible = false
-margin_left = 738.439
-margin_top = 442.841
-margin_right = 847.439
-margin_bottom = 458.841
-text = "Defeated Agent"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblDefeatedAgentCount" type="Label" parent="controlGame"]
-visible = false
-margin_left = 897.456
-margin_top = 441.427
-margin_right = 1006.46
-margin_bottom = 457.427
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblLocalPlayer" type="Label" parent="controlGame"]
-visible = false
-margin_left = 27.3425
-margin_top = 83.4875
-margin_right = 172.343
-margin_bottom = 109.487
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PanelServerInfo" type="Panel" parent="controlGame"]
-visible = false
-margin_left = 597.0
-margin_top = 484.0
-margin_right = 701.0
-margin_bottom = 504.0
-rect_scale = Vector2( 3.88731, 2.12269 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblPing" type="Label" parent="controlGame/PanelServerInfo"]
-margin_left = 0.643118
-margin_top = 16.4885
-margin_right = 104.643
-margin_bottom = 30.4885
-
-[node name="lblServerName" type="Label" parent="controlGame"]
-margin_left = 687.0
-margin_top = 548.0
-margin_right = 1020.0
-margin_bottom = 570.0
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="LeftWeaponControl" type="Control" parent="controlGame"]
-visible = false
-margin_left = 705.0
-margin_top = 352.0
-margin_right = 992.0
-margin_bottom = 443.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Background" type="TextureRect" parent="controlGame/LeftWeaponControl"]
-self_modulate = Color( 0.254902, 0.254902, 0.254902, 0.254902 )
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 44.0
-margin_bottom = -4.0
-texture = ExtResource( 10 )
-expand = true
-stretch_mode = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponLabel" type="Label" parent="controlGame/LeftWeaponControl"]
-margin_left = 150.597
-margin_top = 2.98839
-margin_right = 269.597
-margin_bottom = 16.9884
-text = "LEFT WEAPON"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponName" type="Label" parent="controlGame/LeftWeaponControl"]
-margin_left = 150.597
-margin_top = 32.1329
-margin_right = 269.597
-margin_bottom = 46.1329
-text = "LEFT WEAPON"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponAmmo" type="Label" parent="controlGame/LeftWeaponControl"]
-visible = false
-margin_left = 151.695
-margin_top = 49.7503
-margin_right = 256.695
-margin_bottom = 63.7503
-text = "000/000"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponAmmoMessage" type="Label" parent="controlGame/LeftWeaponControl"]
-visible = false
-margin_left = 150.072
-margin_top = 70.9775
-margin_right = 248.072
-margin_bottom = 84.9775
-rect_pivot_offset = Vector2( 53.3791, 14 )
-custom_colors/font_color = Color( 1, 0, 0, 1 )
-text = "OUT OF AMMO"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="textureWeaponSymbol" type="TextureRect" parent="controlGame/LeftWeaponControl"]
-margin_left = 68.1537
-margin_top = 11.1362
-margin_right = 108.154
-margin_bottom = 51.1362
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="RightWeaponControl" type="Control" parent="controlGame"]
-visible = false
-margin_left = 705.0
-margin_top = 453.117
-margin_right = 992.0
-margin_bottom = 544.117
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Background" type="TextureRect" parent="controlGame/RightWeaponControl"]
-self_modulate = Color( 0.254902, 0.254902, 0.254902, 0.254902 )
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 44.0
-margin_bottom = -4.0
-texture = ExtResource( 10 )
-expand = true
-stretch_mode = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponLabel" type="Label" parent="controlGame/RightWeaponControl"]
-margin_left = 150.597
-margin_top = 2.98839
-margin_right = 269.597
-margin_bottom = 16.9884
-text = "LEFT WEAPON"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponName" type="Label" parent="controlGame/RightWeaponControl"]
-margin_left = 150.597
-margin_top = 32.1329
-margin_right = 269.597
-margin_bottom = 46.1329
-text = "LEFT WEAPON"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponAmmo" type="Label" parent="controlGame/RightWeaponControl"]
-visible = false
-margin_left = 151.695
-margin_top = 49.7503
-margin_right = 256.695
-margin_bottom = 63.7503
-text = "000/000"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="lblWeaponAmmoMessage" type="Label" parent="controlGame/RightWeaponControl"]
-visible = false
-margin_left = 150.072
-margin_top = 70.9775
-margin_right = 248.072
-margin_bottom = 84.9775
-rect_pivot_offset = Vector2( 53.3791, 14 )
-custom_colors/font_color = Color( 1, 0, 0, 1 )
-text = "OUT OF AMMO"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="textureWeaponSymbol" type="TextureRect" parent="controlGame/RightWeaponControl"]
-margin_left = 68.1537
-margin_top = 11.1362
-margin_right = 108.154
-margin_bottom = 51.1362
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="MiniMap" parent="controlGame" instance=ExtResource( 8 )]
-margin_left = 773.698
-margin_top = 95.0572
-margin_right = 973.698
-margin_bottom = 295.057
-
-[node name="InventoryUI" parent="controlGame" instance=ExtResource( 11 )]
 
 [node name="controlOverallMessage" type="Control" parent="."]
 visible = false
@@ -435,5 +130,36 @@ margin_bottom = 56.6489
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/MessageAnnounce = SubResource( 3 )
+
+[node name="GameControl" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 0.840942
+margin_top = 6.10352e-05
+margin_right = 0.840942
+margin_bottom = 6.10352e-05
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LeftWeaponControl" parent="GameControl" instance=ExtResource( 2 )]
+margin_left = 800.0
+margin_top = 317.209
+margin_right = 1000.0
+margin_bottom = 417.209
+
+[node name="RightWeaponControl" parent="GameControl" instance=ExtResource( 2 )]
+margin_left = 800.0
+margin_top = 429.302
+margin_right = 1000.0
+margin_bottom = 529.302
+
+[node name="MiniMap" parent="GameControl" instance=ExtResource( 8 )]
+margin_left = 789.561
+margin_top = 109.485
+margin_right = 983.561
+margin_bottom = 303.485
+
+[node name="InventoryUI" parent="GameControl" instance=ExtResource( 11 )]
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationPlayerFinished"]

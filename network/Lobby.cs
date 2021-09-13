@@ -106,7 +106,7 @@ public class Lobby : Control
 
     private void onReadyGameStart()
     {
-        ((GameStates)GetNode("/root/GAMESTATES")).next_level();
+        ((GameStates)GetNode("/root/GAMESTATES")).EnterNetworkLevel();
     }
 
     private void _networkFail(String message)

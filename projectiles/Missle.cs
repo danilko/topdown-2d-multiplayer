@@ -21,8 +21,8 @@ public class Missle : Projectile
         AgentExplosionParticle explosion = (AgentExplosionParticle)GetNode("AgentExplosionParticle");
         explosion.SetTrigger(true);
 
-        AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
-        audioManager.playSoundEffect(MusicHitClip);
+        //AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
+        //audioManager.playSoundEffect(MusicHitClip);
     }
 
     protected override void ComputeDamage()

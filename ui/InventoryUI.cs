@@ -22,6 +22,25 @@ public class InventoryUI : PopupPanel
         _gridContainerWeaponChoices = (GridContainer)GetNode("TabContainer/Assembly/VSplitContainer/WeaponChoiceScrollable/GridContainerWeaponChoice");
     }
 
+    public void Activate(Boolean activate)
+    {
+        // Enable mouse
+        if(activate)
+        {
+            // Enable mouse for selecting item
+            Input.SetMouseMode(Input.MouseMode.Visible);
+            // Use exclusive to force user must use command to close instead of random click in game screen cause unexpected weapon firing
+            PopupExclusive = true;
+            PopupCentered();
+        }
+        else
+        {
+            // Enable mouse for selecting item
+            Input.SetMouseMode(Input.MouseMode.Hidden);
+            Hide();
+        }
+    }
+
     public void Initialize(InventoryManager inventoryManager, Inventory inventory)
     {
         _inventoryManager = inventoryManager;

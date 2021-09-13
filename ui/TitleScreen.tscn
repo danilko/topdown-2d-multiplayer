@@ -10,7 +10,7 @@
 size = 86
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=2]
 size = 20
 font_data = ExtResource( 3 )
 
@@ -82,7 +82,7 @@ custom_constants/separation = 20
 [node name="NewGame" type="Button" parent="CanvasLayer/CenterContainer/VBoxContainer"]
 margin_right = 300.0
 margin_bottom = 31.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 disabled = true
 text = "NEW GAME"
 __meta__ = {
@@ -93,7 +93,7 @@ __meta__ = {
 margin_top = 51.0
 margin_right = 300.0
 margin_bottom = 82.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "LOBBY"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -103,7 +103,7 @@ __meta__ = {
 margin_top = 102.0
 margin_right = 300.0
 margin_bottom = 133.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "SETTINGS"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -113,7 +113,7 @@ __meta__ = {
 margin_top = 153.0
 margin_right = 300.0
 margin_bottom = 184.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "EXIT"
 __meta__ = {
 "_edit_use_anchors_": false

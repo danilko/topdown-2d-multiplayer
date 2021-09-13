@@ -105,6 +105,8 @@ public class GameStates : Node
 
     public void endGameScreen()
     {   
+        // In menu, enable mouse
+        Input.SetMouseMode(Input.MouseMode.Visible);
         GetTree().ChangeScene(endResultScreen);
     }
 
@@ -116,12 +118,16 @@ public class GameStates : Node
 
     public void EnterLobbyScreen()
     {
+        // In menu, enable mouse
+        Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 1;
         GetTree().ChangeScene(levels[current_level]);
     }
 
     public void EnterTitleScreen()
     {
+        // In menu, enable mouse
+        Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 0;
         GetTree().ChangeScene(levels[current_level]);
     }
@@ -129,20 +135,8 @@ public class GameStates : Node
     public void EnterNetworkLevel()
     {
         current_level = 2;
+        // In game, disable mouse
+        Input.SetMouseMode(Input.MouseMode.Hidden);
         GetTree().ChangeScene(levels[current_level]);
-    }
-
-    public void next_level()
-    {
-        current_level += 1;
-        if (current_level < levels.Length)
-        {
-            GetTree().ChangeScene(levels[current_level]);
-        }
-        else
-        {
-            restart();
-        }
-
     }
 }
