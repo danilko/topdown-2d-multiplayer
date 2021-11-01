@@ -1,14 +1,15 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class InventoryDatabase : Node
 {
-    Godot.Collections.Array<ItemResource> _items;
+    List<ItemResource> _items;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        _items = new Godot.Collections.Array<ItemResource>();
+        _items = new List<ItemResource>();
         Godot.Directory directory = new Godot.Directory();
         directory.Open("res://items");
         directory.ListDirBegin();
@@ -28,7 +29,7 @@ public class InventoryDatabase : Node
         directory.ListDirEnd();
     }
 
-    public Godot.Collections.Array<ItemResource> GetItems()
+    public List<ItemResource> GetItems()
     {
         return _items;
     }

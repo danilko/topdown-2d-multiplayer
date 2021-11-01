@@ -1,31 +1,34 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class ObstacleManager : Node2D
 {
     TileMap _tileMap;
 
-    private Godot.Collections.Dictionary<String, Vector2> _obstacles = new Godot.Collections.Dictionary<String, Vector2>();
-    private Godot.Collections.Array _obstaclesDestroyed = new Godot.Collections.Array();
+    private Dictionary<String, Vector2> _obstacles;
+    private List<String> _obstaclesDestroyed;
 
     private Vector2 _halfCellSize;
 
-    private Godot.Collections.Array _traverableTiles;
+    private List<Vector2> _traverableTiles;
 
     private String _obstaclePrefix = "obstacle_";
     private String _obstacleIndexSeparator = "_";
 
     public override void _Ready()
     {
-        _traverableTiles = new Godot.Collections.Array();
+         _obstacles = new Dictionary<String, Vector2>();
+         _obstaclesDestroyed = new List<String>();
+        _traverableTiles = new List<Vector2>();
     }
 
-    public Godot.Collections.Array GetObstaclesDestroyed()
+    public List<String> GetObstaclesDestroyed()
     {
         return _obstaclesDestroyed;
     }
 
-    public Godot.Collections.Dictionary<String, Vector2> GetObstacles()
+    public Dictionary<String, Vector2> GetObstacles()
     {
         return _obstacles;
     }
@@ -40,7 +43,7 @@ public class ObstacleManager : Node2D
 
     }
 
-    public Godot.Collections.Array GetTraversableTiles()
+    public List<Vector2> GetTraversableTiles()
     {
         return _traverableTiles;
     }
@@ -98,9 +101,9 @@ public class ObstacleManager : Node2D
                     item = Obstacle.Items.roadblock_red;
                 }
 
-                Label mapLabel = (Label)GetNode("../MapCoordinate").Duplicate();
-                mapLabel.Text = ("(" + xIndex + "," + yIndex + ")");
-                mapLabel.Name = "maplabel_" + xIndex + _obstacleIndexSeparator + yIndex;
+                //Label mapLabel = (Label)GetNode("../MapCoordinate").Duplicate();
+                //mapLabel.Text = ("(" + xIndex + "," + yIndex + ")");
+                //mapLabel.Name = "maplabel_" + xIndex + _obstacleIndexSeparator + yIndex;
 
                 position = _tileMap.MapToWorld(new Vector2(xIndex, yIndex));
 
@@ -116,7 +119,7 @@ public class ObstacleManager : Node2D
 
                     obstacle.GlobalPosition = position + _halfCellSize;
 
-                    mapLabel.Set("custom_colors/font_color", new Color("#ff0000"));
+                    //mapLabel.Set("custom_colors/font_color", new Color("#ff0000"));
                 }
                 else
                 {
@@ -126,12 +129,12 @@ public class ObstacleManager : Node2D
                         _traverableTiles.Add(new Vector2(xIndex, yIndex));
                     }
 
-                    mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
+                   // mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
                 }
 
-                mapLabel.SetGlobalPosition(position + _halfCellSize);
+                //mapLabel.SetGlobalPosition(position + _halfCellSize);
 
-                AddChild(mapLabel);
+                //AddChild(mapLabel);
             }
         }
 

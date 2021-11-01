@@ -33,6 +33,7 @@ region_enabled = true
 region_rect = Rect2( 265, 172, 2, 2 )
 
 [node name="UnitDisplay" parent="." instance=ExtResource( 4 )]
+
 [connection signal="body_entered" from="." to="." method="_onCapturableBaseBodyEntered"]
 [connection signal="body_exited" from="." to="." method="_onCapturableBaseBodyExited"]
 [connection signal="timeout" from="CaptureTimer" to="." method="_updateBaseTeam"]

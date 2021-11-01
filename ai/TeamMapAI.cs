@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class TeamMapAI : Node2D
 {
@@ -15,7 +16,7 @@ public class TeamMapAI : Node2D
     [Export]
     private BaseCaptureStartOrder baseCaptureStartOrder = BaseCaptureStartOrder.FIRST;
 
-    private Godot.Collections.Array _bases;
+    private CapturableBaseManager _capturableBaseManager;
     private Team _team;
 
     private Node _unitsContainer;
@@ -68,7 +69,7 @@ public class TeamMapAI : Node2D
         _autoSpawnMember = autoSpawnMember;
     }
 
-    public Team.TeamCode GetCurrentTeam()
+    public Team.TeamCode GetTeam()
     {
         return _team.CurrentTeamCode;
     }
@@ -183,10 +184,10 @@ public class TeamMapAI : Node2D
         return true;
     }
 
-    public void Initialize(GameWorld gameWorld, InventoryManager inventoryManager, Godot.Collections.Array bases, Team.TeamCode team, PathFinding pathFinding)
+    public void Initialize(GameWorld gameWorld, InventoryManager inventoryManager, CapturableBaseManager capturableBaseManager, Team.TeamCode team, PathFinding pathFinding)
     {
         _inventoryManager = inventoryManager;
-        _bases = bases;
+        _capturableBaseManager = capturableBaseManager;
         _team.CurrentTeamCode = team;
         _gameWorld = gameWorld;
         _pathFinding = pathFinding;
@@ -217,23 +218,25 @@ public class TeamMapAI : Node2D
 
     private CapturableBase _getNextCapturableBase()
     {
+        List<CapturableBase> bases = _capturableBaseManager.GetBases();
+
         if (baseCaptureStartOrder == BaseCaptureStartOrder.LAST)
         {
-            for (int index = _bases.Count - 1; index > 0; index--)
+            foreach (CapturableBase capturableBase in bases)
             {
-                if (((CapturableBase)_bases[index]).GetCaptureBaseTeam() != _team.CurrentTeamCode)
+                if (capturableBase.GetCaptureBaseTeam() != _team.CurrentTeamCode)
                 {
-                    return (CapturableBase)(_bases[index]);
+                    return capturableBase;
                 }
             }
         }
         else
         {
-            for (int index = 0; index < _bases.Count; index++)
+            for (int index = 0; index < bases.Count; index++)
             {
-                if (((CapturableBase)_bases[index]).GetCaptureBaseTeam() != _team.CurrentTeamCode)
+                if (bases[index].GetCaptureBaseTeam() != _team.CurrentTeamCode)
                 {
-                    return (CapturableBase)(_bases[index]);
+                    return bases[index];
                 }
             }
         }
@@ -316,8 +319,6 @@ public class TeamMapAI : Node2D
         {
             int weaponCombine = _randomNumberGenerator.RandiRange(0 , 5);
 
-            
-
             if (weaponCombine == 0)
             {
                 // Add Laser weapon
@@ -392,7 +393,7 @@ public class TeamMapAI : Node2D
         CapturableBase targetCaptureBase = null;
         CapturableBase neutralCaptureBase = null;
 
-        foreach (CapturableBase captureBase in _bases)
+        foreach (CapturableBase captureBase in _capturableBaseManager.GetBases())
         {
             if (captureBase.GetCaptureBaseTeam() == _team.CurrentTeamCode)
             {

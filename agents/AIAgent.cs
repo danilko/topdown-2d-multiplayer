@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class AIAgent : Agent
 {
@@ -11,8 +12,6 @@ public class AIAgent : Agent
     public float DetectRadius { get; set; }
 
     private int _speed;
-
-    private Godot.Collections.Array members = null;
 
     private Vector2 _originalPathLineLocation;
 
@@ -27,8 +26,6 @@ public class AIAgent : Agent
         LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
 
         _speed = MaxSpeed;
-
-        members = new Godot.Collections.Array();
 
         _originalPathLineLocation = GlobalPosition;
 
@@ -87,7 +84,7 @@ public class AIAgent : Agent
         if (GetTree().IsNetworkServer())
         {
             _agentAI.Control(delta);
-            ((Label)(GetNode("UnitDisplay/Name"))).Text = GetDisplayName() + "(" + GetCurrentTeam() + ")" + " - " + _agentAI.getState();
+            ((Label)(GetNode("UnitDisplay/Name"))).Text = GetDisplayName() + "(" + GetTeam() + ")" + " - " + _agentAI.getState();
 
         }
     }

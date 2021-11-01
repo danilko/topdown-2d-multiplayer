@@ -82,7 +82,7 @@ public class Weapon : Node2D
     {
         Agent = agent;
         _team = new Team();
-        _team.CurrentTeamCode = agent.GetCurrentTeam();
+        _team.CurrentTeamCode = agent.GetTeam();
         _gameWorld = gameWorld;
         _weaponOrder = weaponOrder;
         _weaponIndex = weaponIndex;

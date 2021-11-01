@@ -286,6 +286,7 @@ public class Player : Agent
         if(_screenIndicator != null)
         {
             _screenIndicator.SetActivate(false);
+            _inventoryUI.Hide();
         }
 
     }

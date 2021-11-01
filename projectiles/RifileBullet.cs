@@ -8,16 +8,13 @@ public class RifileBullet : Projectile
     {
         base._Ready();
     }
+
     public override void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget, Vector2 defaultTargetPosition)
     {
         // This weapon does not support tracking, so disable target
         base.Initialize(position, direction, inSource, sourceTeam, null, defaultTargetPosition);
     }
 
-    public override void _PhysicsProcess(float delta)
-    {
-        base._PhysicsProcess(delta);
-    }
 
     public override void Explode()
     {

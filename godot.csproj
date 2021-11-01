@@ -26,7 +26,7 @@
     <Compile Include="effects\AgentExplosionParticle.cs" />
     <Compile Include="effects\RemainParticles.cs" />
     <Compile Include="effects\Trail.cs" />
-    <Compile Include="environments\CapaturableBaseManager.cs" />
+    <Compile Include="environments\CapturableBaseManager.cs" />
     <Compile Include="environments\CapturableBase.cs" />
     <Compile Include="environments\ObstacleManager.cs" />
     <Compile Include="inventory\Inventory.cs" />
@@ -37,12 +37,12 @@
     <Compile Include="network\WaitingRoom.cs" />
     <Compile Include="PostProcess\PostProcess.cs" />
     <Compile Include="PostProcess\TestScene.cs" />
+    <Compile Include="projectiles\ExplosionBlast.cs" />
     <Compile Include="projectiles\ExplosionRay.cs" />
     <Compile Include="projectiles\MultiTunnelMissle.cs" />
     <Compile Include="projectiles\Projectile.cs" />
     <Compile Include="projectiles\LaserRay.cs" />
     <Compile Include="projectiles\Missle.cs" />
-    <Compile Include="projectiles\ProjectileArea2D.cs" />
     <Compile Include="projectiles\RifileBullet.cs" />
     <Compile Include="environments\Obstacle.cs" />
     <Compile Include="GameStates.cs" />
@@ -52,6 +52,8 @@
     <Compile Include="network\NetworkPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="inventory\InventoryDatabase.cs" />
+    <Compile Include="spawn\AgentSpawnSystem.cs" />
+    <Compile Include="ui\CharacterDialog.cs" />
     <Compile Include="ui\InventoryUI.cs" />
     <Compile Include="ui\ItemPanel.cs" />
     <Compile Include="ui\MiniMap.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="ui\TeamSettingPanel.cs" />
     <Compile Include="ui\WeaponControl.cs" />
     <Compile Include="ui\WeaponSlotPanel.cs" />
+    <Compile Include="weapons\LightSaberAttack.cs" />
     <Compile Include="weapons\RemoteWeapon.cs" />
     <Compile Include="weapons\RemoteWeaponController.cs" />
     <Compile Include="weapons\MultiTunnelMissleLauncher.cs" />

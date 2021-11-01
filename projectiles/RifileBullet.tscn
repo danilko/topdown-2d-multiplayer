@@ -1,48 +1,15 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://projectiles/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://projectiles/RifileBullet.cs" type="Script" id=3]
 [ext_resource path="res://effects/Trail.tscn" type="PackedScene" id=4]
-[ext_resource path="res://projectiles/Particle2DProjectile.tscn" type="PackedScene" id=5]
 [ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 20.125, 7.75 )
+extents = Vector2( 10.2772, 10.4057 )
 
-[sub_resource type="CanvasItemMaterial" id=2]
-blend_mode = 1
-light_mode = 1
-
-[sub_resource type="Gradient" id=3]
-offsets = PoolRealArray( 0, 0.236607, 0.285714, 1 )
-colors = PoolColorArray( 5, 1.97, 0.1, 1, 10, 0.07, 0, 0.94, 4.64286, 0.271873, 0.180357, 0.933036, 1, 1, 1, 0.25 )
-
-[sub_resource type="GradientTexture" id=4]
-gradient = SubResource( 3 )
-
-[sub_resource type="Curve" id=5]
-_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), -1.96477, 0.0, 0, 0 ]
-
-[sub_resource type="CurveTexture" id=6]
-curve = SubResource( 5 )
-
-[sub_resource type="ParticlesMaterial" id=7]
-emission_shape = 2
-emission_box_extents = Vector3( 1, 1, 1 )
-flag_disable_z = true
-spread = 10.0
-gravity = Vector3( 0, 0, 0 )
-initial_velocity = 1000.0
-angular_velocity = 100.0
-orbit_velocity = 0.0
-orbit_velocity_random = 0.0
-linear_accel = 100.0
-scale = 10.0
-scale_curve = SubResource( 6 )
-color_ramp = SubResource( 4 )
-
-[sub_resource type="Gradient" id=8]
+[sub_resource type="Gradient" id=2]
 offsets = PoolRealArray( 0, 0.303797, 0.481013, 0.873418, 1 )
 colors = PoolColorArray( 3.67, 3.53, 0.92, 0.2, 3.76234, 0.851574, 0.670406, 0.510744, 3.90771, 0.862, 0.277429, 1, 8.2, 1.06, 0.3, 1, 5.95, 0.31, 0.07, 1 )
 
@@ -52,7 +19,11 @@ Speed = 4000
 Damage = 10
 Lifetime = 5.0
 
-[node name="Sprite" parent="." index="0"]
+[node name="CollisionShape2D" parent="." index="0"]
+scale = Vector2( 1.34407, 0.742193 )
+shape = SubResource( 1 )
+
+[node name="Sprite" parent="." index="1"]
 visible = false
 self_modulate = Color( 3, 0.95, 0.51, 1 )
 rotation = 3.14159
@@ -60,27 +31,13 @@ texture = ExtResource( 2 )
 region_enabled = true
 region_rect = Rect2( 653, 41, 30, 24 )
 
-[node name="ProjectileArea2D" parent="." index="2"]
-visible = false
-collision_layer = 4
-collision_mask = 4
-
-[node name="CollisionShape2D" parent="ProjectileArea2D" index="0"]
-shape = SubResource( 1 )
-
-[node name="ParticleTrail" parent="." index="3" instance=ExtResource( 5 )]
-material = SubResource( 2 )
-lifetime = 2.0
-process_material = SubResource( 7 )
-texture = null
-
-[node name="Explosion" parent="." index="4" instance=ExtResource( 6 )]
+[node name="Explosion" parent="." index="3" instance=ExtResource( 6 )]
 visible = false
 scale = Vector2( 0.75, 0.75 )
 
-[node name="LineTrail" parent="." index="5" instance=ExtResource( 4 )]
+[node name="LineTrail" parent="." index="4" instance=ExtResource( 4 )]
 _length = 8
 _width = 5.0
-_gradientColor = SubResource( 8 )
+_gradientColor = SubResource( 2 )
 
 [connection signal="animation_finished" from="Explosion" to="." method="_OnExplosionAnimationFinished"]

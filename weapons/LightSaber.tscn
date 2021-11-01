@@ -1,9 +1,10 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://weapons/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
 [ext_resource path="res://weapons/LightSaber.cs" type="Script" id=3]
 [ext_resource path="res://effects/Trail.cs" type="Script" id=4]
+[ext_resource path="res://weapons/LightSaberAttack.cs" type="Script" id=5]
 
 [sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 1
@@ -30,7 +31,7 @@ tracks/0/keys = {
 "values": [ 50.0, -50.0, 50.0 ]
 }
 tracks/1/type = "value"
-tracks/1/path = NodePath("Area2D/CollisionShape2D:disabled")
+tracks/1/path = NodePath("LightSaberAttack/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -83,7 +84,7 @@ tracks/0/keys = {
 "values": [ -50.0, 50.0, -50.0 ]
 }
 tracks/1/type = "value"
-tracks/1/path = NodePath("Area2D/CollisionShape2D:disabled")
+tracks/1/path = NodePath("LightSaberAttack/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -124,7 +125,6 @@ extents = Vector2( 97.8958, 125.843 )
 
 [node name="LightSaber" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
-CurrentWeaponType = 4
 ItemResourceID = "SYC-200"
 MaxAmmo = 0
 CooldownTime = 5.0
@@ -160,16 +160,17 @@ gradient = SubResource( 3 )
 anims/Attack_Left = SubResource( 4 )
 anims/Attack_Right = SubResource( 5 )
 
-[node name="Area2D" type="Area2D" parent="." index="5"]
+[node name="LightSaberAttack" type="Area2D" parent="." index="5"]
 visible = false
 collision_layer = 4
 collision_mask = 15
+script = ExtResource( 5 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LightSaberAttack" index="0"]
 position = Vector2( 57.1696, -61.416 )
 shape = SubResource( 6 )
 disabled = true
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_onAnimationFinished"]
-[connection signal="area_exited" from="Area2D" to="." method="_onCollisionEntered"]
-[connection signal="body_entered" from="Area2D" to="." method="_onCollisionEntered"]
+[connection signal="area_exited" from="LightSaberAttack" to="LightSaberAttack" method="_onCollisionEntered"]
+[connection signal="body_entered" from="LightSaberAttack" to="LightSaberAttack" method="_onCollisionEntered"]

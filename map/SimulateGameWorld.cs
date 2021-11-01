@@ -1,9 +1,10 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class SimulateGameWorld : GameWorld
 {
-    private Godot.Collections.Dictionary<String, int> _spawnBotTargetBase = new Godot.Collections.Dictionary<String, int>();
+    private Dictionary<String, int> _spawnBotTargetBase = new Dictionary<String, int>();
 
     public override void _Ready()
     {
@@ -44,7 +45,7 @@ public class SimulateGameWorld : GameWorld
             agent.Heal(100);
             // Assign next bases
 
-            _spawnBotTargetBase[agent.GetUnitName()] = (_spawnBotTargetBase[agent.GetUnitName()] + 1) % CapaturableBaseManager.GetBases().Count;
+            _spawnBotTargetBase[agent.GetUnitName()] = (_spawnBotTargetBase[agent.GetUnitName()] + 1) % CapturableBaseManager.GetBases().Count;
         }
     }
 
@@ -65,9 +66,9 @@ public class SimulateGameWorld : GameWorld
         foreach (Agent agent in SpawnBots.Values)
         {
             // Locate the bot node
-            Agent enemyNode = (Agent)TeamMapAIs[(int)agent.GetCurrentTeam()].GetUnit(agent.Name);
+            Agent enemyNode = (Agent)TeamMapAIs[(int)agent.GetTeam()].GetUnit(agent.Name);
 
-            CapturableBase capturableBase = (CapturableBase)(CapaturableBaseManager.GetBases()[_spawnBotTargetBase[agent.GetUnitName()]]);
+            CapturableBase capturableBase = CapturableBaseManager.GetBases()[_spawnBotTargetBase[agent.GetUnitName()]];
 
             Vector2 randomPosition = capturableBase.GetRandomPositionWithinCaptureRadius();
 

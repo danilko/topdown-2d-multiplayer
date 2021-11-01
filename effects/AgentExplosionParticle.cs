@@ -15,15 +15,16 @@ public class AgentExplosionParticle : Node2D
         {
             _trigger = trigger;
 
-                foreach (CPUParticles2D particle in GetNode("Particles").GetChildren())
-                {
-                    particle.Emitting = _trigger;
-                }
+            foreach (CPUParticles2D particle in GetNode("Particles").GetChildren())
+            {
+                particle.Emitting = _trigger;
+            }
 
-                if(_trigger) {
-    Timer timer =  (Timer)GetNode("Timer");
-    timer.Start();
-}
+            if (_trigger)
+            {
+                Timer timer = (Timer)GetNode("Timer");
+                timer.Start();
+            }
         }
 
 
@@ -63,14 +64,14 @@ public class AgentExplosionParticle : Node2D
         _checkEmitting();
     }
 
-/**
-* Force the timeout in case somehow particle is stuck
-**/
+    /**
+    * Force the timeout in case somehow particle is stuck
+    **/
     public void EffectTimeout()
     {
         EmitSignal(nameof(EffectCompleteSignal));
-         _trigger = false;
-         QueueFree();
+        _trigger = false;
+        QueueFree();
     }
 
 }

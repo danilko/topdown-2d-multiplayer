@@ -32,7 +32,7 @@ public class Shield : Weapon
         _shieldPhysics = (ShieldPhysics)((PackedScene)GD.Load("res://weapons/ShieldPhysics.tscn")).Instance();
         gameWorld.AddChild(_shieldPhysics);
 
-        _shieldPhysics.Initialize(this);
+        _shieldPhysics.Initialize(this, agent.GetTeam());
         _collisionShape2D = (CollisionShape2D)_shieldPhysics.GetNode("CollisionShape2D");
 
         base.Initialize(gameWorld, agent, weaponOrder, weaponIndex);

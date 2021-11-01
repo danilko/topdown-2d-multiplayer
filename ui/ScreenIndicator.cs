@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class ScreenIndicator : Node2D
 {
@@ -7,9 +8,9 @@ public class ScreenIndicator : Node2D
     private float _zoom = 1.5f;
 
     private Agent _player;
-    private Godot.Collections.Dictionary<String, Agent> _agents;
+    private Dictionary<String, Agent> _agents;
 
-    private Godot.Collections.Dictionary<String, Node2D> _agentMarkers;
+    private Dictionary<String, Node2D> _agentMarkers;
 
     private Node2D _agentMarker;
 
@@ -59,8 +60,8 @@ public class ScreenIndicator : Node2D
     public void Initialize(Agent agent)
     {
         _agent = agent;
-        _agents = new Godot.Collections.Dictionary<String, Agent>();
-        _agentMarkers = new Godot.Collections.Dictionary<String, Node2D>();
+        _agents = new Dictionary<String, Agent>();
+        _agentMarkers = new Dictionary<String, Node2D>();
 
         _lockonIndicator = (TextureRect)agent.GetGameWorld().GetNode("LockOnIndicator");
     }
@@ -77,7 +78,7 @@ public class ScreenIndicator : Node2D
             Node2D agentMarker = (Node2D)_agentMarker.Duplicate();
             agentMarker.Name = agent.GetUnitName() + "_marker";
 
-            agentMarker.Modulate = Team.TeamColor[(int)agent.GetCurrentTeam()];
+            agentMarker.Modulate = Team.TeamColor[(int)agent.GetTeam()];
 
             AddChild(agentMarker);
 

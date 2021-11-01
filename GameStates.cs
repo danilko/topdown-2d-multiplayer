@@ -45,7 +45,7 @@ public class GameStates : Node
     //This will be filled only on the server
     public Dictionary<int, Dictionary<int, PlayerInput>> playerInputs = new Dictionary<int, Dictionary<int, PlayerInput>>();
 
-    public Godot.Collections.Array<TeamMapAISetting> _teamMapAISettings = null;
+    public List<TeamMapAISetting> _teamMapAISettings = null;
 
     private String messages;
 
@@ -54,12 +54,12 @@ public class GameStates : Node
         set_update_rate(updateRate);
     }
 
-    public Godot.Collections.Array<TeamMapAISetting> GetTeamMapAISettings()
+    public List<TeamMapAISetting> GetTeamMapAISettings()
     {
         return _teamMapAISettings;
     }
 
-    public void SetTeamMapAISettings(Godot.Collections.Array<TeamMapAISetting> teamMapAISettings)
+    public void SetTeamMapAISettings(List<TeamMapAISetting> teamMapAISettings)
     {
         _teamMapAISettings = teamMapAISettings;
     }

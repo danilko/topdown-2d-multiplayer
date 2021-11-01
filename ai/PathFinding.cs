@@ -1,9 +1,11 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+
 
 public class PathFinding : Node2D
 {
-    private Godot.Collections.Dictionary _tilestoWorld;
+    private Dictionary<int, Vector2> _tilestoWorld;
     private Vector2 _halfCellSize;
 
     private TileMap _tileMap;
@@ -18,7 +20,7 @@ public class PathFinding : Node2D
     private Color _enableColor = new Color("c9dffb");
     private Color _disableColor = new Color("fbc9c9");
 
-    private Godot.Collections.Dictionary<int, ColorRect> _gridRects;
+    private Dictionary<int, ColorRect> _gridRects;
 
     private Timer _updateTraversableTilesTimer;
 
@@ -38,8 +40,8 @@ public class PathFinding : Node2D
             _grid.Visible = false;
         }
 
-        _tilestoWorld = new Godot.Collections.Dictionary();
-        _gridRects = new Godot.Collections.Dictionary<int, ColorRect>();
+        _tilestoWorld = new Dictionary<int, Vector2>();
+        _gridRects = new Dictionary<int, ColorRect>();
 
         _updateTraversableTilesTimer = (Timer)GetNode("UpdateTraversableTilesTimer");
         _updateTraversableTilesTimer.WaitTime = UpdateTRaversableTilesTime;
@@ -100,7 +102,7 @@ public class PathFinding : Node2D
         _updateTraversableTilesTimer.Start();
     }
 
-    private void _updateTraversableTiles(Godot.Collections.Array tiles)
+    private void _updateTraversableTiles(List<Vector2> tiles)
     {
         // No need to update as tiles not change
         if (_tilestoWorld.Count == tiles.Count)
@@ -112,7 +114,7 @@ public class PathFinding : Node2D
         _connectTraversableTiles(tiles);
     }
 
-    public void _addTraversableTiles(Godot.Collections.Array tiles)
+    public void _addTraversableTiles(List<Vector2> tiles)
     {
         foreach (Vector2 tile in tiles)
         {
@@ -186,7 +188,7 @@ public class PathFinding : Node2D
         UpdateNavigationMap();
     }
 
-    private void _connectTraversableTiles(Godot.Collections.Array tiles)
+    private void _connectTraversableTiles(List<Vector2> tiles)
     {
 
         foreach (Vector2 tile in tiles)
@@ -229,7 +231,7 @@ public class PathFinding : Node2D
                         }
                     }
 
-                    if (!_aStar.ArePointsConnected(fromId, toId))
+                    if (fromId != toId && !_aStar.ArePointsConnected(fromId, toId))
                     {
                         // Debug code
                         if (debug)

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class InventoryManager : Node
 {
@@ -17,7 +18,7 @@ public class InventoryManager : Node
         _gameWorld = gameWorld;
     }
 
-    public Godot.Collections.Array<ItemResource> GetPurchasableItems()
+    public List<ItemResource> GetPurchasableItems()
     {
         return _inventoryDatabase.GetItems();
     }
@@ -32,7 +33,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
         {
-            String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
+            String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
 
             if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
             {
@@ -88,7 +89,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
 
             if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
             {
@@ -147,7 +148,7 @@ public class InventoryManager : Node
         {
             if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
             {
-                String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
+                String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
 
                 _serverAddItem(info);
             }
@@ -276,7 +277,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (dropItem ? 1 : 0);
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (dropItem ? 1 : 0);
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -297,7 +298,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryItemIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex;
+            String info = inventoryItemIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex;
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -345,7 +346,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex + ";" + dropWeapon;
+            String info = (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex + ";" + dropWeapon;
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -400,7 +401,7 @@ public class InventoryManager : Node
     {
         if (agent != null && IsInstanceValid(agent))
         {
-            String info = (int)agent.GetCurrentTeam() + "," + agent.GetUnitName() + "," + agent.GetInventory().GetInventoryState();
+            String info = (int)agent.GetTeam() + "," + agent.GetUnitName() + "," + agent.GetInventory().GetInventoryState();
 
             if (rpcId != -1)
             {
@@ -445,7 +446,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetCurrentTeam() + ";" + inventory.GetAgent().GetUnitName();
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {

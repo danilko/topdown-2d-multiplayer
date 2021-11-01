@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class InventoryUI : PopupPanel
 {
@@ -93,7 +94,7 @@ public class InventoryUI : PopupPanel
             Agent agent = _inventory.GetAgent();
             if (agent != null && IsInstanceValid(agent))
             {
-                Godot.Collections.Array<Weapon> weapons = agent.GetWeapons(weaponOrder);
+                List<Weapon> weapons = agent.GetWeapons(weaponOrder);
                 for (int weaponIndex = 0; weaponIndex < weapons.Count; weaponIndex++)
                 {
                     String name = "WeaponSlotPanel_" + weaponOrder + "_" + weaponIndex;
@@ -201,7 +202,7 @@ public class InventoryUI : PopupPanel
     {
         _cleanGridContainer(gridContainer);
 
-        Godot.Collections.Array<ItemResource> items = null;
+        List<ItemResource> items = null;
         if (gridContainer.Name == _gridContainerStore.Name)
         {
             items = _inventoryManager.GetPurchasableItems();

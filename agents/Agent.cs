@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Agent : KinematicBody2D
 {
@@ -42,10 +43,10 @@ public class Agent : KinematicBody2D
 
     public int RightWeaponAction { set; get; }
     public int LeftWeaponAction { set; get; }
-    protected Godot.Collections.Array<Weapon> RightWeapons = new Godot.Collections.Array<Weapon>();
-    protected Godot.Collections.Array<Weapon> LeftWeapons = new Godot.Collections.Array<Weapon>();
+    protected List<Weapon> RightWeapons;
+    protected List<Weapon> LeftWeapons;
 
-    protected Godot.Collections.Dictionary<Weapon.WeaponOrder, int> CurrentWeaponIndex = new Godot.Collections.Dictionary<Weapon.WeaponOrder, int>();
+    protected Dictionary<Weapon.WeaponOrder, int> CurrentWeaponIndex;
 
     [Export]
     private int MaxWeaponCount = 3;
@@ -96,6 +97,11 @@ public class Agent : KinematicBody2D
     public override void _Ready()
     {
 
+        RightWeapons = new List<Weapon>();
+        LeftWeapons = new List<Weapon>();
+        CurrentWeaponIndex = new Dictionary<Weapon.WeaponOrder, int>();
+
+
         gameStates = (GameStates)GetNode("/root/GAMESTATES");
         network = (Network)GetNode("/root/NETWORK");
 
@@ -138,7 +144,7 @@ public class Agent : KinematicBody2D
         _teamMapAI = teamMapAI;
 
         _gameWorld = gameWorld;
-        SetCurrentTeam(_teamMapAI.GetCurrentTeam());
+        SetCurrentTeam(_teamMapAI.GetTeam());
         SetUnitName(unitName);
         SetDisplayName(displayName);
 
@@ -158,7 +164,7 @@ public class Agent : KinematicBody2D
         return _gameWorld;
     }
 
-    private void _initializeWeapon(Godot.Collections.Array<Weapon> weapons)
+    private void _initializeWeapon(List<Weapon> weapons)
     {
         for (int index = 0; index < MaxWeaponCount; index++)
         {
@@ -174,7 +180,7 @@ public class Agent : KinematicBody2D
     public virtual void changeWeapon(int weaponIndex, Weapon.WeaponOrder weaponOrder)
     {
         weaponIndex = Mathf.Abs(weaponIndex);
-        Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
+        List<Weapon> weapons = GetWeapons(weaponOrder);
 
         // Caculate actual index base on availble weapon
         weaponIndex = weaponIndex % weapons.Count;
@@ -264,7 +270,7 @@ public class Agent : KinematicBody2D
     **/
     public bool EquipWeapon(PackedScene weaponScene, Weapon.WeaponOrder weaponOrder, int index)
     {
-        Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
+        List<Weapon> weapons = GetWeapons(weaponOrder);
 
         if (weapons[index] != null)
         {
@@ -287,7 +293,7 @@ public class Agent : KinematicBody2D
         return true;
     }
 
-    public Godot.Collections.Array<Weapon> GetWeapons(Weapon.WeaponOrder weaponOrder)
+    public List<Weapon> GetWeapons(Weapon.WeaponOrder weaponOrder)
     {
         if (weaponOrder == Weapon.WeaponOrder.Right)
         {
@@ -309,7 +315,7 @@ public class Agent : KinematicBody2D
     **/
     public void UnequipWeapon(Weapon.WeaponOrder weaponOrder, int weaponIndex)
     {
-        Godot.Collections.Array<Weapon> weapons = GetWeapons(weaponOrder);
+        List<Weapon> weapons = GetWeapons(weaponOrder);
 
         Weapon weapon = (Weapon)weapons[weaponIndex];
 
@@ -340,12 +346,13 @@ public class Agent : KinematicBody2D
         ((Sprite)(GetNode("TeamIndicator"))).Modulate = new Color(_team.getTeamColor(_team.CurrentTeamCode), 0.5f);
     }
 
-    public Team.TeamCode GetCurrentTeam()
+    public Team.TeamCode GetTeam()
     {
         return _team.CurrentTeamCode;
     }
 
-    public TeamMapAI GetCurrentTeamMapAI()
+
+    public TeamMapAI GetTeamMapAI()
     {
         return _teamMapAI;
     }
@@ -519,7 +526,7 @@ public class Agent : KinematicBody2D
             sourceAlive = false;
         }
 
-        if (sourceTeam.CurrentTeamCode == GetCurrentTeam())
+        if (sourceTeam.CurrentTeamCode == GetTeam())
         {
             trackDamage = false;
         }
@@ -599,7 +606,7 @@ public class Agent : KinematicBody2D
     {
         for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
         {
-            Godot.Collections.Array<Weapon> weapons = GetWeapons((Weapon.WeaponOrder)index);
+            List<Weapon> weapons = GetWeapons((Weapon.WeaponOrder)index);
 
             foreach (Weapon weapon in weapons)
             {

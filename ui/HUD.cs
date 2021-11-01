@@ -8,21 +8,25 @@ public class HUD : CanvasLayer
 
     bool lblMessage = false;
 
-    private Godot.Collections.Dictionary<Weapon.WeaponOrder, WeaponControl> _weaponControls;
+    private Dictionary<Weapon.WeaponOrder, WeaponControl> _weaponControls;
 
     private Control _gameControl;
     private Control _miniMap;
 
     private Control _overallMessageControll;
 
+    private CharacterDialog _characterDialog;
+
     public override void _Ready()
     {
+        _characterDialog = (CharacterDialog)GetNode("CharacterDialog");
+
         _gameControl = (Control)(GetNode("GameControl"));
         _miniMap = ((MiniMap)_gameControl.GetNode("MiniMap"));
         _overallMessageControll = ((Control)GetNode("controlOverallMessage"));
         _overallMessageControll.Visible = false;
 
-        _weaponControls = new Godot.Collections.Dictionary<Weapon.WeaponOrder, WeaponControl>();
+        _weaponControls = new Dictionary<Weapon.WeaponOrder, WeaponControl>();
         _weaponControls.Add(Weapon.WeaponOrder.Right, (WeaponControl)(_gameControl.GetNode("RightWeaponControl")));
         _weaponControls.Add(Weapon.WeaponOrder.Left, (WeaponControl)(_gameControl.GetNode("LeftWeaponControl")));
 
@@ -36,7 +40,7 @@ public class HUD : CanvasLayer
 
     public void UpdateWeapon(ItemResource itemResource, Weapon.WeaponOrder weaponOrder, int weaponIndex)
     {
-       _weaponControls[weaponOrder].UpdateWeapon(itemResource, weaponOrder, weaponIndex);
+        _weaponControls[weaponOrder].UpdateWeapon(itemResource, weaponOrder, weaponIndex);
     }
 
     public void OnPlayerDefeated()
@@ -82,6 +86,12 @@ public class HUD : CanvasLayer
             _overallMessageControll.Visible = false;
             lblMessage = false;
         }
+
+        // COmment out for now as part of test
+        //if (!_characterDialog.Visible && Input.IsKeyPressed((int)Godot.KeyList.Space))
+       // {
+       //     _characterDialog.Activate();
+       // }
     }
 
 }

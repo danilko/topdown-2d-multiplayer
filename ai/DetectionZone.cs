@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class DetectionZone : Area2D
 {
@@ -21,14 +22,14 @@ public class DetectionZone : Area2D
 
     private Agent _targetAgent = null;
 
-    private Godot.Collections.Array<String> _targetAgents;
-    private Godot.Collections.Dictionary<String, Agent> _detectedAgents;
+    private List<String> _targetAgents;
+    private Dictionary<String, Agent> _detectedAgents;
     private GameWorld _gameWorld;
 
     public override void _Ready()
     {
-        _targetAgents = new Godot.Collections.Array<String>();
-        _detectedAgents = new Godot.Collections.Dictionary<String, Agent>();
+        _targetAgents = new List<String>();
+        _detectedAgents = new Dictionary<String, Agent>();
     }
 
     public void Initialize(GameWorld gameWorld, Agent agent, float detectRaidus)
@@ -55,7 +56,7 @@ public class DetectionZone : Area2D
         return _targetAgent;
     }
 
-    public Godot.Collections.Dictionary<String, Agent> GetDetectedAgents()
+    public Dictionary<String, Agent> GetDetectedAgents()
     {
         return _detectedAgents;
     }
@@ -63,7 +64,7 @@ public class DetectionZone : Area2D
     private void _onDetectionZoneBodyEntered(Node body)
     {
 
-        if (body.HasMethod(nameof(Agent.GetCurrentTeam))
+        if (body.HasMethod(nameof(Agent.GetTeam))
                 && body != _agent
                 && !_detectedAgents.ContainsKey(((Agent)body).GetUnitName()))
         {
@@ -76,7 +77,7 @@ public class DetectionZone : Area2D
             _detectedAgents.Add(agent.GetUnitName(), agent);
 
             // If not same team identifier, identify as target
-            if (agent.GetCurrentTeam() != _agent.GetCurrentTeam())
+            if (agent.GetTeam() != _agent.GetTeam())
             {
                 if (_targetAgent == null)
                 {
@@ -94,7 +95,7 @@ public class DetectionZone : Area2D
 
     private void _onDetectionZoneBodyExited(Node body)
     {
-        if (body.HasMethod(nameof(Agent.GetCurrentTeam))
+        if (body.HasMethod(nameof(Agent.GetTeam))
             && body != _agent
             && _detectedAgents.ContainsKey(((Agent)body).GetUnitName()))
         {

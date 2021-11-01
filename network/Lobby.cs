@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Lobby : Control
 {
@@ -11,7 +12,7 @@ public class Lobby : Control
 
     private OptionButton playerTeams;
 
-    private Godot.Collections.Array<TeamMapAISetting> _teamMapAISettings;
+    private List<TeamMapAISetting> _teamMapAISettings;
     private GridContainer _gridcontainerTeamManagement;
 
     private GameStates _gameStates;
@@ -46,7 +47,7 @@ public class Lobby : Control
 
         playerTeams = (OptionButton)_player.GetNode("optPlayerTeam");
 
-        _teamMapAISettings = new Godot.Collections.Array<TeamMapAISetting>();
+        _teamMapAISettings = new List<TeamMapAISetting>();
 
         _populatePlayerTeams();
     }

@@ -6,11 +6,11 @@
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://network/WaitingRoom.tscn" type="PackedScene" id=5]
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=1]
 size = 20
 font_data = ExtResource( 4 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=2]
 size = 20
 font_data = ExtResource( 4 )
 
@@ -44,7 +44,7 @@ custom_constants/separation = 15
 [node name="Lobby" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 265.0
 margin_bottom = 25.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "LOBBY"
 align = 1
 uppercase = true
@@ -53,7 +53,7 @@ uppercase = true
 margin_top = 40.0
 margin_right = 265.0
 margin_bottom = 71.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "CREATE SERVER"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -63,7 +63,7 @@ __meta__ = {
 margin_top = 86.0
 margin_right = 265.0
 margin_bottom = 117.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "JOIN SERVER"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -73,7 +73,7 @@ __meta__ = {
 margin_top = 132.0
 margin_right = 265.0
 margin_bottom = 163.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "Exit Lobby"
 
 [node name="Host" type="Popup" parent="."]
@@ -127,7 +127,7 @@ margin_left = 168.411
 margin_top = 111.168
 margin_right = 242.411
 margin_bottom = 135.168
-value = 10.0
+value = 5.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -144,7 +144,7 @@ margin_left = 528.0
 margin_top = 112.0
 margin_right = 662.0
 margin_bottom = 143.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "Cancel"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -155,7 +155,7 @@ margin_left = 357.357
 margin_top = 111.067
 margin_right = 410.357
 margin_bottom = 131.067
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "Create"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -166,7 +166,7 @@ margin_left = 15.4126
 margin_top = 9.5559
 margin_right = 840.413
 margin_bottom = 23.5559
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "Create Server"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -177,7 +177,7 @@ margin_left = 15.4126
 margin_top = 170.167
 margin_right = 840.413
 margin_bottom = 184.167
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "Team Setting"
 uppercase = true
 __meta__ = {
@@ -276,7 +276,6 @@ __meta__ = {
 }
 
 [node name="Join" type="Popup" parent="."]
-visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
@@ -293,7 +292,7 @@ margin_left = 19.0
 margin_top = 8.0
 margin_right = 847.0
 margin_bottom = 22.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "Join Server"
 
 [node name="Label2" type="Label" parent="Join"]
@@ -329,7 +328,7 @@ margin_left = 24.0
 margin_top = 128.0
 margin_right = 107.0
 margin_bottom = 159.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "JOIN"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -340,7 +339,7 @@ margin_left = 160.0
 margin_top = 128.0
 margin_right = 294.0
 margin_bottom = 159.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "Cancel"
 __meta__ = {
 "_edit_use_anchors_": false

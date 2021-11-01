@@ -4,7 +4,7 @@ using System;
 // Concept from following
 // from https://www.fiverr.com/nathanwfranke
 // from https://www.fiverr.com/nonunknown
-public class Projectile : RayCast2D
+public class Projectile : Area2D
 {
     [Signal]
     public delegate void ProjectileDamageSignal();
@@ -47,9 +47,6 @@ public class Projectile : RayCast2D
         GlobalPosition = position;
 
         Rotation = direction.Angle();
-        Velocity = direction * Speed;
-
-        Acceleration = new Vector2();
 
         Target = inTarget;
 
@@ -61,11 +58,12 @@ public class Projectile : RayCast2D
         timer.Start();
 
         IsProjectileStart = true;
-        Enabled = IsProjectileStart;
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(_musicClip);
 
+        Velocity = Transform.x * Speed;
+        Acceleration = Vector2.Zero;
     }
 
     public Team.TeamCode GetTeam()
@@ -75,8 +73,17 @@ public class Projectile : RayCast2D
 
     protected virtual Vector2 Seek()
     {
-        Vector2 desired = (Target.Position - Position).Normalized() * Speed;
-        Vector2 steer = (desired - Velocity).Normalized() * SteerForce;
+        Vector2 steer = Vector2.Zero;
+
+        if (Target != null && IsInstanceValid(Target))
+        {
+            Vector2 desired = (Target.Position - Position).Normalized() *  Speed;
+            steer = (desired - Velocity).Normalized() * SteerForce;
+        }
+        else
+        {
+            Target = null;
+        }
 
         return steer;
     }
@@ -90,39 +97,80 @@ public class Projectile : RayCast2D
             {
                 Target = null;
             }
-
-            if (Target != null)
+            
+            if(Target!=null)
             {
-                Acceleration +=  (Target.Position - Position).Normalized() * Speed;
-                Velocity += Acceleration * delta;
-                Rotation = ((Target.Position - Position).Normalized() * Speed).Angle();
+                LookAt(Target.Position);
+                Velocity = Transform.x * Speed;
             }
 
-            if (IsColliding())
-            {
-                IsProjectileStart = false;
-                Enabled = IsProjectileStart;
+            //Acceleration += Seek();
+            //Velocity += Acceleration * delta;
 
-                ComputeDamage();
+            
 
-                Explode();
-            }
-
-            GlobalPosition += Transform.x * Speed * delta;
-            CastTo = Vector2.Right * 2.0f * Speed * delta;
+            Velocity = Velocity.Clamped(Speed);
+            Rotation = Velocity.Angle();
+            GlobalPosition += Velocity * delta;
         }
     }
 
-    protected virtual void ComputeDamage()
+    public virtual void OnNodeEntered(Node body)
     {
-        // This is the code responsible for able to shoot down bullet with bullet
-        EmitSignal(nameof(ProjectileDamageSignal), Damage, GetCollisionNormal(), Source, SourceTeam, GetCollider());
+        if(IsProjectileStart)
+        {
+        if(body.HasMethod("GetTeam"))
+        {
+           if(body is ExplosionBlast)
+           {
+               // Ignore explosion blast for now
+               return;
+           }
+
+           if(body is Projectile && ((Projectile)body).GetTeam() == GetTeam())
+           {
+               // This is from same team, ignore it
+               return;
+           }
+
+           if(body is ShieldPhysics && ((ShieldPhysics)body).GetTeam() == GetTeam())
+           {
+               // This is from same team, ignore it
+               return;
+           }
+
+           if(body is LightSaberAttack)
+           {
+               // Ignore light saber for now, this will be taken care of by Attack
+               return;
+           }
+
+
+            if(body is Agent && ((Agent)body).GetTeam() == GetTeam())
+           {
+               // This is from same team, ignore it
+               return;
+           }
+        }
+
+        IsProjectileStart = false;
+
+        ComputeDamage(body);
+
+        Explode();
+        }
     }
+
+
+    protected virtual void ComputeDamage(Node body)
+    {
+        EmitSignal(nameof(ProjectileDamageSignal), Damage, Vector2.Right.Rotated(Mathf.Deg2Rad(GlobalRotation)), Source, SourceTeam, body);
+    }
+
 
     public virtual void Explode()
     {
         IsProjectileStart = false;
-        Enabled = IsProjectileStart;
 
         Velocity = Vector2.Zero;
 

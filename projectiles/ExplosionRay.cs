@@ -31,9 +31,9 @@ public class ExplosionRay : RayCast2D
         if (Enabled && IsColliding())
         {
             // Projectile will collide
-            if (GetCollider().HasMethod("_onProjectileAreaEntered"))
+            if (GetCollider() is Projectile)
             {
-                ProjectileArea2D collider = (ProjectileArea2D)(GetCollider());
+                Projectile collider = (Projectile)(GetCollider());
 
                 // Only bullets from different team will cloide
                 if (collider.GetTeam() != _sourceTeam.CurrentTeamCode)

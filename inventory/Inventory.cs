@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Inventory : Node
 {
@@ -13,15 +14,19 @@ public class Inventory : Node
 
     private int _availableCapacity;
 
-    private Godot.Collections.Array<ItemResource> _items = new Godot.Collections.Array<ItemResource>();
+    private List<ItemResource> _items;
 
-    private Godot.Collections.Dictionary<String, int> _equipmentIndex = new Godot.Collections.Dictionary<String, int>();
-    private Godot.Collections.Array<int> _usedIndex = new Godot.Collections.Array<int>();
+    private Dictionary<String, int> _equipmentIndex;
+    private List<int> _usedIndex;
 
     private Agent _agent;
 
     public override void _Ready()
     {
+        _items = new List<ItemResource>();
+        _equipmentIndex = new Dictionary<String, int>();
+        _usedIndex = new List<int>();
+
         _availableCapacity = _maxItemCapacity;
 
         for (int index = 0; index < _maxItemCapacity; index++)
@@ -36,12 +41,12 @@ public class Inventory : Node
         EmitSignal(nameof(InventoryChangeSignal));
     }
 
-    public TeamMapAI GetCurrentTeamMapAI()
+    public TeamMapAI GetTeamMapAI()
     {
-        return _agent.GetCurrentTeamMapAI();
+        return _agent.GetTeamMapAI();
     }
 
-    public Godot.Collections.Array<ItemResource> GetItems()
+    public List<ItemResource> GetItems()
     {
         return _items;
     }

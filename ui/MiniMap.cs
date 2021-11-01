@@ -1,22 +1,23 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class MiniMap : MarginContainer
 {
     private float _zoom = 1.5f;
 
     private Agent _player;
-    private Godot.Collections.Dictionary<String, Agent> _agents;
+    private Dictionary<String, Agent> _agents;
 
-    private Godot.Collections.Dictionary<String, Sprite> _agentMarkers;
-    private Godot.Collections.Dictionary<String, Sprite> _baseMarkers;
+    private Dictionary<String, Sprite> _agentMarkers;
+    private Dictionary<String, Sprite> _baseMarkers;
 
     private Sprite _agentMarker;
     private Sprite _baseMarker;
     private TextureRect _grid;
     private Vector2 _gridScale = Vector2.Zero;
 
-    private CapaturableBaseManager _capaturableBaseManager;
+    private CapturableBaseManager _capturableBaseManager;
 
     public override void _Ready()
     {
@@ -24,20 +25,20 @@ public class MiniMap : MarginContainer
 
         _agentMarker = (Sprite)_grid.GetNode("AgentMarker");
         _baseMarker = (Sprite)_grid.GetNode("BaseMarker");
-        _agents = new Godot.Collections.Dictionary<String, Agent>();
-        _agentMarkers = new Godot.Collections.Dictionary<String, Sprite>();
-        _baseMarkers = new Godot.Collections.Dictionary<String, Sprite>();
+        _agents = new Dictionary<String, Agent>();
+        _agentMarkers = new Dictionary<String, Sprite>();
+        _baseMarkers = new Dictionary<String, Sprite>();
 
         _player = null;
-        _capaturableBaseManager = null;
+        _capturableBaseManager = null;
         _gridScale = _grid.RectSize / (GetViewportRect().Size * _zoom);
     }
 
-    public void Iniitialize(CapaturableBaseManager capaturableBaseManager)
+    public void Iniitialize(CapturableBaseManager capturableBaseManager)
     {
-        _capaturableBaseManager = capaturableBaseManager;
+        _capturableBaseManager = capturableBaseManager;
 
-        foreach (CapturableBase capturableBase in capaturableBaseManager.GetBases())
+        foreach (CapturableBase capturableBase in _capturableBaseManager.GetBases())
         {
             Sprite baseMarker = (Sprite)_baseMarker.Duplicate();
             baseMarker.Name = capturableBase.Name + "_marker";
@@ -69,7 +70,7 @@ public class MiniMap : MarginContainer
             Sprite agentMarker = (Sprite)_agentMarker.Duplicate();
             agentMarker.Name = agent.GetUnitName() + "_marker";
 
-            agentMarker.Modulate = Team.TeamColor[(int)agent.GetCurrentTeam()];
+            agentMarker.Modulate = Team.TeamColor[(int)agent.GetTeam()];
 
             _grid.AddChild(agentMarker);
 
@@ -126,7 +127,7 @@ public class MiniMap : MarginContainer
         }
 
 
-        foreach (CapturableBase capturableBase in _capaturableBaseManager.GetBases())
+        foreach (CapturableBase capturableBase in _capturableBaseManager.GetBases())
         {
             Vector2 markerPosition = ((capturableBase.GlobalPosition - _player.GlobalPosition) * _gridScale) + _grid.RectSize / 2.0f;
             markerPosition.x = Mathf.Clamp(markerPosition.x, 0, _grid.RectSize.x);

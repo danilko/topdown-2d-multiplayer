@@ -1,9 +1,10 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class CapturableBase : Area2D
 {
-    private Godot.Collections.Array agentsEntered;
+    private List<int> agentsEntered;
 
     private Team _team;
 
@@ -48,7 +49,7 @@ public class CapturableBase : Area2D
 
         _timer = (Timer)GetNode("CaptureTimer");
 
-        agentsEntered = new Godot.Collections.Array();
+        agentsEntered = new List<int>();
 
         for (int index = 0; index < Enum.GetNames(typeof(Team.TeamCode)).Length; index++)
         {
@@ -92,10 +93,10 @@ public class CapturableBase : Area2D
 
     private void _onCapturableBaseBodyEntered(Node2D body)
     {
-        if (body.HasMethod(nameof(Agent.GetCurrentTeam)))
+        if (body.HasMethod(nameof(Agent.GetTeam)))
         {
             Agent agent = (Agent)body;
-            agentsEntered[(int)agent.GetCurrentTeam()] = (int)agentsEntered[(int)agent.GetCurrentTeam()] + 1;
+            agentsEntered[(int)agent.GetTeam()] = (int)agentsEntered[(int)agent.GetTeam()] + 1;
 
             checkIsBaseCaptured();
         }
@@ -103,13 +104,13 @@ public class CapturableBase : Area2D
 
     private void _onCapturableBaseBodyExited(Node2D body)
     {
-        if (body.HasMethod(nameof(Agent.GetCurrentTeam)))
+        if (body.HasMethod(nameof(Agent.GetTeam)))
         {
             Agent agent = (Agent)body;
-            agentsEntered[(int)agent.GetCurrentTeam()] = (int)agentsEntered[(int)agent.GetCurrentTeam()] - 1;
-            if ((int)agentsEntered[(int)agent.GetCurrentTeam()] < 0)
+            agentsEntered[(int)agent.GetTeam()] = (int)agentsEntered[(int)agent.GetTeam()] - 1;
+            if ((int)agentsEntered[(int)agent.GetTeam()] < 0)
             {
-                agentsEntered[(int)agent.GetCurrentTeam()] = 0;
+                agentsEntered[(int)agent.GetTeam()] = 0;
             }
 
             checkIsBaseCaptured();
