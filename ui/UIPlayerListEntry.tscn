@@ -1,12 +1,40 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
-[ext_resource path="res://ui/UIPlayerListEntry.cs" type="Script" id=2]
+
+[sub_resource type="CSharpScript" id=1]
+script/source = "using Godot;
+using System;
+
+public class UIPlayerListEntry : MenuButton
+{
+    // Declare member variables here. Examples:
+    // private int a = 2;
+    // private string b = \"text\";
+
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+
+    }
+
+    public void setInfo(String pName)
+    {
+        ((Label)(GetNode(\"PlayerRow/lblName\"))).Text = pName;
+        //((TextureRect)(GetNode(\"PlayerRow/Icon\"))).Texture = \"\";
+    }
+
+    public void setLatency(float latency)
+    {
+        ((Label)(GetNode(\"PlayerRow/lblLatency\"))).Text = \"(\" + latency + \")\";
+    }
+}
+"
 
 [node name="UIPlayerListEntry" type="MenuButton"]
 margin_right = 210.0
 margin_bottom = 20.0
-script = ExtResource( 2 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

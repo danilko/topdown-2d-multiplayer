@@ -43,7 +43,7 @@ public class CapturableBase : Area2D
 
         _rng = new RandomNumberGenerator();
         _rng.Randomize();
-        
+
         _base = (Sprite)GetNode("Base");
         _boundry = (Sprite)GetNode("Boundry");
 
@@ -84,7 +84,7 @@ public class CapturableBase : Area2D
     public Vector2 GetRandomPositionWithinCaptureRadius()
     {
         Vector2 extents = (Vector2)_collisionShape.Shape.Get("extents");
-        Vector2 topLeftCorner =  _collisionShape.GlobalPosition - extents;
+        Vector2 topLeftCorner = _collisionShape.GlobalPosition - extents;
         float randX = _rng.RandfRange(topLeftCorner.x, topLeftCorner.x + extents.x);
         float randY = _rng.RandfRange(topLeftCorner.y, topLeftCorner.y + extents.y);
 
@@ -182,12 +182,33 @@ public class CapturableBase : Area2D
 
             if (_counter == _timeToCaptureBase)
             {
-                SetCaptureBaseTeam(_captureTeamCode);
+                // Client will rely on server to "notify capture of server"
+                // Server and signle player will capture itself
+                if (GetTree().IsNetworkServer())
+                {
+                    SetCaptureBaseTeam(_captureTeamCode);
+                    Rpc(nameof(_clientCapturableBase), "" + (int)_captureTeamCode);
+                }
+                else if (GetTree().NetworkPeer == null)
+                {
+                    SetCaptureBaseTeam(_captureTeamCode);
+                }
             }
         }
         else
         {
             _timer.Stop();
+        }
+    }
+
+    [Remote]
+    private void _clientCapturableBase(String info)
+    {
+        if (!GetTree().IsNetworkServer())
+        {
+            int team = int.Parse(info.Split(";")[1]);
+
+            SetCaptureBaseTeam((Team.TeamCode)_captureTeamCode);
         }
     }
 }

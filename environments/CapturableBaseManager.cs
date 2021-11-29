@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class CapturableBaseManager : Node2D
+public class CapturableBaseManager : Node
 {
     private List<CapturableBase> _bases;
     private GameWorld _gameWorld;
@@ -11,7 +11,7 @@ public class CapturableBaseManager : Node2D
         _bases = new List<CapturableBase>();
     }
 
-    public List<CapturableBase> GetBases()
+    public List<CapturableBase> GetCapturableBases()
     {
         return _bases;
     }

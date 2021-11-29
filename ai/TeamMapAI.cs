@@ -218,7 +218,7 @@ public class TeamMapAI : Node2D
 
     private CapturableBase _getNextCapturableBase()
     {
-        List<CapturableBase> bases = _capturableBaseManager.GetBases();
+        List<CapturableBase> bases = _capturableBaseManager.GetCapturableBases();
 
         if (baseCaptureStartOrder == BaseCaptureStartOrder.LAST)
         {
@@ -393,7 +393,7 @@ public class TeamMapAI : Node2D
         CapturableBase targetCaptureBase = null;
         CapturableBase neutralCaptureBase = null;
 
-        foreach (CapturableBase captureBase in _capturableBaseManager.GetBases())
+        foreach (CapturableBase captureBase in _capturableBaseManager.GetCapturableBases())
         {
             if (captureBase.GetCaptureBaseTeam() == _team.CurrentTeamCode)
             {

@@ -11,18 +11,40 @@ public class HUD : CanvasLayer
     private Dictionary<Weapon.WeaponOrder, WeaponControl> _weaponControls;
 
     private Control _gameControl;
-    private Control _miniMap;
+    private MiniMap _miniMap;
 
     private Control _overallMessageControll;
 
     private CharacterDialog _characterDialog;
 
+    private PopUpMessage _popUpMessage;
+
+    private GameTimerManager _gameTimerManager;
+
+    private GameTimerManager.GameTimerState _gameTimerState;
+
+    private GameWorld _gameWorld;
+
+    private Label _timerTickLabel;
+
     public override void _Ready()
     {
+
+    }
+
+    public void Initailize(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld;
+        _gameTimerManager = _gameWorld.GetGameTimerManager();
+        _gameTimerManager.Connect(nameof(GameTimerManager.GameTimerTickSignal), this, nameof(_onUpdateTimerTick));
+
+        _gameTimerState = _gameTimerManager.GetGameTimerState();
+
+        _timerTickLabel =  ((Label)GetNode("lblTimerStatus"));
+
         _characterDialog = (CharacterDialog)GetNode("CharacterDialog");
 
         _gameControl = (Control)(GetNode("GameControl"));
-        _miniMap = ((MiniMap)_gameControl.GetNode("MiniMap"));
         _overallMessageControll = ((Control)GetNode("controlOverallMessage"));
         _overallMessageControll.Visible = false;
 
@@ -30,6 +52,33 @@ public class HUD : CanvasLayer
         _weaponControls.Add(Weapon.WeaponOrder.Right, (WeaponControl)(_gameControl.GetNode("RightWeaponControl")));
         _weaponControls.Add(Weapon.WeaponOrder.Left, (WeaponControl)(_gameControl.GetNode("LeftWeaponControl")));
 
+        _miniMap = (MiniMap)_gameControl.GetNode("MiniMap");
+        _popUpMessage = (PopUpMessage)GetNode("PopUpMessage");
+
+        _miniMap.Iniitialize(gameWorld.GetCapturableBaseManager());
+
+        //_postProcess = (PostProcess)GetNode("PostProcess");
+
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerDefeatedSignal), this, nameof(_onPlayerDefeated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreateSignal), this, nameof(_onPlayerCreated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentDefeatedSignal), this, nameof(_onAgentDefeated));
+    }
+
+    private void _onAgentDefeated(String agentId, String unitName, Team.TeamCode teamCode)
+    {
+        _miniMap.RemoveAgent(unitName);
+        _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS ELIMINATED");
+
+    }
+
+    public PopUpMessage GetPopUpMessage()
+    {
+        return _popUpMessage;
+    }
+
+    public MiniMap GetMiniMap()
+    {
+        return _miniMap;
     }
 
     private void _onNetworkRateUpdate(String message)
@@ -43,7 +92,7 @@ public class HUD : CanvasLayer
         _weaponControls[weaponOrder].UpdateWeapon(itemResource, weaponOrder, weaponIndex);
     }
 
-    public void OnPlayerDefeated()
+    private void _onPlayerCreated()
     {
         _gameControl.Visible = false;
         _overallMessageControll.Visible = true;
@@ -51,7 +100,7 @@ public class HUD : CanvasLayer
         ((AnimationPlayer)GetNode("AnimationPlayer")).Play("MessageAnnounce");
     }
 
-    public void OnPlayerCreated()
+    private void _onPlayerDefeated()
     {
         _overallMessageControll.Visible = false;
 
@@ -64,19 +113,21 @@ public class HUD : CanvasLayer
         ((Label)GetNode("lblTeamUnitUsageAmount")).Text = "" + cost;
     }
 
-    private void _onUpdateTimer(String message)
+    private void _onUpdateTimerTick(int time)
     {
-        if (message.Contains("00:00:"))
+        String message = _gameTimerManager.ConvertToDateFormat(time) + " " + _gameTimerState;
+
+        // If less than 60 seconds, modify color
+        if (time < 60)
         {
-            ((Label)GetNode("lblTimerStatus")).Set("custom_colors/font_color", new Color("#ffc65b"));
+            _timerTickLabel.Set("custom_colors/font_color", new Color("#ffc65b"));
         }
         else
         {
-            ((Label)GetNode("lblTimerStatus")).Set("custom_colors/font_color", new Color("#96ff5b"));
+            _timerTickLabel.Set("custom_colors/font_color", new Color("#96ff5b"));
         }
 
-
-        ((Label)GetNode("lblTimerStatus")).Text = message;
+        _timerTickLabel.Text = message;
     }
 
     public override void _PhysicsProcess(float delta)
@@ -89,9 +140,9 @@ public class HUD : CanvasLayer
 
         // COmment out for now as part of test
         //if (!_characterDialog.Visible && Input.IsKeyPressed((int)Godot.KeyList.Space))
-       // {
-       //     _characterDialog.Activate();
-       // }
+        // {
+        //     _characterDialog.Activate();
+        // }
     }
 
 }

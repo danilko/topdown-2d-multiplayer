@@ -2,5 +2,5 @@
 
 [ext_resource path="res://environments/CapturableBaseManager.cs" type="Script" id=1]
 
-[node name="CapaturableBaseManager" type="Node2D"]
+[node name="CapaturableBaseManager" type="Node"]
 script = ExtResource( 1 )

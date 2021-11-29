@@ -15,9 +15,21 @@ public class EndGameScreen : Control
         // Set the message to empty as it is recieved
         gameStates.setMessagesForNextScene("");
 
-        ((Label) GetNode("ResultPanel/lblResultTitle")).Text = messages.Split(";")[0];
-        ((Label) GetNode("ResultPanel/lblResultSummary")).Text = messages.Split(";")[1];
-        ((Label) GetNode("ResultPanel/lblElapsedTime")).Text = "Elapsed Time: " + messages.Split(";")[2];
+        GameConditionManager.GameResultMessage gameResultMessage = GameConditionManager.DecodeGameResult(messages);
+
+        String title = "";
+        if(gameResultMessage.WinningTeamCode == Team.TeamCode.TEAMUNKOWN)
+        {
+            title = "IT IS A TIE";
+        }
+        else
+        {
+            title = "WINNER: " + gameResultMessage.WinningTeamCode;
+        }
+
+        ((Label) GetNode("ResultPanel/lblResultTitle")).Text = title;
+        ((Label) GetNode("ResultPanel/lblResultSummary")).Text = "" + gameResultMessage.EndGameCondition;
+        ((Label) GetNode("ResultPanel/lblElapsedTime")).Text = "Elapsed Time: " + gameResultMessage.ElapsedTime;
     }
 
     private void btContinue()

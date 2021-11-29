@@ -35,12 +35,11 @@ public class ObstacleManager : Node2D
 
     // Build obstacles base on tile map
     // Will not build obstacles on the road automatically
-    public void Initialize(TileMap tileMap)
+    public void Initialize(GameWorld gameWorld)
     {
-        _tileMap = tileMap;
+        _tileMap = (TileMap)gameWorld.GetNode("Ground");
         _halfCellSize = _tileMap.CellSize / 2;
         buildObstacles();
-
     }
 
     public List<Vector2> GetTraversableTiles()

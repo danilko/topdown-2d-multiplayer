@@ -480,11 +480,6 @@ public class Agent : KinematicBody2D
     {
         // 100 is the tweak effect to have a nice knocback
         MoveAndSlide(force * 100);
-
-        if (isCurrentPlayer)
-        {
-            _gameWorld.StartScreenShake();
-        }
     }
 
     public void setHealth(int health)

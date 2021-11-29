@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -10,7 +10,14 @@
 [ext_resource path="res://assets/crosshair055.png" type="Texture" id=8]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
 [ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
-[ext_resource path="res://PostProcess/PostProcess.tscn" type="PackedScene" id=11]
+[ext_resource path="res://environments/TeamMapAIManager.tscn" type="PackedScene" id=11]
+[ext_resource path="res://environments/AgentSpawnManager.tscn" type="PackedScene" id=12]
+[ext_resource path="res://environments/GameConditionManager.tscn" type="PackedScene" id=13]
+[ext_resource path="res://environments/GameTimerManager.tscn" type="PackedScene" id=14]
+[ext_resource path="res://network/NetworkSnapshotManager.tscn" type="PackedScene" id=15]
+[ext_resource path="res://environments/GameStateManager.tscn" type="PackedScene" id=16]
+[ext_resource path="res://agents/Observer.tscn" type="PackedScene" id=17]
+[ext_resource path="res://environments/PathManager.tscn" type="PackedScene" id=18]
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
@@ -26,8 +33,6 @@ glow_blend_mode = 1
 script = ExtResource( 3 )
 
 [node name="HUD" parent="." instance=ExtResource( 5 )]
-
-[node name="PostProcess" parent="." instance=ExtResource( 11 )]
 
 [node name="Ground" type="TileMap" parent="."]
 modulate = Color( 0.572549, 0.611765, 0.65098, 1 )
@@ -56,14 +61,29 @@ position = Vector2( 11.1118, 10.3181 )
 [node name="dot" type="Sprite" parent="."]
 texture = ExtResource( 2 )
 
-[node name="Timer" type="Timer" parent="."]
-autostart = true
-
 [node name="MapCoordinate" type="Label" parent="."]
 margin_right = 40.0
 margin_bottom = 14.0
 custom_colors/font_color = Color( 1, 0, 0, 1 )
 text = "TEST"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GameCamera" parent="." instance=ExtResource( 9 )]
+zoom = Vector2( 4, 4 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
+[node name="LockOnIndicator" type="TextureRect" parent="."]
+visible = false
+modulate = Color( 0, 1, 0.658824, 1 )
+anchor_right = 1.0
+margin_right = 384.0
+margin_bottom = 384.0
+texture = ExtResource( 8 )
+expand = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -86,26 +106,21 @@ _defaultTeamCode = 1
 position = Vector2( 1449.93, 4039.13 )
 _defaultTeamCode = 1
 
-[node name="RespawnPlayerTimer" type="Timer" parent="."]
-
-[node name="GameCamera" parent="." instance=ExtResource( 9 )]
-zoom = Vector2( 4, 4 )
-
 [node name="InventoryManager" parent="." instance=ExtResource( 10 )]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( 1 )
+[node name="AgentSpawnManager" parent="." instance=ExtResource( 12 )]
 
-[node name="LockOnIndicator" type="TextureRect" parent="."]
-visible = false
-modulate = Color( 0, 1, 0.658824, 1 )
-anchor_right = 1.0
-margin_right = 384.0
-margin_bottom = 384.0
-texture = ExtResource( 8 )
-expand = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="GameConditionManager" parent="." instance=ExtResource( 13 )]
 
-[connection signal="timeout" from="Timer" to="." method="_onNetworkRateTimerUpdate"]
+[node name="GameTimerManager" parent="." instance=ExtResource( 14 )]
+
+[node name="NetworkSnapshotManager" parent="." instance=ExtResource( 15 )]
+
+[node name="GameStateManager" parent="." instance=ExtResource( 16 )]
+
+[node name="TeamMapAIManager" parent="." instance=ExtResource( 11 )]
+
+[node name="Observer" parent="." instance=ExtResource( 17 )]
+pause_mode = 1
+
+[node name="PathManager" parent="." instance=ExtResource( 18 )]
