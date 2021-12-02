@@ -22,11 +22,14 @@ public class AgentSpawnManager : Node
     [Signal]
     public delegate void AgentDefeatedSignal();
 
+    [Signal]
+    public delegate void AgentCreatedSignal();
+
     private Queue<AgentSpawnInfo> spawnQueue;
 
     private GameWorld _gameWorld;
     private GameStates _gameStates;
-    
+
     private class SpwanInfo
     {
         public long spawn_index { get; set; }
@@ -41,7 +44,7 @@ public class AgentSpawnManager : Node
     public static String AgentPlayerPrefix = "agent_player_";
 
     public static String AgentObserverPrefix = "agent_observer_";
-    
+
     private Network _network;
 
 
@@ -61,7 +64,7 @@ public class AgentSpawnManager : Node
     {
         return _spawnBots;
     }
-    
+
     public Dictionary<String, Agent> GetSpawnPlayers()
     {
         return _spawnPlayers;
@@ -116,7 +119,7 @@ public class AgentSpawnManager : Node
         {
             existingPosition = currentSpawnCache[id].GlobalPosition;
 
-            EmitSignal(nameof(AgentDefeatedSignal),  currentSpawnCache[id].GetUnitName(), currentSpawnCache[id].GetTeam());
+            EmitSignal(nameof(AgentDefeatedSignal), currentSpawnCache[id].GetUnitName(), currentSpawnCache[id].GetTeam());
 
             _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)currentSpawnCache[id].GetTeam()].RemoveUnit(currentSpawnCache[id].Name);
         }
@@ -150,7 +153,7 @@ public class AgentSpawnManager : Node
 
 
     [Remote]
-    private void _spawnPlayer(String unitInfo)
+    private void _spawnPlayerOnServer(String unitInfo)
     {
         int netId = int.Parse(unitInfo.Split(";")[0]);
         int team = int.Parse(unitInfo.Split(";")[1]);
@@ -159,33 +162,23 @@ public class AgentSpawnManager : Node
 
         if (GetTree().IsNetworkServer())
         {
-            foreach (KeyValuePair<int, NetworkPlayer> item in network.networkPlayers)
-            {
-                // Spawn the new player within the currently iterated player as long it's not the server
-                // Because the server's list already contains the new player, that one will also get itself!
-                if (item.Key != 1)
-                {
-                    RpcId(item.Key, nameof(_spawnPlayer), unitInfo);
-                }
-            }
-        }
+            Rpc(nameof(_spawnPlayer), unitInfo);
 
-        _cratePlayer(netId, (Team.TeamCode)team, unitName, displayName);
+        }
     }
 
-    private void _cratePlayer(int netId, Team.TeamCode team, String unitName, String displayName)
+    private void _spawnPlayer(int netId, Team.TeamCode team, String unitName, String displayName)
     {
-        String playerId = _agentPlayerPrefix + netId;
+        String playerId = AgentPlayerPrefix + netId;
 
         // Already generated
-        if (spawnPlayers.ContainsKey(playerId))
+        if (_spawnPlayers.ContainsKey(playerId))
         {
             return;
         }
 
-
         // Load the scene and create an instance
-        Player agent = (Player)(TeamMapAIs[(int)team].CreateUnit(unitName, displayName, false));
+        Player agent = (Player)(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitName, displayName, false));
 
         // If this actor does not belong to the server, change the network master accordingly
         if (netId != 1)
@@ -193,97 +186,27 @@ public class AgentSpawnManager : Node
             agent.SetNetworkMaster(netId);
         }
 
-
-
         // If this actor is the current client controlled, add camera and attach HUD
-        if (netId == network.gamestateNetworkPlayer.net_id)
+        if (netId == _network.gamestateNetworkPlayer.net_id)
         {
             // Attach camera
-            agent.SetHUD(_hud, _inventoryManager);
-            agent.SetCameraRemotePath(_camera2D);
-
-            // Set player marker
-            _miniMap.SetPlayer(agent);
-        }
-        else
-        {
-            // Add as normal agent marker
-            _miniMap.AddAgent(agent);
+            agent.SetHUD(_gameWorld.GetHUD(), _gameWorld.getInventoryManager());
+            agent.SetCameraRemotePath(_gameWorld.GetGameCamera());
         }
 
-        spawnPlayers.Add(playerId, agent);
+        _spawnPlayers.Add(playerId, agent);
         EmitSignal(nameof(PlayerCreateSignal));
+        EmitSignal(nameof(AgentCreatedSignal), agent.GetUnitName(), agent.GetTeam());
     }
 
-
-    private void _syncBots()
-    {
-        if (GetTree().IsNetworkServer())
-        {
-            // Calculate the target amount of spawned bots
-            int bot_count = network.serverinfo.max_players - network.networkPlayers.Count;
-
-            if (SpawnBots.Count > bot_count)
-            {
-                while (SpawnBots.Count > bot_count)
-                {
-                    foreach (Agent spawnBot in SpawnBots.Values)
-                    {
-                        _removeUnitOnNetwork(spawnBot.Name);
-                        break;
-                    }
-                }
-            }
-            else if (SpawnBots.Count < bot_count)
-            {
-                // If bot_count
-                while (SpawnBots.Count < bot_count)
-                {
-                    TeamMapAI targetAI = null;
-                    // Set the initial to max bot count
-                    int smallestUnitCount = bot_count;
-
-                    foreach (TeamMapAI currentAI in TeamMapAIs)
-                    {
-                        if (currentAI.GetAutoSpawnMember() && currentAI.isNewUnitAllow())
-                        {
-                            if (currentAI.GetUnitsContainer().GetChildren().Count <= smallestUnitCount)
-                            {
-                                smallestUnitCount = currentAI.GetUnitsContainer().GetChildren().Count;
-                                targetAI = currentAI;
-                            }
-                        }
-                    }
-
-                    if (targetAI != null)
-                    {
-                        String botId = (int)targetAI.GetTeam() + ";" + AgentPrefix + AgentBotCounter;
-                        AgentBotCounter++;
-
-                        Rpc(nameof(_addBotOnNetwork), botId);
-
-                        _addBotOnNetwork(botId);
-                    }
-                    else
-                    {
-                        // No longer allowed to add more bot now, so exit loop
-                        break;
-                    }
-                }
-            }
-
-            _checkGameWinningCondition();
-        }
-
-    }
 
     [Remote]
-    private void _addBotOnNetwork(String botId)
+    private void _addBoT(String botId)
     {
         Team.TeamCode team = (Team.TeamCode)int.Parse(botId.Split(";")[0]);
         String unitName = botId.Split(";")[1];
 
-        if (!SpawnBots.ContainsKey(unitName))
+        if (!_spawnBots.ContainsKey(unitName))
         {
             bool enableAI = false;
 
@@ -292,11 +215,9 @@ public class AgentSpawnManager : Node
                 enableAI = true;
             }
 
-            Agent agent = TeamMapAIs[(int)team].CreateUnit(unitName, unitName, enableAI);
-            SpawnBots.Add(unitName, agent);
-
-            // Add agent marker to minimap
-            _miniMap.AddAgent(agent);
+            Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitName, unitName, enableAI);
+            _spawnBots.Add(unitName, agent);
+            EmitSignal(nameof(AgentCreatedSignal), agent.GetUnitName(), agent.GetTeam());
         }
     }
 

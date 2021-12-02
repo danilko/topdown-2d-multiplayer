@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -7,7 +7,6 @@
 [ext_resource path="res://ui/HUD.tscn" type="PackedScene" id=5]
 [ext_resource path="res://environments/CapturableBaseManager.tscn" type="PackedScene" id=6]
 [ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
-[ext_resource path="res://assets/crosshair055.png" type="Texture" id=8]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
 [ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
 [ext_resource path="res://environments/TeamMapAIManager.tscn" type="PackedScene" id=11]
@@ -75,18 +74,6 @@ zoom = Vector2( 4, 4 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 1 )
-
-[node name="LockOnIndicator" type="TextureRect" parent="."]
-visible = false
-modulate = Color( 0, 1, 0.658824, 1 )
-anchor_right = 1.0
-margin_right = 384.0
-margin_bottom = 384.0
-texture = ExtResource( 8 )
-expand = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="CapaturableBaseManager" parent="." instance=ExtResource( 6 )]
 

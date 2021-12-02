@@ -40,7 +40,7 @@ public class HUD : CanvasLayer
 
         _gameTimerState = _gameTimerManager.GetGameTimerState();
 
-        _timerTickLabel =  ((Label)GetNode("lblTimerStatus"));
+        _timerTickLabel = ((Label)GetNode("lblTimerStatus"));
 
         _characterDialog = (CharacterDialog)GetNode("CharacterDialog");
 
@@ -62,23 +62,25 @@ public class HUD : CanvasLayer
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerDefeatedSignal), this, nameof(_onPlayerDefeated));
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreateSignal), this, nameof(_onPlayerCreated));
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentDefeatedSignal), this, nameof(_onAgentDefeated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
     }
 
-    private void _onAgentDefeated(String agentId, String unitName, Team.TeamCode teamCode)
+    private void _onAgentDefeated(String unitName, Team.TeamCode teamCode)
     {
         _miniMap.RemoveAgent(unitName);
         _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS ELIMINATED");
-
     }
+
+    private void _onAgentCreated(String unitName, Team.TeamCode teamCode)
+    {
+        _miniMap.AddAgent(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode].GetUnit(unitName));
+        _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS IDENTITIED");
+    }
+
 
     public PopUpMessage GetPopUpMessage()
     {
         return _popUpMessage;
-    }
-
-    public MiniMap GetMiniMap()
-    {
-        return _miniMap;
     }
 
     private void _onNetworkRateUpdate(String message)
@@ -96,8 +98,6 @@ public class HUD : CanvasLayer
     {
         _gameControl.Visible = false;
         _overallMessageControll.Visible = true;
-
-        ((AnimationPlayer)GetNode("AnimationPlayer")).Play("MessageAnnounce");
     }
 
     private void _onPlayerDefeated()
