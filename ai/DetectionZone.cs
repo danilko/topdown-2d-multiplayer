@@ -16,8 +16,6 @@ public class DetectionZone : Area2D
     [Signal]
     public delegate void AgentExitedSignal();
 
-    private Team currentTeam;
-
     private Agent _agent;
 
     private Agent _targetAgent = null;

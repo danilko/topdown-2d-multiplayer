@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://terrain/terrain_tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://assets/ui/red_tick.png" type="Texture" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://ui/HUD.tscn" type="PackedScene" id=5]
 [ext_resource path="res://environments/CapturableBaseManager.tscn" type="PackedScene" id=6]
 [ext_resource path="res://environments/ObstacleManager.tscn" type="PackedScene" id=7]
+[ext_resource path="res://environments/ProjectileManager.tscn" type="PackedScene" id=8]
 [ext_resource path="res://agents/GameCamera.tscn" type="PackedScene" id=9]
 [ext_resource path="res://inventory/InventoryManager.tscn" type="PackedScene" id=10]
 [ext_resource path="res://environments/TeamMapAIManager.tscn" type="PackedScene" id=11]
@@ -111,3 +112,5 @@ _defaultTeamCode = 1
 pause_mode = 1
 
 [node name="PathManager" parent="." instance=ExtResource( 18 )]
+
+[node name="ProjectileManager" parent="." instance=ExtResource( 8 )]

@@ -55,23 +55,19 @@ public class Missle : Projectile
     {
         base.Explode();
 
-        CallDeferred("createExplosion");
+        CallDeferred(nameof(_createExplosionDamage));
 
         QueueFree();
     }
 
-    private void createExplosion()
+    private void _createExplosionDamage()
     {
-        ExplosionBlast explosionBlast = (ExplosionBlast)((PackedScene)GD.Load("res://projectiles/ExplosionBlast.tscn")).Instance();
-        GameWorld.AddChild(explosionBlast);
-        explosionBlast.Initialize(Source, SourceTeam,  GameWorld, DamageRayRadius, Damage, GlobalPosition);
+        EmitSignal(nameof(Projectile.ProjectileExplosionSignal), Source, SourceTeam, DamageRayRadius, Damage, GlobalPosition);
     }
 
     protected override void ComputeDamage(Node body)
     {
         // Instead of direct compute, will be handle by explosion blast in this case
-
-
     }
 
 }

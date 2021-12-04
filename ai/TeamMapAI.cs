@@ -44,7 +44,7 @@ public class TeamMapAI : Node2D
     [Export]
     private Boolean _autoSpawnMember = true;
 
-    private  Godot.RandomNumberGenerator _randomNumberGenerator;
+    private Godot.RandomNumberGenerator _randomNumberGenerator;
 
     public override void _Ready()
     {
@@ -56,7 +56,7 @@ public class TeamMapAI : Node2D
         _advancedTimer = (Timer)GetNode("AdvancedTimer");
         _advancedTimer.WaitTime = _advancedWaitInterval;
 
-        _randomNumberGenerator =  new Godot.RandomNumberGenerator();
+        _randomNumberGenerator = new Godot.RandomNumberGenerator();
     }
 
     public Boolean GetAutoSpawnMember()
@@ -86,9 +86,15 @@ public class TeamMapAI : Node2D
 
         EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
 
-        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+            }
+
+            // Call locally for server
+            _clientSetAmount(_currentUnitUsageAmount);
         }
     }
 
@@ -103,24 +109,18 @@ public class TeamMapAI : Node2D
             _currentUnitUsageAmount = _currentUnitUsageAmount - chargeAmount;
             EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
 
-            if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
-                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+                if (GetTree().NetworkPeer != null)
+                {
+                    Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+                }
+
+                // Call locally for server
+                _clientSetAmount(_currentUnitUsageAmount);
             }
 
             return true;
-        }
-    }
-
-    public void SyncTeamMapAICurrentUnitAmount(int rpcId)
-    {
-        if (rpcId != -1)
-        {
-            RpcId(rpcId, nameof(_clientSetAmount), _currentUnitUsageAmount);
-        }
-        else
-        {
-            Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
         }
     }
 
@@ -317,14 +317,14 @@ public class TeamMapAI : Node2D
     {
         if (GetTree().NetworkPeer == null || IsNetworkMaster())
         {
-            int weaponCombine = _randomNumberGenerator.RandiRange(0 , 5);
+            int weaponCombine = _randomNumberGenerator.RandiRange(0, 5);
 
             if (weaponCombine == 0)
             {
                 // Add Laser weapon
                 _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-1000"), agent.GetInventory());
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-1000"), Weapon.WeaponOrder.Left, 0);
-             }
+            }
             if (weaponCombine == 1)
             {
                 // Add missle launcher + sheild
@@ -333,7 +333,7 @@ public class TeamMapAI : Node2D
 
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-300"), Weapon.WeaponOrder.Left, 0);
-             }
+            }
             if (weaponCombine == 2)
             {
                 // Add multi missle launcher + shield
@@ -342,7 +342,7 @@ public class TeamMapAI : Node2D
 
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
-             }
+            }
             if (weaponCombine == 3)
             {
                 // Add multi missle launcher + shield
@@ -351,7 +351,7 @@ public class TeamMapAI : Node2D
 
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Right, 0);
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
-             }
+            }
             if (weaponCombine == 4)
             {
                 // Add multi missle launcher + shield
@@ -360,7 +360,7 @@ public class TeamMapAI : Node2D
 
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Right, 0);
                 _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
-             }
+            }
             if (weaponCombine == 5)
             {
                 // Add rifile + sheild

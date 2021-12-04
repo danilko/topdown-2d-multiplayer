@@ -29,7 +29,6 @@ public class ItemPanel : Panel
     public enum ItemPanelType { PURCHASE, SALE, INVENTORY, WEAPON };
 
     private ItemPanelType _itemPanelType = ItemPanelType.PURCHASE;
-    private bool _isOnPanel;
     private bool _isUsed;
     private bool _isEquipped;
 
@@ -48,7 +47,6 @@ public class ItemPanel : Panel
     {
         SelfModulate = _exitedColor;
         _itemResource = itemResource;
-        _isOnPanel = false;
         _isUsed = false;
         _isEquipped = false;
         _itemPanelType = itemPanelType;
@@ -169,14 +167,12 @@ public class ItemPanel : Panel
     private void mouseEntered()
     {
         SelfModulate = _enteredColor;
-        _isOnPanel = true;
 
     }
 
     private void mouseExited()
     {
         SelfModulate = _exitedColor;
-        _isOnPanel = false;
 
     }
 

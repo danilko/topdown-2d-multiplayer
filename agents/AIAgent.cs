@@ -22,8 +22,8 @@ public class AIAgent : Agent
     {
         base._Ready();
 
-        RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
-        LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+        RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+        LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
 
         _speed = MaxSpeed;
 

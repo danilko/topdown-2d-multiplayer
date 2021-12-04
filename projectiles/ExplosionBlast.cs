@@ -30,7 +30,7 @@ public class ExplosionBlast : Area2D
         QueueFree();
     }
 
-    public void Initialize(Node2D source, Team sourceTeam, GameWorld gameWorld, float raidus, float damage, Vector2 position)
+    public void Initialize(Node2D source, Team sourceTeam, float raidus, float damage, Vector2 position)
     {
         CollisionShape2D detectRadius = (CollisionShape2D)GetNode("CollisionShape2D");
 
@@ -41,12 +41,6 @@ public class ExplosionBlast : Area2D
         Source = source;
         SourceTeam = sourceTeam;
         Damage = damage;
-
-        // Set the parent to gameworld
-        if (!IsConnected(nameof(ExplosionBlastDamageSignal), gameWorld, "_onDamageCalculation"))
-        {
-            Connect(nameof(ExplosionBlastDamageSignal), gameWorld, "_onDamageCalculation");
-        }
 
         GlobalPosition = position;
 

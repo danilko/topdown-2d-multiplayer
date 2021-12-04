@@ -10,7 +10,6 @@ public class GameStateManager : Node
 
     private GameStates _gamestates;
     private GameTimerManager _gameTimerManager;
-    private AgentSpawnManager _agentSpawnManager;
 
     private float _currentTime;
 
@@ -29,7 +28,6 @@ public class GameStateManager : Node
         _gameTimerManager = _gameWorld.GetGameTimerManager();
         _networkSnapshotManager = _gameWorld.GetNetworkSnasphotManager();
         _network = _networkSnapshotManager.GetNetwork();
-        _agentSpawnManager = _gameWorld.GetAgentSpawnManager();
 
         if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
         {
@@ -62,7 +60,7 @@ public class GameStateManager : Node
             }
 
             // push the player remove to all clients (include server)
-            _agentSpawnManager.PlaceRemoveUnit(AgentSpawnManager.AgentPrefix + playerId);
+            _gameWorld.GetAgentSpawnManager().PlaceRemoveUnit(AgentSpawnManager.AgentPrefix + playerId);
         }
     }
 
@@ -103,13 +101,13 @@ public class GameStateManager : Node
         {
             String playerId = AgentSpawnManager.AgentPlayerPrefix + networkPlayer.Value.net_id;
             // Node may not being created yet
-            if (!_agentSpawnManager.GetSpawnPlayers().ContainsKey(playerId))
+            if (!_gameWorld.GetAgentSpawnManager().GetSpawnPlayers().ContainsKey(playerId))
             {
                 // Ideally should give a warning that a player node wasn't found
                 continue;
             }
 
-            Agent playerNode = _agentSpawnManager.GetSpawnPlayers()[playerId];
+            Agent playerNode = _gameWorld.GetAgentSpawnManager().GetSpawnPlayers()[playerId];
 
             if (playerNode == null || !IsInstanceValid(playerNode))
             {
@@ -124,16 +122,16 @@ public class GameStateManager : Node
             if (playerNode.getHealth() > 0)
             {
                 // Check if there is any input for this player. In that case, update the state
-                if (_gamestates.playerInputs.ContainsKey(networkPlayer.Key) && _gamestates.playerInputs[networkPlayer.Key].Count > 0)
+                if (_networkSnapshotManager.playerInputs.ContainsKey(networkPlayer.Key) && _networkSnapshotManager.playerInputs[networkPlayer.Key].Count > 0)
                 {
 
                     int rightWeapon = 0;
                     int leftWeapon = 0;
 
                     // Calculate the delta
-                    float delta = _gamestates.updateDelta / (float)(_gamestates.playerInputs[networkPlayer.Key].Count);
+                    float delta = _gamestates.updateDelta / (float)(_networkSnapshotManager.playerInputs[networkPlayer.Key].Count);
 
-                    foreach (KeyValuePair<int, GameStates.PlayerInput> input in _gamestates.playerInputs[networkPlayer.Key])
+                    foreach (KeyValuePair<int, NetworkSnapshotManager.PlayerInput> input in _networkSnapshotManager.playerInputs[networkPlayer.Key])
                     {
                         Vector2 moveDir = Vector2.Zero;
                         moveDir.y -= input.Value.Up;
@@ -157,9 +155,9 @@ public class GameStateManager : Node
                     }
 
                     // Cleanup the input vector
-                    _gamestates.playerInputs[networkPlayer.Key].Clear();
+                    _networkSnapshotManager.playerInputs[networkPlayer.Key].Clear();
 
-                    _gamestates.playerInputs.Remove(networkPlayer.Key);
+                    _networkSnapshotManager.playerInputs.Remove(networkPlayer.Key);
 
                     NetworkSnapshotManager.ClientData clientData = new NetworkSnapshotManager.ClientData();
                     clientData.Id = networkPlayer.Key + "";
@@ -181,19 +179,19 @@ public class GameStateManager : Node
         }
 
         // Clean the input
-        _gamestates.playerInputs.Clear();
+        _networkSnapshotManager.playerInputs.Clear();
 
         foreach (String spawnPlayerId in removeSpawnPlayers)
         {
             // Respawn dead player if that team still allow new unit
-            Team.TeamCode teamCode = _agentSpawnManager.GetSpawnPlayers()[spawnPlayerId].GetTeam();
-            String displayName = _agentSpawnManager.GetSpawnPlayers()[spawnPlayerId].GetDisplayName();
-            _agentSpawnManager.PlaceRemoveUnit(spawnPlayerId);
+            Team.TeamCode teamCode = _gameWorld.GetAgentSpawnManager().GetSpawnPlayers()[spawnPlayerId].GetTeam();
+            String displayName = _gameWorld.GetAgentSpawnManager().GetSpawnPlayers()[spawnPlayerId].GetDisplayName();
+            _gameWorld.GetAgentSpawnManager().PlaceRemoveUnit(spawnPlayerId);
         }
 
         List<String> removeSpawnBots = new List<String>();
 
-        foreach (Agent agent in _agentSpawnManager.GetSpawnBots().Values)
+        foreach (Agent agent in _gameWorld.GetAgentSpawnManager().GetSpawnBots().Values)
         {
             // Locate the bot node
             Agent enemyNode = (Agent)_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)agent.GetTeam()].GetUnit(agent.Name);
@@ -205,8 +203,8 @@ public class GameStateManager : Node
             }
 
 
-            int rightWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
-            int leftWeapon = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            int rightWeapon = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+            int leftWeapon = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
 
             if (isGamingPeriod)
             {
@@ -234,13 +232,13 @@ public class GameStateManager : Node
                 snapshot.botData.Add(enemyNode.Name, clientData);
 
                 // This logic is necessary to notify the AI that reload is pick up, so can continue with next state
-                if (rightWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+                if (rightWeapon == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
                 {
-                    enemyNode.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                    enemyNode.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
                 }
-                if (leftWeapon == (int)GameStates.PlayerInput.InputAction.RELOAD)
+                if (leftWeapon == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
                 {
-                    enemyNode.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+                    enemyNode.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
                 }
             }
             else
@@ -251,7 +249,7 @@ public class GameStateManager : Node
 
         foreach (String spawnBotId in removeSpawnBots)
         {
-            _agentSpawnManager.PlaceRemoveUnit(spawnBotId);
+            _gameWorld.GetAgentSpawnManager().PlaceRemoveUnit(spawnBotId);
         }
 
         // Encode and broadcast the snapshot - if there is at least one connected client
@@ -268,14 +266,14 @@ public class GameStateManager : Node
         // the loop
 
         Agent agent = null;
-        if (_agentSpawnManager.GetSpawnPlayers().ContainsKey(agentNodeName))
+        if (_gameWorld.GetAgentSpawnManager().GetSpawnPlayers().ContainsKey(agentNodeName))
         {
-            agent = _agentSpawnManager.GetSpawnPlayers()[agentNodeName];
+            agent = _gameWorld.GetAgentSpawnManager().GetSpawnPlayers()[agentNodeName];
         }
 
-        if (_agentSpawnManager.GetSpawnBots().ContainsKey(agentNodeName))
+        if (_gameWorld.GetAgentSpawnManager().GetSpawnBots().ContainsKey(agentNodeName))
         {
-            agent = _agentSpawnManager.GetSpawnBots()[agentNodeName];
+            agent = _gameWorld.GetAgentSpawnManager().GetSpawnBots()[agentNodeName];
         }
 
         if (agent == null || !IsInstanceValid(agent))

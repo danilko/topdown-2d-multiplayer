@@ -184,13 +184,13 @@ public class CapturableBase : Area2D
             {
                 // Client will rely on server to "notify capture of server"
                 // Server and signle player will capture itself
-                if (GetTree().IsNetworkServer())
+                if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
                 {
-                    SetCaptureBaseTeam(_captureTeamCode);
-                    Rpc(nameof(_clientCapturableBase), "" + (int)_captureTeamCode);
-                }
-                else if (GetTree().NetworkPeer == null)
-                {
+                    if (GetTree().NetworkPeer != null)
+                    {
+                        Rpc(nameof(_clientCapturableBase), "" + (int)_captureTeamCode);
+                    }
+
                     SetCaptureBaseTeam(_captureTeamCode);
                 }
             }

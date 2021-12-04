@@ -110,7 +110,7 @@ public class AgentSpawnSystem : Node2D
     }
 
 
-    private void _cratePlayer(int netId, Team.TeamCode team, String unitName, String displayName)
+    private void _createAgent(int netId, Team.TeamCode team, String unitName, String displayName)
     {
         String playerId = _agentPlayerPrefix + netId;
 

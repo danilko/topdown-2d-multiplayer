@@ -87,7 +87,7 @@ public class Weapon : Node2D
         _weaponOrder = weaponOrder;
         _weaponIndex = weaponIndex;
 
-        Connect(nameof(FireSignal), _gameWorld, "_onProjectileShoot");
+        Connect(nameof(FireSignal), _gameWorld.GetProjectileManager(), "_onProjectileShoot");
 
         EmitSignal(nameof(AmmoChangeSignal), Ammo, MaxAmmo, GetWeaponOrder());
     }

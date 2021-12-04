@@ -450,11 +450,11 @@ public class Agent : KinematicBody2D
 
         if (weapon != null)
         {
-            if (weaponAction == (int)GameStates.PlayerInput.InputAction.RELOAD)
+            if (weaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
             {
                 ReloadWeapon(weaponOrder);
             }
-            else if (weaponAction == (int)GameStates.PlayerInput.InputAction.TRIGGER)
+            else if (weaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER)
             {
 
                 Vector2 fireTarget = this.GlobalPosition + new Vector2(2000, 0).Rotated(GlobalRotation);

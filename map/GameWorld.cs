@@ -6,8 +6,6 @@ public class GameWorld : Node2D
 {
     protected GameStates GameStates;
 
-    Network network;
-
     private CapturableBaseManager _capturableBaseManager;
 
     private GameCamera _gameCamera;
@@ -24,6 +22,8 @@ public class GameWorld : Node2D
     private GameStateManager _gameStateManager;
     private TeamMapAIManager _teamMapAIManager;
     private PathManager _pathManager;
+
+    private ProjectileManager _projectileManager;
 
     public override void _Ready()
     {
@@ -42,10 +42,14 @@ public class GameWorld : Node2D
         _initailizeGameConditionManager();
         _initailizeAgentSpawnManager();
 
+        _initailizeProjectileManager();
+
         _initializeHUD();
 
         // Complete all initialize, start game timer
         _gameTimerManager.StartGameTimer();
+
+        _agentSpawnManager.InitUnits();
     }
 
     private void _initializeGameCamera()
@@ -68,6 +72,17 @@ public class GameWorld : Node2D
     public HUD GetHUD()
     {
         return _hud;
+    }
+
+    private void _initailizeProjectileManager()
+    {
+        _projectileManager = (ProjectileManager)GetNode("ProjectileManager");
+        _projectileManager.Initailize(this);
+    }
+
+    public ProjectileManager GetProjectileManager()
+    {
+        return _projectileManager;
     }
 
     private void _initializeNetworkSnapshotManager()

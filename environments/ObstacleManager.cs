@@ -18,8 +18,8 @@ public class ObstacleManager : Node2D
 
     public override void _Ready()
     {
-         _obstacles = new Dictionary<String, Vector2>();
-         _obstaclesDestroyed = new List<String>();
+        _obstacles = new Dictionary<String, Vector2>();
+        _obstaclesDestroyed = new List<String>();
         _traverableTiles = new List<Vector2>();
     }
 
@@ -128,7 +128,7 @@ public class ObstacleManager : Node2D
                         _traverableTiles.Add(new Vector2(xIndex, yIndex));
                     }
 
-                   // mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
+                    // mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
                 }
 
                 //mapLabel.SetGlobalPosition(position + _halfCellSize);
@@ -147,7 +147,7 @@ public class ObstacleManager : Node2D
     {
         foreach (Node node in GetChildren())
         {
-            if(! node.HasMethod(nameof(Obstacle.TakeEnvironmentDamage)))
+            if (!node.HasMethod(nameof(Obstacle.TakeEnvironmentDamage)))
             {
                 continue;
             }
@@ -171,6 +171,11 @@ public class ObstacleManager : Node2D
     {
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(destroyObstacle), obstacleName);
+            }
+
             if (_obstacles.ContainsKey(obstacleName))
             {
                 _obstacles.Remove(obstacleName);
@@ -179,8 +184,6 @@ public class ObstacleManager : Node2D
             _obstaclesDestroyed.Add(obstacleName);
 
             destroyObstacle(obstacleName);
-
-            Rpc(nameof(destroyObstacle), obstacleName);
         }
 
     }

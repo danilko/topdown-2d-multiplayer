@@ -43,12 +43,41 @@ public class NetworkSnapshotManager : Node
         public int LeftWeaponIndex;
     }
 
-    public class Snapshot
+    public class Snapshot : Godot.Object
     {
         public int signature;
         public Dictionary<String, ClientData> playerData = new Dictionary<String, ClientData>();
         public Dictionary<String, ClientData> botData = new Dictionary<String, ClientData>();
     }
+
+    public class PlayerInput
+    {
+        public enum InputAction {
+            NOT_TRIGGER,
+            TRIGGER,
+            RELOAD
+        }
+
+        public int Up;
+
+        public int Down;
+
+        public int Left;
+
+        public int Right;
+
+        public Vector2 MousePosition;
+
+        public int RightWeaponAction;
+        public int LeftWeaponAction;
+        public int RightWeaponIndex;
+        public int LeftWeaponIndex;
+    }
+
+    // Holds player input data (including the local one) which will be used to update the game state
+    //This will be filled only on the server
+    public Dictionary<int, Dictionary<int, PlayerInput>> playerInputs = new Dictionary<int, Dictionary<int, PlayerInput>>();
+
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -74,6 +103,20 @@ public class NetworkSnapshotManager : Node
         this.Connect(nameof(SnapshotReceivedSignal), this, nameof(applySnapshot));
     }
 
+    public void CacheInput(int net_id, PlayerInput playerInput)
+    {
+        if (!GetTree().IsNetworkServer())
+        {
+            return;
+        }
+
+        if (! playerInputs.ContainsKey(net_id))
+        {
+            playerInputs.Add(net_id, new Dictionary<int, PlayerInput>());
+        }
+
+        playerInputs[net_id].Add(playerInputs[net_id].Count, playerInput);
+    }
 
     // Cacluate network rate base on send bytes, received snapshots, applied snapshots
     private void _onNetworkRateTimerUpdate()

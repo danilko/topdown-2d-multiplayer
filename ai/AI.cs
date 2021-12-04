@@ -122,13 +122,13 @@ public class AI : Node2D
         _pathLine.GlobalRotation = 0;
 
         // If not reloading, then set to default
-        if (_agent.RightWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (_agent.RightWeaponAction != (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
         {
-            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            _agent.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
         }
-        if (_agent.LeftWeaponAction != (int)GameStates.PlayerInput.InputAction.RELOAD)
+        if (_agent.LeftWeaponAction != (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
         {
-            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            _agent.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
         }
 
         Godot.Collections.Array pathPoints = null;
@@ -169,8 +169,8 @@ public class AI : Node2D
                     // Only start fire when agent is closely faced to its target agent (around Pi / 4)
                     if (Mathf.Abs(_agent.GlobalRotation - angelToTargetAgent) < 0.8f)
                     {
-                        _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
-                        _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.TRIGGER;
+                        _agent.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER;
+                        _agent.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER;
                     }
 
                     // Chanse engaged agent closer if possible
@@ -210,11 +210,11 @@ public class AI : Node2D
     {
         if (weaponOrder == Weapon.WeaponOrder.Left)
         {
-            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+            _agent.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD;
         }
         else
         {
-            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.RELOAD;
+            _agent.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD;
         }
     }
 
@@ -222,11 +222,11 @@ public class AI : Node2D
     {
         if (weaponOrder == Weapon.WeaponOrder.Left)
         {
-            _agent.LeftWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            _agent.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
         }
         else
         {
-            _agent.RightWeaponAction = (int)GameStates.PlayerInput.InputAction.NOT_TRIGGER;
+            _agent.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
         }
 
     }

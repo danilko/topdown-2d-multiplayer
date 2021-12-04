@@ -18,10 +18,11 @@ public class GameConditionManager : Node
         ALL_UNITS_DEFEATED
     }
 
-    public class GameResultMessage{
-        public EndGameCondition EndGameCondition{get; set;}
-        public Team.TeamCode WinningTeamCode{get; set;}
-        public String ElapsedTime{get; set;}
+    public class GameResultMessage
+    {
+        public EndGameCondition EndGameCondition { get; set; }
+        public Team.TeamCode WinningTeamCode { get; set; }
+        public String ElapsedTime { get; set; }
     }
 
     // Called when the node enters the scene tree for the first time.
@@ -41,10 +42,13 @@ public class GameConditionManager : Node
         _capturableBaseManager = _gameWorld.GetCapturableBaseManager();
         _gameStates = _gameWorld.GetGameStateManager().GetGameStates();
 
-        if(GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+        // Client will rely on server to "notify capture of server"
+        // Server and signle player will capture itself
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             _gameTimerManager.Connect(nameof(GameTimerManager.GameTimerTickSignal), this, nameof(_checkGameWinningCondition));
         }
+
     }
 
     private void _checkGameWinningCondition(int time)
@@ -89,12 +93,12 @@ public class GameConditionManager : Node
     {
         _winningTeam.CurrentTeamCode = Team.TeamCode.TEAMUNKOWN;
 
-        Dictionary <Team.TeamCode, int> captureBasesMap = new Dictionary <Team.TeamCode, int> ();
-        Dictionary <int, int> captureBasesCountMap = new Dictionary <int, int> ();
+        Dictionary<Team.TeamCode, int> captureBasesMap = new Dictionary<Team.TeamCode, int>();
+        Dictionary<int, int> captureBasesCountMap = new Dictionary<int, int>();
 
         foreach (CapturableBase currentBase in _capturableBaseManager.GetCapturableBases())
         {
-            if (! captureBasesMap.ContainsKey(currentBase.GetCaptureBaseTeam()))
+            if (!captureBasesMap.ContainsKey(currentBase.GetCaptureBaseTeam()))
             {
                 captureBasesMap.Add(currentBase.GetCaptureBaseTeam(), 0);
             }
@@ -105,7 +109,7 @@ public class GameConditionManager : Node
 
         foreach (Team.TeamCode currentTeamCode in captureBasesMap.Keys)
         {
-            if (! captureBasesCountMap.ContainsKey(captureBasesMap[currentTeamCode]))
+            if (!captureBasesCountMap.ContainsKey(captureBasesMap[currentTeamCode]))
             {
                 captureBasesCountMap.Add(captureBasesMap[currentTeamCode], 0);
             }

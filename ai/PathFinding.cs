@@ -10,8 +10,6 @@ public class PathFinding : Node2D
 
     private TileMap _tileMap;
 
-    private Rect2 used_rect;
-
     private AStar2D _aStar;
 
     private ObstacleManager _obstacleManager;

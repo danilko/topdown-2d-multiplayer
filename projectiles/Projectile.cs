@@ -9,6 +9,9 @@ public class Projectile : Area2D
     [Signal]
     public delegate void ProjectileDamageSignal();
 
+    [Signal]
+    public delegate void ProjectileExplosionSignal();
+
     [Export]
     protected int Speed;
 
@@ -36,14 +39,9 @@ public class Projectile : Area2D
 
     protected bool IsProjectileStart = false;
 
-    protected GameWorld GameWorld;
-
 
     public virtual void Initialize(Vector2 position, Vector2 direction, Node2D inSource, Team sourceTeam, Node2D inTarget, Vector2 defaultTargetPosition)
     {
-        GameWorld = (GameWorld)GetParent();
-        Connect(nameof(ProjectileDamageSignal), GameWorld, "_onDamageCalculation");
-
         GlobalPosition = position;
 
         Rotation = direction.Angle();

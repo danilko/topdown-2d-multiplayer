@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class HUD : CanvasLayer
 {
-    Network network;
-
     bool lblMessage = false;
 
     private Dictionary<Weapon.WeaponOrder, WeaponControl> _weaponControls;
@@ -21,8 +19,6 @@ public class HUD : CanvasLayer
 
     private GameTimerManager _gameTimerManager;
 
-    private GameTimerManager.GameTimerState _gameTimerState;
-
     private GameWorld _gameWorld;
 
     private Label _timerTickLabel;
@@ -37,8 +33,6 @@ public class HUD : CanvasLayer
         _gameWorld = gameWorld;
         _gameTimerManager = _gameWorld.GetGameTimerManager();
         _gameTimerManager.Connect(nameof(GameTimerManager.GameTimerTickSignal), this, nameof(_onUpdateTimerTick));
-
-        _gameTimerState = _gameTimerManager.GetGameTimerState();
 
         _timerTickLabel = ((Label)GetNode("lblTimerStatus"));
 
@@ -60,7 +54,7 @@ public class HUD : CanvasLayer
         //_postProcess = (PostProcess)GetNode("PostProcess");
 
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerDefeatedSignal), this, nameof(_onPlayerDefeated));
-        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreateSignal), this, nameof(_onPlayerCreated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreatedSignal), this, nameof(_onPlayerCreated));
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentDefeatedSignal), this, nameof(_onAgentDefeated));
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
     }
@@ -115,7 +109,7 @@ public class HUD : CanvasLayer
 
     private void _onUpdateTimerTick(int time)
     {
-        String message = _gameTimerManager.ConvertToDateFormat(time) + " " + _gameTimerState;
+        String message = _gameTimerManager.ConvertToDateFormat(time) + " " + _gameTimerManager.GetGameTimerState();
 
         // If less than 60 seconds, modify color
         if (time < 60)

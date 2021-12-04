@@ -224,13 +224,19 @@ public class InventoryManager : Node
                     {
                         Vector2 itemPosition = agent.GlobalPosition + new Vector2(200f, 200f);
 
-                        _createPickUp(itemResource, itemPosition);
-
-                        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
                         {
                             String dropItemInfo = itemResource.ItemID + ";" + itemPosition.x + ";" + itemPosition.y + ";";
-                            Rpc(nameof(_clientCreatePickUp), dropItemInfo);
+
+                            if (GetTree().NetworkPeer != null)
+                            {
+                                Rpc(nameof(_clientCreatePickUp), dropItemInfo);
+                            }
+
+                            // Call locally for server
+                            _clientCreatePickUp(dropItemInfo);
                         }
+
                     }
                 }
 
@@ -268,7 +274,7 @@ public class InventoryManager : Node
 
             float positionY = float.Parse(splitInfo[infoIndex]);
             infoIndex++;
-            
+
             _createPickUp(itemResource, new Vector2(positionX, positionY));
         }
     }

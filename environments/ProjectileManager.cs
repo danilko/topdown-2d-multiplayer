@@ -1,18 +1,40 @@
 using Godot;
 using System;
 
-public class ProjectileManager : Node2D
+public class ProjectileManager : Node
 {
-    // Called when the node enters the scene tree for the first time.
+    private GameWorld _gameWorld;
+
     public override void _Ready()
     {
     }
 
+   public void Initailize(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld;
+    }
+
+
     private void _onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target, Vector2 defaultTarget)
     {
         Projectile newProjectile = (Projectile)projectile.Instance();
-        AddChild(newProjectile);
-        newProjectile.Initialize(_position, _direction, source, sourceTeam, target, defaultTarget);
+        _gameWorld.AddChild(newProjectile);
+
+        newProjectile.Connect(nameof(Projectile.ProjectileDamageSignal), this, nameof(_onDamageCalculation));
+        newProjectile.Connect(nameof(Projectile.ProjectileExplosionSignal), this, nameof(_onProjectileExplosion));
+
+        newProjectile.Initialize( _position, _direction, source, sourceTeam, target, defaultTarget);
+    }
+
+    private void _onProjectileExplosion(Node2D source, Team sourceTeam, float raidus, float damage, Vector2 position)
+    {
+        ExplosionBlast explosionBlast = (ExplosionBlast)((PackedScene)GD.Load("res://projectiles/ExplosionBlast.tscn")).Instance();
+        AddChild(explosionBlast);
+
+        // Set the parent to gameworld
+        explosionBlast.Connect(nameof(ExplosionBlast.ExplosionBlastDamageSignal), this, nameof(_onDamageCalculation));
+
+        explosionBlast.Initialize(source, sourceTeam, raidus, damage, position);
     }
 
     private void _onDamageCalculation(int damage, Vector2 hitDir, Godot.Object source, Team sourceTeam, Godot.Object target)

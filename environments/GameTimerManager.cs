@@ -47,13 +47,16 @@ public class GameTimerManager : Node
 
     public void StartGameTimer()
     {
-        // Set the timer on server to do waiting period count down
-        if (GetTree().IsNetworkServer())
+        internalTimer = _maxWaitingTime;
+
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            _serverTimerStart(_maxWaitingTime, (int)GameTimerState.WAITING);
-        }
-        else if (GetTree().NetworkPeer == null)
-        {
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(_clientTimerStart), _maxWaitingTime, (int)GameTimerState.WAITING);
+            }
+
+            // Call locally for server
             _clientTimerStart(_maxWaitingTime, (int)GameTimerState.WAITING);
         }
     }
@@ -103,12 +106,14 @@ public class GameTimerManager : Node
         }
 
         // Update to next state
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            _serverTimerStart(internalTimer, (int)nextGameTimerState);
-        }
-        else if (GetTree().NetworkPeer == null)
-        {
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(_clientTimerStart), internalTimer, (int)nextGameTimerState);
+            }
+
+            // Call locally for server
             _clientTimerStart(internalTimer, (int)nextGameTimerState);
         }
 
@@ -130,24 +135,19 @@ public class GameTimerManager : Node
         EmitSignal(nameof(GameTimerTickSignal), internalTimer);
     }
 
-    private void _serverTimerStart(int waitingTime, int gameTimerState)
-    {
-        Rpc(nameof(_clientTimerStart), waitingTime, gameTimerState);
-    }
-
     [Remote]
     private void _clientTimerStart(int waitingTime, int gameTimerState)
     {
+        _timer.Stop();
+
         _gameTimerState = (GameTimerState)gameTimerState;
+        internalTimer = waitingTime;
 
         EmitSignal(nameof(GameTimerStateChangeSignal), _gameTimerState);
 
-        _timer.Stop();
-
         // No need to restart timer, as the game timer is now in end
-        if(_gameTimerState != GameTimerState.END)
+        if (_gameTimerState != GameTimerState.END)
         {
-            internalTimer = _maxWaitingTime;
             _timer.Start();
         }
     }

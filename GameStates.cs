@@ -17,34 +17,6 @@ public class GameStates : Node
 
     public float currentTime = 0;
 
-    public class PlayerInput
-    {
-        public enum InputAction {
-            NOT_TRIGGER,
-            TRIGGER,
-            RELOAD
-        }
-
-        public int Up;
-
-        public int Down;
-
-        public int Left;
-
-        public int Right;
-
-        public Vector2 MousePosition;
-
-        public int RightWeaponAction;
-        public int LeftWeaponAction;
-        public int RightWeaponIndex;
-        public int LeftWeaponIndex;
-    }
-
-    // Holds player input data (including the local one) which will be used to update the game state
-    //This will be filled only on the server
-    public Dictionary<int, Dictionary<int, PlayerInput>> playerInputs = new Dictionary<int, Dictionary<int, PlayerInput>>();
-
     public List<TeamMapAISetting> _teamMapAISettings = null;
 
     private String messages;
@@ -64,20 +36,6 @@ public class GameStates : Node
         _teamMapAISettings = teamMapAISettings;
     }
 
-    public void cacheInput(int net_id, PlayerInput playerInput)
-    {
-        if (!GetTree().IsNetworkServer())
-        {
-            return;
-        }
-
-        if (! playerInputs.ContainsKey(net_id))
-        {
-            playerInputs.Add(net_id, new Dictionary<int, PlayerInput>());
-        }
-
-        playerInputs[net_id].Add(playerInputs[net_id].Count, playerInput);
-    }
 
     public void setMessagesForNextScene(String inputMessages)
     {

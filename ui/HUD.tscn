@@ -164,20 +164,20 @@ margin_bottom = 303.485
 
 [node name="InventoryUI" parent="GameControl" instance=ExtResource( 11 )]
 
-[node name="CharacterDialog" parent="." instance=ExtResource( 4 )]
-visible = false
-margin_top = 325.403
-margin_bottom = -74.5967
-
-[node name="LockOnIndicator" type="TextureRect" parent="."]
+[node name="LockOnIndicator" type="TextureRect" parent="GameControl"]
 visible = false
 modulate = Color( 0, 1, 0.658824, 1 )
 anchor_right = 1.0
-margin_left = 237.0
-margin_top = 73.0
-margin_right = -659.0
+margin_left = 236.159
+margin_top = 72.9999
+margin_right = -659.841
 margin_bottom = 201.0
 texture = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="CharacterDialog" parent="." instance=ExtResource( 4 )]
+visible = false
+margin_top = 325.403
+margin_bottom = -74.5967

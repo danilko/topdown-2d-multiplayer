@@ -57,13 +57,13 @@ public class ScreenIndicator : Node2D
         _currentTargetAgnet = null;
     }
 
-    public void Initialize(Agent agent)
+    public void Initialize(GameWorld gameWorld, Agent agent)
     {
         _agent = agent;
         _agents = new Dictionary<String, Agent>();
         _agentMarkers = new Dictionary<String, Node2D>();
 
-        _lockonIndicator = (TextureRect)agent.GetGameWorld().GetNode("LockOnIndicator");
+        _lockonIndicator = (TextureRect)gameWorld.GetHUD().GetNode("GameControl/LockOnIndicator");
     }
 
     public void setCurrentTargetAgent(Agent agent)
