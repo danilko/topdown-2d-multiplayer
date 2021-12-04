@@ -59,7 +59,7 @@ public class HUD : CanvasLayer
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
     }
 
-    private void _onAgentDefeated(String unitName, Team.TeamCode teamCode)
+    private void _onAgentDefeated(String unitId, Team.TeamCode teamCode, String unitName, String displayName)
     {
         _miniMap.RemoveAgent(unitName);
         _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS ELIMINATED");

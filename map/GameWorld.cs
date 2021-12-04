@@ -39,8 +39,8 @@ public class GameWorld : Node2D
         _initializePathManager();
         _initializeTeamMapAIManager();
  
-        _initailizeGameConditionManager();
         _initailizeAgentSpawnManager();
+        _initailizeGameConditionManager();
 
         _initailizeProjectileManager();
 
@@ -49,7 +49,7 @@ public class GameWorld : Node2D
         // Complete all initialize, start game timer
         _gameTimerManager.StartGameTimer();
 
-        _agentSpawnManager.InitUnits();
+        _gameConditionManager.InitAgents();
     }
 
     private void _initializeGameCamera()

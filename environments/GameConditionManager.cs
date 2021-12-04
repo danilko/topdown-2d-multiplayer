@@ -6,6 +6,9 @@ public class GameConditionManager : Node
 {
     private TeamMapAIManager _teamMapAIManager;
     private GameTimerManager _gameTimerManager;
+
+    private AgentSpawnManager _agentSpawnManager;
+
     private GameWorld _gameWorld;
 
     private Team _winningTeam;
@@ -42,6 +45,8 @@ public class GameConditionManager : Node
         _capturableBaseManager = _gameWorld.GetCapturableBaseManager();
         _gameStates = _gameWorld.GetGameStateManager().GetGameStates();
 
+        _agentSpawnManager = _gameWorld.GetAgentSpawnManager();
+
         // Client will rely on server to "notify capture of server"
         // Server and signle player will capture itself
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
@@ -50,6 +55,52 @@ public class GameConditionManager : Node
         }
 
     }
+
+    public void InitAgents()
+    {
+        if (GetTree().IsNetworkServer())
+        {
+            foreach (KeyValuePair<int, NetworkPlayer> item in _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers)
+            {
+                String unitId = AgentSpawnManager.AgentPlayerPrefix + item.Value.net_id;
+                Team.TeamCode team = (Team.TeamCode)item.Value.team;
+                String unitName = unitId;
+                String displayName = item.Value.name;
+
+                _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+            }
+        }
+        else if (GetTree().NetworkPeer == null)
+        {
+            String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
+            Team.TeamCode team = (Team.TeamCode)0;
+            String unitName = unitId;
+            String displayName = "Player";
+
+            _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+        }
+    }
+
+    public Boolean CheckRespawnCondition(Team.TeamCode teamCode)
+    {
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode];
+        if (teamMapAI.isUnitUsageAmountAllowed())
+        {
+            bool availableBase = false;
+            foreach (CapturableBase currentBase in _capturableBaseManager.GetCapturableBases())
+            {
+                if(currentBase.GetCaptureBaseTeam() == teamCode)
+                {
+                    availableBase = true;
+                }
+            }
+
+            return availableBase;
+        }
+
+        return false;
+    }
+
 
     private void _checkGameWinningCondition(int time)
     {

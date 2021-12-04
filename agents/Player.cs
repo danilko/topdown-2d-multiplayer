@@ -78,10 +78,8 @@ public class Player : Agent
         _screenIndicator.SetActivate(true);
         Connect(nameof(Agent.HealthChangedSignal), _screenIndicator, nameof(ScreenIndicator.UpdateHealth));
 
-
         setHealth(MaxHealth);
         setEnergy(MaxEnergy);
-
 
         DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), _screenIndicator, "_onAgentEntered");
         DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), _screenIndicator, "_onAgentExited");
@@ -148,13 +146,10 @@ public class Player : Agent
             _inventoryUI.Activate(!_inventoryUI.Visible);
         }
 
-
-        // Only read input is inventory is not open
+        // Only read input if inventory is not open
         if (_inventoryUI == null || !_inventoryUI.Visible)
         {
             NetworkSnapshotManager.PlayerInput playerInput = new NetworkSnapshotManager.PlayerInput();
-
-
 
             if (Input.IsActionPressed("turn_right"))
             {
@@ -255,7 +250,7 @@ public class Player : Agent
             }
 
 
-            if (GetTree().IsNetworkServer())
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
                 _gameWorld.GetNetworkSnasphotManager().CacheInput(1, playerInput);
             }
