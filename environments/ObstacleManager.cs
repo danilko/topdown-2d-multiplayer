@@ -171,10 +171,6 @@ public class ObstacleManager : Node2D
     {
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            if (GetTree().NetworkPeer != null)
-            {
-                Rpc(nameof(destroyObstacle), obstacleName);
-            }
 
             if (_obstacles.ContainsKey(obstacleName))
             {
@@ -184,6 +180,11 @@ public class ObstacleManager : Node2D
             _obstaclesDestroyed.Add(obstacleName);
 
             destroyObstacle(obstacleName);
+
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(destroyObstacle), obstacleName);
+            }
         }
 
     }

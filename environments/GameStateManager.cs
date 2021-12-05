@@ -29,14 +29,14 @@ public class GameStateManager : Node
         _networkSnapshotManager = _gameWorld.GetNetworkSnasphotManager();
         _network = _networkSnapshotManager.GetNetwork();
 
-        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            // Connect logic if server disconnect logic, which will perform end game
-            _network.Connect(nameof(Network.DisconnectedSignal), this, nameof(_onGameExit));
-
             // Connect player remove logic, which remove
             _network.Connect(nameof(Network.PlayerRemovedSignal), this, nameof(_onPlayerRemoved));
         }
+
+        // Connect logic if server disconnect logic, which will perform end game
+        _network.Connect(nameof(Network.DisconnectedSignal), this, nameof(_onGameExit));
     }
 
     public GameStates GetGameStates()
@@ -51,17 +51,8 @@ public class GameStateManager : Node
 
     private void _onPlayerRemoved(int playerId)
     {
-        foreach (KeyValuePair<int, NetworkPlayer> item in _network.networkPlayers)
-        {
-            // Skip disconnecte player and server from replication code
-            if (item.Key == playerId || item.Key == 1)
-            {
-                continue;
-            }
-
-            // push the player remove to all clients (include server)
-            _gameWorld.GetAgentSpawnManager().PlaceRemoveUnit(AgentSpawnManager.AgentPrefix + playerId);
-        }
+        // push the player remove to all clients (include server)
+        _gameWorld.GetAgentSpawnManager().PlaceRemoveUnit(AgentSpawnManager.AgentPlayerPrefix + playerId);
     }
 
     // Update and generate a game state snapshot

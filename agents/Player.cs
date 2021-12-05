@@ -86,7 +86,7 @@ public class Player : Agent
 
 
         // Setup Inventory UI
-        _inventoryUI = (InventoryUI)_hud.GetNode("GameControl/InventoryUI");
+        _inventoryUI = _hud.GetInventoryUI();
         _inventoryUI.Initialize(_inventoryManager, CurrentInventory);
 
         if (!_teamMapAI.IsConnected(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount)))
@@ -308,7 +308,7 @@ public class Player : Agent
         //some major lag in the game
         gameStates.currentTime -= gameStates.updateDelta;
 
-        if (GetTree().NetworkPeer != null && IsNetworkMaster())
+        if (GetTree().NetworkPeer == null || IsNetworkMaster())
         {
             gatherInput(delta);
         }

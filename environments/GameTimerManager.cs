@@ -51,13 +51,13 @@ public class GameTimerManager : Node
 
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
+            // Call locally for server
+            _clientTimerStart(_maxWaitingTime, (int)GameTimerState.WAITING);
+
             if (GetTree().NetworkPeer != null)
             {
                 Rpc(nameof(_clientTimerStart), _maxWaitingTime, (int)GameTimerState.WAITING);
             }
-
-            // Call locally for server
-            _clientTimerStart(_maxWaitingTime, (int)GameTimerState.WAITING);
         }
     }
 
@@ -108,13 +108,14 @@ public class GameTimerManager : Node
         // Update to next state
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
+
+            // Call locally for server
+            _clientTimerStart(internalTimer, (int)nextGameTimerState);
+
             if (GetTree().NetworkPeer != null)
             {
                 Rpc(nameof(_clientTimerStart), internalTimer, (int)nextGameTimerState);
             }
-
-            // Call locally for server
-            _clientTimerStart(internalTimer, (int)nextGameTimerState);
         }
 
     }

@@ -62,7 +62,7 @@ public class GameStates : Node
     private void noSet(float rate) { }
 
     public void endGameScreen()
-    {   
+    {
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         GetTree().ChangeScene(endResultScreen);
@@ -70,7 +70,9 @@ public class GameStates : Node
 
     public void restart()
     {
+        Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 0;
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 
@@ -79,6 +81,7 @@ public class GameStates : Node
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 1;
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 
@@ -87,6 +90,7 @@ public class GameStates : Node
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 0;
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 
@@ -95,6 +99,7 @@ public class GameStates : Node
         current_level = 2;
         // In game, disable mouse
         Input.SetMouseMode(Input.MouseMode.Hidden);
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 }

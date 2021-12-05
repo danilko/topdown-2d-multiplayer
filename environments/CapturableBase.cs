@@ -57,7 +57,7 @@ public class CapturableBase : Area2D
         }
 
         // Update unit display
-        SetCaptureBaseTeam(_team.CurrentTeamCode);
+        _setCaptureBaseTeam((int)_team.CurrentTeamCode);
     }
 
     public void Initialize(GameWorld gameWorld)
@@ -70,9 +70,10 @@ public class CapturableBase : Area2D
         return _team.CurrentTeamCode;
     }
 
-    public void SetCaptureBaseTeam(Team.TeamCode team)
+    [Remote]
+    private void _setCaptureBaseTeam(int teamCode)
     {
-        _team.CurrentTeamCode = team;
+        _team.CurrentTeamCode = (Team.TeamCode)teamCode;
         _base.Modulate = _team.getTeamColor(_team.CurrentTeamCode);
         _boundry.Modulate = _team.getTeamColor(_team.CurrentTeamCode);
         _unitDisplayLabel.Text = Name + " (" + _team.CurrentTeamCode + ")";
@@ -186,29 +187,18 @@ public class CapturableBase : Area2D
                 // Server and signle player will capture itself
                 if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
                 {
+                    _setCaptureBaseTeam((int)_captureTeamCode);
+
                     if (GetTree().NetworkPeer != null)
                     {
-                        Rpc(nameof(_clientCapturableBase), "" + (int)_captureTeamCode);
+                        Rpc(nameof(_setCaptureBaseTeam), (int)_captureTeamCode);
                     }
-
-                    SetCaptureBaseTeam(_captureTeamCode);
                 }
             }
         }
         else
         {
             _timer.Stop();
-        }
-    }
-
-    [Remote]
-    private void _clientCapturableBase(String info)
-    {
-        if (!GetTree().IsNetworkServer())
-        {
-            int team = int.Parse(info.Split(";")[1]);
-
-            SetCaptureBaseTeam((Team.TeamCode)_captureTeamCode);
         }
     }
 }

@@ -71,7 +71,11 @@ public class HUD : CanvasLayer
         _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS IDENTITIED");
     }
 
-
+    public InventoryUI GetInventoryUI()
+    {
+        return (InventoryUI)GetNode("GameControl/InventoryUI");
+    }
+    
     public PopUpMessage GetPopUpMessage()
     {
         return _popUpMessage;
@@ -90,15 +94,15 @@ public class HUD : CanvasLayer
 
     private void _onPlayerCreated()
     {
-        _gameControl.Visible = false;
-        _overallMessageControll.Visible = true;
+        _gameControl.Visible = true;
+        _overallMessageControll.Visible = false;
     }
 
     private void _onPlayerDefeated()
     {
-        _overallMessageControll.Visible = false;
+        _overallMessageControll.Visible = true;
 
-        _gameControl.Visible = true;
+        _gameControl.Visible = false;
         lblMessage = false;
     }
 

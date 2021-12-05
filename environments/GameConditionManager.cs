@@ -81,7 +81,7 @@ public class GameConditionManager : Node
         }
     }
 
-    public Boolean CheckRespawnCondition(Team.TeamCode teamCode)
+    public Boolean CheckIfCanSpawn(Team.TeamCode teamCode)
     {
         TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode];
         if (teamMapAI.isUnitUsageAmountAllowed())
@@ -89,7 +89,7 @@ public class GameConditionManager : Node
             bool availableBase = false;
             foreach (CapturableBase currentBase in _capturableBaseManager.GetCapturableBases())
             {
-                if(currentBase.GetCaptureBaseTeam() == teamCode)
+                if (currentBase.GetCaptureBaseTeam() == teamCode)
                 {
                     availableBase = true;
                 }
@@ -100,8 +100,7 @@ public class GameConditionManager : Node
 
         return false;
     }
-
-
+    
     private void _checkGameWinningCondition(int time)
     {
         Boolean endGame = false;
@@ -181,6 +180,23 @@ public class GameConditionManager : Node
         }
     }
 
+    public Boolean CheckIfPlayerNeedToBeRespawn(String unitId)
+    {
+        // Check if player need to be respawn (i.e. if disconnected, no need to respawn)
+        if(unitId.Contains(AgentSpawnManager.AgentPlayerPrefix))
+        {
+            int netId = int.Parse(unitId.Replace(AgentSpawnManager.AgentPlayerPrefix, ""));
+
+            if(! _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers.ContainsKey(netId))
+            {
+                // This player is disconnected, so no need to respawn
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     private bool checkIfOnlyOneTeamRemain()
     {
         int currentFieldTeam = 0;
@@ -205,14 +221,23 @@ public class GameConditionManager : Node
     {
         String message = _encodeGameResult();
 
-        Rpc(nameof(_clientNotifyEndGame), message);
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+        {
+            // Call locally for server
+            _clientNotifyEndGame(message);
+
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(_clientNotifyEndGame), message);
+            }
+        }
     }
 
     private String _encodeGameResult()
     {
-        String message = "" + (int)_endGameCondition;
-        message = message + (int)_winningTeam.CurrentTeamCode;
-        message = message + ";" + _gameTimerManager.ConvertToDateFormat(_gameTimerManager.GetElpasedTime());
+        String message = "" + (int)_endGameCondition + ";";
+        message = message + (int)_winningTeam.CurrentTeamCode + ";";
+        message = message + _gameTimerManager.ConvertToDateFormat(_gameTimerManager.GetElpasedTime());
 
         return message;
     }

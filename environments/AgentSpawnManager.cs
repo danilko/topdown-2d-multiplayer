@@ -38,8 +38,6 @@ public class AgentSpawnManager : Node
     private Dictionary<String, Agent> _spawnBots;
     private Dictionary<String, Agent> _spawnPlayers;
 
-    public static String AgentPrefix = "agent_";
-
     public static String AgentPlayerPrefix = "agent_player_";
 
     public static String AgentObserverPrefix = "agent_observer_";
@@ -49,7 +47,7 @@ public class AgentSpawnManager : Node
     private Timer _counterTimer;
 
     public static int INIT_DELAY = 1;
-    public static int DEFAULT_DELAY = 10;
+    public static int DEFAULT_DELAY = 20;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -66,6 +64,7 @@ public class AgentSpawnManager : Node
             _counterTimer.Connect("timeout", this, nameof(_checkAgentSpawnQueue));
             Connect(nameof(AgentStartToCreateSignal), this, nameof(_spawnAgentServer));
             Connect(nameof(AgentDefeatedSignal), this, nameof(_placeDefeatedUnitIntoCreationQueue));
+
             _counterTimer.Start();
         }
     }
@@ -102,6 +101,12 @@ public class AgentSpawnManager : Node
 
     public void _placeDefeatedUnitIntoCreationQueue(String unitId, Team.TeamCode team, String unitName, String displayName)
     {
+        // Check if this player need to be respawn
+        if (!_gameWorld.GetGameConditionManager().CheckIfPlayerNeedToBeRespawn(unitId))
+        {
+            return;
+        }
+
         PlaceNewUnit(unitId, team, unitName, displayName, DEFAULT_DELAY);
     }
 
@@ -109,13 +114,13 @@ public class AgentSpawnManager : Node
     {
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
+            // Call locally for server
+            _placeRemoveUnit(id);
+
             if (GetTree().NetworkPeer != null)
             {
                 Rpc(nameof(_placeRemoveUnit), id);
             }
-
-            // Call locally for server
-            _placeRemoveUnit(id);
         }
     }
 
@@ -201,8 +206,9 @@ public class AgentSpawnManager : Node
 
     private void _spawnAgentServer(AgentSpawnInfo unitSpawnInfo)
     {
-        // If condition cannot spawn, re added back to queue and 
-        if (_gameWorld.GetGameConditionManager().CheckRespawnCondition(unitSpawnInfo.Team) == false)
+        // If condition cannot spawn, re - added back to queue and 
+        // TODO: Need to better control whatever it is base/amount, if amount, will block the team if from adding to queue
+        if (!_gameWorld.GetGameConditionManager().CheckIfCanSpawn(unitSpawnInfo.Team))
         {
             unitSpawnInfo.Delay = DEFAULT_DELAY;
             PlaceNewUnit(unitSpawnInfo.UnitId, unitSpawnInfo.Team, unitSpawnInfo.UnitName, unitSpawnInfo.DisplayName, DEFAULT_DELAY);
@@ -213,16 +219,28 @@ public class AgentSpawnManager : Node
 
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
+
+            // Call locally for server
+            _spawnAgentClient(agentInfo);
+
+            _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].ChargeUnitAmount();
+
             if (GetTree().NetworkPeer != null)
             {
                 Rpc(nameof(_spawnAgentClient), agentInfo);
             }
 
-            // Call locally for server
-            _spawnAgentClient(agentInfo);
 
+            // Equip weapons, on server side only and sync to client, note
+            if (unitSpawnInfo.UnitId.Contains(AgentPlayerPrefix))
+            {
+                _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].AssignDefaultWeapon(_spawnPlayers[unitSpawnInfo.UnitId]);
+            }
+            else
+            {
+                _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].AssignDefaultAIRandomCombine(_spawnBots[unitSpawnInfo.UnitId]);
+            }
         }
-
     }
 
     [Remote]
@@ -262,10 +280,11 @@ public class AgentSpawnManager : Node
             // Attach camera
             agent.SetHUD(_gameWorld.GetHUD(), _gameWorld.getInventoryManager());
             agent.SetCameraRemotePath(_gameWorld.GetGameCamera());
-
-            // Set the authority to the net player who owns it
-            agent.SetNetworkMaster(netId);
         }
+
+        // Set the authority to the net player who owns it
+        // This one is important so a player cannot control unit does not belong to player
+        agent.SetNetworkMaster(netId);
 
         _spawnPlayers.Add(playerId, agent);
 
@@ -273,8 +292,6 @@ public class AgentSpawnManager : Node
         EmitSignal(nameof(AgentCreatedSignal), unitName, team);
     }
 
-
-    [Remote]
     private void _spawnBot(String botId, Team.TeamCode team, String unitName, String displayName)
     {
         // Already generated
@@ -294,6 +311,7 @@ public class AgentSpawnManager : Node
         _spawnBots.Add(unitName, agent);
 
         EmitSignal(nameof(AgentCreatedSignal), unitName, team);
+
     }
 
 }

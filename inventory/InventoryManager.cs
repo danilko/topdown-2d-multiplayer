@@ -228,13 +228,13 @@ public class InventoryManager : Node
                         {
                             String dropItemInfo = itemResource.ItemID + ";" + itemPosition.x + ";" + itemPosition.y + ";";
 
+                            // Call locally for server
+                            _clientCreatePickUp(dropItemInfo);
+
                             if (GetTree().NetworkPeer != null)
                             {
                                 Rpc(nameof(_clientCreatePickUp), dropItemInfo);
                             }
-
-                            // Call locally for server
-                            _clientCreatePickUp(dropItemInfo);
                         }
 
                     }

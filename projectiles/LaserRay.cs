@@ -96,9 +96,9 @@ public class LaserRay : RayCast2D
         _gameWorld = gameWorld;
 
         // Set the parent to player
-        if (!IsConnected(nameof(RayDamageSignal), _gameWorld, "_onDamageCalculation"))
+        if (!IsConnected(nameof(RayDamageSignal), _gameWorld.GetProjectileManager(), "_onDamageCalculation"))
         {
-            Connect(nameof(RayDamageSignal), _gameWorld, "_onDamageCalculation");
+            Connect(nameof(RayDamageSignal), _gameWorld.GetProjectileManager(), "_onDamageCalculation");
         }
     }
 
