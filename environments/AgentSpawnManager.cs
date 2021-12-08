@@ -40,6 +40,8 @@ public class AgentSpawnManager : Node
 
     public static String AgentPlayerPrefix = "agent_player_";
 
+    public static String AgentBotPrefix = "agent_bot_";
+
     public static String AgentObserverPrefix = "agent_observer_";
 
     private Network _network;
@@ -99,7 +101,7 @@ public class AgentSpawnManager : Node
         _spawnList.Add(agentSpawnInfo);
     }
 
-    public void _placeDefeatedUnitIntoCreationQueue(String unitId, Team.TeamCode team, String unitName, String displayName)
+    private void _placeDefeatedUnitIntoCreationQueue(String unitId, Team.TeamCode team, String unitName, String displayName)
     {
         // Check if this player need to be respawn
         if (!_gameWorld.GetGameConditionManager().CheckIfPlayerNeedToBeRespawn(unitId))

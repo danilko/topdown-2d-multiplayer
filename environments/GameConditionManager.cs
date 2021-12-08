@@ -58,6 +58,15 @@ public class GameConditionManager : Node
 
     public void InitAgents()
     {
+
+        Dictionary<int, int> teamMemberDictionary = new Dictionary<int, int>();
+
+        foreach (TeamMapAI currentAI in _teamMapAIManager.GetTeamMapAIs())
+        {
+            teamMemberDictionary.Add((int)currentAI.GetTeam(), 0);
+        }
+
+
         if (GetTree().IsNetworkServer())
         {
             foreach (KeyValuePair<int, NetworkPlayer> item in _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers)
@@ -67,7 +76,10 @@ public class GameConditionManager : Node
                 String unitName = unitId;
                 String displayName = item.Value.name;
 
+                teamMemberDictionary[(int)item.Value.team] += 1;
+
                 _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+
             }
         }
         else if (GetTree().NetworkPeer == null)
@@ -77,7 +89,33 @@ public class GameConditionManager : Node
             String unitName = unitId;
             String displayName = "Player";
 
+            teamMemberDictionary[0] += 1;
+
             _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+        }
+
+
+        int maxPlayers = _gameWorld.GetNetworkSnasphotManager().GetNetwork().serverinfo.max_players;
+        int counter = 0;
+
+        foreach (TeamMapAI currentAI in _teamMapAIManager.GetTeamMapAIs())
+        {
+            if (currentAI.GetAutoSpawnMember() && CheckIfCanSpawn(currentAI.GetTeam()))
+            {
+                int teamPlayers =  maxPlayers - teamMemberDictionary[(int)currentAI.GetTeam()];
+
+                for (int index = 0; index < teamPlayers; index++)
+                {
+                    String unitId = AgentSpawnManager.AgentBotPrefix + counter;
+                    Team.TeamCode team = currentAI.GetTeam();
+                    String unitName = unitId;
+                    String displayName = "Player " + counter;
+
+                    _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+                    counter++;
+                }
+            }
+
         }
     }
 
@@ -100,7 +138,7 @@ public class GameConditionManager : Node
 
         return false;
     }
-    
+
     private void _checkGameWinningCondition(int time)
     {
         Boolean endGame = false;
@@ -183,17 +221,17 @@ public class GameConditionManager : Node
     public Boolean CheckIfPlayerNeedToBeRespawn(String unitId)
     {
         // Check if player need to be respawn (i.e. if disconnected, no need to respawn)
-        if(unitId.Contains(AgentSpawnManager.AgentPlayerPrefix))
+        if (unitId.Contains(AgentSpawnManager.AgentPlayerPrefix))
         {
             int netId = int.Parse(unitId.Replace(AgentSpawnManager.AgentPlayerPrefix, ""));
 
-            if(! _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers.ContainsKey(netId))
+            if (!_gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers.ContainsKey(netId))
             {
                 // This player is disconnected, so no need to respawn
                 return false;
             }
         }
-        
+
         return true;
     }
 
