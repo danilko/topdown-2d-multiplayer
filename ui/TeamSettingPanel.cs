@@ -4,6 +4,7 @@ using System;
 public class TeamSettingPanel : Panel
 {
     private SpinBox _spinBoxBudget;
+    private SpinBox _spinBoxTotalCount;
     private CheckBox _checkboxAutoSpawnMember;
 
     private Team.TeamCode _teamCode;
@@ -11,13 +12,14 @@ public class TeamSettingPanel : Panel
     public override void _Ready()
     {
         _spinBoxBudget = (SpinBox)GetNode("SpinBoxTeamBudget");
+        _spinBoxTotalCount = (SpinBox)GetNode("SpinBoxTotalUnitCount");
         _checkboxAutoSpawnMember = (CheckBox)GetNode("CheckBoxAutoSapwnMembers");
     }
 
     public void Initialize(Team.TeamCode teamCode)
     {
         _teamCode = teamCode;
-        
+
         TextureRect textureRect = (TextureRect)GetNode("TextrectTeam");
         textureRect.Modulate = Team.TeamColor[(int)_teamCode];
 
@@ -39,4 +41,10 @@ public class TeamSettingPanel : Panel
     {
         return _checkboxAutoSpawnMember.Pressed;
     }
+
+    public int GetTeamTotalUnitCount()
+    {
+        return (int)_spinBoxTotalCount.Value;
+    }
+
 }

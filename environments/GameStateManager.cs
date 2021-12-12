@@ -60,7 +60,7 @@ public class GameStateManager : Node
     public void UpdateState(float phyisDelta)
     {
         // If not on the server, bail
-        if (!GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
         {
             return;
         }
@@ -234,7 +234,17 @@ public class GameStateManager : Node
             }
             else
             {
+                // Simulation will not remove bot, but rather just set its max health
+            if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+            {
+                 enemyNode.setHealth(enemyNode.MaxHealth);
+            }
+            else
+            {
+                
                 removeSpawnBots.Insert(0, enemyNode.Name);
+            }
+
             }
         }
 

@@ -67,7 +67,17 @@ public class HUD : CanvasLayer
 
     private void _onAgentCreated(String unitName, Team.TeamCode teamCode)
     {
-        _miniMap.AddAgent(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode].GetUnit(unitName));
+        Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode].GetUnit(unitName);
+        
+        if (agent.IsCurrentPlayer())
+        {
+            _miniMap.SetPlayer(agent);
+        }
+        else
+        {
+            _miniMap.AddAgent(agent);
+        }
+
         _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS IDENTITIED");
     }
 
@@ -75,7 +85,7 @@ public class HUD : CanvasLayer
     {
         return (InventoryUI)GetNode("GameControl/InventoryUI");
     }
-    
+
     public PopUpMessage GetPopUpMessage()
     {
         return _popUpMessage;

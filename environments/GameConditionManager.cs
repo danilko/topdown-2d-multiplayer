@@ -67,7 +67,7 @@ public class GameConditionManager : Node
         }
 
 
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
         {
             foreach (KeyValuePair<int, NetworkPlayer> item in _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers)
             {
@@ -84,25 +84,34 @@ public class GameConditionManager : Node
         }
         else if (GetTree().NetworkPeer == null)
         {
-            String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
-            Team.TeamCode team = (Team.TeamCode)0;
-            String unitName = unitId;
-            String displayName = "Player";
+            if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION)
+            {
+                String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
+                Team.TeamCode team = (Team.TeamCode)0;
+                String unitName = unitId;
+                String displayName = "Player";
 
-            teamMemberDictionary[0] += 1;
+                teamMemberDictionary[0] += 1;
 
-            _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+                _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+            }
         }
 
 
-        int maxPlayers = _gameWorld.GetNetworkSnasphotManager().GetNetwork().serverinfo.max_players;
         int counter = 0;
 
         foreach (TeamMapAI currentAI in _teamMapAIManager.GetTeamMapAIs())
         {
             if (currentAI.GetAutoSpawnMember() && CheckIfCanSpawn(currentAI.GetTeam()))
             {
-                int teamPlayers =  maxPlayers - teamMemberDictionary[(int)currentAI.GetTeam()];
+
+                int teamPlayers = currentAI.GetTeamTotalUnitCount() - teamMemberDictionary[(int)currentAI.GetTeam()];
+
+        // If it is simulation, only did 1
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            teamPlayers = 1;
+        }
 
                 for (int index = 0; index < teamPlayers; index++)
                 {

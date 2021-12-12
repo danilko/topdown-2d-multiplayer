@@ -31,16 +31,21 @@ public class GameTimerManager : Node
 
     private GameTimerState _gameTimerState;
 
+    private GameWorld _gameWorld;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         _timer = (Timer)GetNode("Timer");
         _timer.WaitTime = 1;
+
     }
 
     public void Initialize(GameWorld gameWorld)
     {
         _timer.Connect("timeout", this, nameof(_timerTimeout));
+
+        _gameWorld = gameWorld;
 
         _gameTimerState = GameTimerState.INIT;
     }
@@ -101,6 +106,12 @@ public class GameTimerManager : Node
         }
         else if (_gameTimerState == GameTimerState.GAMING)
         {
+            // Simulation will not end
+            if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+            {
+                return;
+            }
+
             internalTimer = -1;
             nextGameTimerState = GameTimerState.END;
         }

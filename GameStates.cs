@@ -5,6 +5,12 @@ using System.Collections.Generic;
 public class GameStates : Node
 {
 
+    public enum GameType {
+        SINGLE_PLAYER, MULTI_PLAYER, SIMULATION
+    }
+
+    private GameType _gameType = GameType.SIMULATION;
+
     public int current_level = 0;
 
     // How many game updates per second
@@ -48,6 +54,11 @@ public class GameStates : Node
         return messages;
     }
 
+    public GameType GetGameType()
+    {
+        return _gameType;
+    }
+
     private void set_update_rate(float rate)
     {
         this.updateRate = rate;
@@ -78,6 +89,7 @@ public class GameStates : Node
 
     public void EnterLobbyScreen()
     {
+        _gameType = GameType.MULTI_PLAYER;
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 1;
@@ -87,6 +99,7 @@ public class GameStates : Node
 
     public void EnterTitleScreen()
     {
+        _gameType = GameType.SIMULATION;
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 0;

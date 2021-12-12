@@ -35,7 +35,7 @@ public class AIAgent : Agent
     public override void Initialize(GameWorld gameWorld, String unitName, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
     {
         base.Initialize(gameWorld, unitName, displayName, teamMapAI, pathFinding);
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             _agentAI.Initialize(_gameWorld, this, pathFinding, DetectionZone);
         }
@@ -81,7 +81,7 @@ public class AIAgent : Agent
 
     public override void _Control(float delta)
     {
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             _agentAI.Control(delta);
             ((Label)(GetNode("UnitDisplay/Name"))).Text = GetDisplayName() + "(" + GetTeam() + ")" + " - " + _agentAI.getState();
@@ -104,7 +104,7 @@ public class AIAgent : Agent
             return;
         }
 
-        if (GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             _Control(delta);
         }

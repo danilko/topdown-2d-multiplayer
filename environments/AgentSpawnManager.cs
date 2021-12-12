@@ -217,7 +217,7 @@ public class AgentSpawnManager : Node
             return;
         }
 
-        String agentInfo = unitSpawnInfo.UnitId + ";" + (int)unitSpawnInfo.Team + ";" + unitSpawnInfo.UnitName + ";" + unitSpawnInfo.DisplayName;
+        String agentInfo = unitSpawnInfo.UnitId + ";" + (int)unitSpawnInfo.Team + ";" + unitSpawnInfo.UnitName + ";" + unitSpawnInfo.DisplayName + ";";
 
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
@@ -304,12 +304,12 @@ public class AgentSpawnManager : Node
 
         bool enableAI = false;
 
-        if (GetTree().IsNetworkServer() || GetTree().NetworkPeer == null)
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
             enableAI = true;
         }
 
-        Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitName, unitName, enableAI);
+        Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitName, displayName, enableAI);
         _spawnBots.Add(unitName, agent);
 
         EmitSignal(nameof(AgentCreatedSignal), unitName, team);

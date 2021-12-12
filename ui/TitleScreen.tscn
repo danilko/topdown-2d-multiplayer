@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://map/SimulateGameWorld.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/fonts/Kenney Rocket.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ui/TitleScreen.cs" type="Script" id=4]
 [ext_resource path="res://ui/Settings.tscn" type="PackedScene" id=5]
@@ -119,6 +120,8 @@ __meta__ = {
 }
 
 [node name="Settings" parent="CanvasLayer" instance=ExtResource( 5 )]
+
+[node name="Map" parent="." instance=ExtResource( 2 )]
 
 [connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Lobby" to="." method="_onLobbyPressed"]
 [connection signal="pressed" from="CanvasLayer/CenterContainer/VBoxContainer/Settings" to="." method="_onSettingsPressed"]

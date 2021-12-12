@@ -39,6 +39,8 @@ public class TeamMapAI : Node2D
 
     private int _unitCost = 100;
 
+    private int _totalUnitCount = 8;
+
     private Timer _advancedTimer;
 
     [Export]
@@ -57,6 +59,16 @@ public class TeamMapAI : Node2D
         _advancedTimer.WaitTime = _advancedWaitInterval;
 
         _randomNumberGenerator = new Godot.RandomNumberGenerator();
+    }
+
+    public int GetTeamTotalUnitCount()
+    {
+        return _totalUnitCount;
+    }
+
+    public void SetTeamInitialUnitCount(int totalUnitCount)
+    {
+        _totalUnitCount = totalUnitCount;
     }
 
     public Boolean GetAutoSpawnMember()
@@ -110,14 +122,17 @@ public class TeamMapAI : Node2D
         {
             return false;
         }
+        // Simulation will not cost money
+        else if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            return true;
+        }
         else
         {
             _currentUnitUsageAmount = _currentUnitUsageAmount - chargeAmount;
-            EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
-
                 // Call locally for server
                 _clientSetAmount(_currentUnitUsageAmount);
 
@@ -134,11 +149,8 @@ public class TeamMapAI : Node2D
     [Remote]
     private void _clientSetAmount(int amount)
     {
-        if (!GetTree().IsNetworkServer())
-        {
-            _currentUnitUsageAmount = amount;
-            EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
-        }
+        _currentUnitUsageAmount = amount;
+        EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
     }
 
     public bool isUnitUsageAmountAllowed()
@@ -311,6 +323,13 @@ public class TeamMapAI : Node2D
     public void AssignDefaultAIRandomCombine(Agent agent)
     {
         int weaponCombine = _randomNumberGenerator.RandiRange(0, 5);
+
+
+        // Simulation will set to specific
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            weaponCombine = 5;
+        }
 
         if (weaponCombine == 0)
         {

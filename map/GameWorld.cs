@@ -65,8 +65,11 @@ public class GameWorld : Node2D
 
     protected void _initializeHUD()
     {
+        if(HasNode("HUD"))
+        {
         _hud = (HUD)GetNode("HUD");
         _hud.Initailize(this);
+        }
     }
 
     public HUD GetHUD()

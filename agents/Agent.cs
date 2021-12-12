@@ -89,7 +89,7 @@ public class Agent : KinematicBody2D
 
     protected DetectionZone DetectionZone;
 
-    protected bool isCurrentPlayer = false;
+    protected bool CurrentPlayer = false;
 
     protected Agent CurrentTargetAgent;
 
@@ -131,6 +131,11 @@ public class Agent : KinematicBody2D
     public DetectionZone GetDetectionZone()
     {
         return DetectionZone;
+    }
+
+    public Boolean IsCurrentPlayer()
+    {
+        return CurrentPlayer;
     }
 
     public Inventory GetInventory()

@@ -47,7 +47,7 @@ public class Player : Agent
 
     public void SetHUD(HUD hud, InventoryManager _inventoryManager)
     {
-        isCurrentPlayer = true;
+        CurrentPlayer = true;
 
         _hud = hud;
 
