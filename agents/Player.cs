@@ -15,7 +15,7 @@ public class Player : Agent
         if (GetTree().IsNetworkServer())
         {
             // Decode the input data
-            GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
+            NetworkSnapshotManager.PlayerInput playerInput = new NetworkSnapshotManager.PlayerInput();
             int parseIndex = 0;
 
             playerInput.Right = Int32.Parse(inputData.Split(";")[parseIndex]);
@@ -40,14 +40,14 @@ public class Player : Agent
             parseIndex++;
 
             // Then cache the decoded data
-            gameStates.cacheInput(GetTree().GetRpcSenderId(), playerInput);
+            _gameWorld.GetNetworkSnasphotManager().CacheInput(GetTree().GetRpcSenderId(), playerInput);
 
         }
     }
 
     public void SetHUD(HUD hud, InventoryManager _inventoryManager)
     {
-        isCurrentPlayer = true;
+        CurrentPlayer = true;
 
         _hud = hud;
 
@@ -74,21 +74,19 @@ public class Player : Agent
         // Set up the player indicator screen
         _screenIndicator = (ScreenIndicator)((PackedScene)GD.Load("res://ui/ScreenIndicator.tscn")).Instance();
         AddChild(_screenIndicator);
-        _screenIndicator.Initialize(this);
+        _screenIndicator.Initialize(_gameWorld, this);
         _screenIndicator.SetActivate(true);
         Connect(nameof(Agent.HealthChangedSignal), _screenIndicator, nameof(ScreenIndicator.UpdateHealth));
 
-
         setHealth(MaxHealth);
         setEnergy(MaxEnergy);
-
 
         DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), _screenIndicator, "_onAgentEntered");
         DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), _screenIndicator, "_onAgentExited");
 
 
         // Setup Inventory UI
-        _inventoryUI = (InventoryUI)_hud.GetNode("GameControl/InventoryUI");
+        _inventoryUI = _hud.GetInventoryUI();
         _inventoryUI.Initialize(_inventoryManager, CurrentInventory);
 
         if (!_teamMapAI.IsConnected(nameof(TeamMapAI.TeamUnitUsageAmountChangeSignal), _hud, nameof(HUD.UpdateTeamUnitUsageAmount)))
@@ -133,7 +131,7 @@ public class Player : Agent
     {
         base.OnTargetAgentChange();
 
-        if(_screenIndicator != null)
+        if (_screenIndicator != null)
         {
             _screenIndicator.setCurrentTargetAgent(CurrentTargetAgent);
         }
@@ -145,76 +143,73 @@ public class Player : Agent
         if (Input.IsActionJustReleased("inventory"))
         {
             // Show UI if UI is not visible, and also hide UI if UI is already visible 
-            _inventoryUI.Activate(! _inventoryUI.Visible);
+            _inventoryUI.Activate(!_inventoryUI.Visible);
         }
 
-
-        // Only read input is inventory is not open
+        // Only read input if inventory is not open
         if (_inventoryUI == null || !_inventoryUI.Visible)
         {
-            GameStates.PlayerInput playerInput = new GameStates.PlayerInput();
-
-
+            NetworkSnapshotManager.PlayerInput playerInput = new NetworkSnapshotManager.PlayerInput();
 
             if (Input.IsActionPressed("turn_right"))
             {
-                playerInput.Right = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                playerInput.Right = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
             }
             else
             {
-                playerInput.Right = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                playerInput.Right = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
             }
 
             if (Input.IsActionPressed("turn_left"))
             {
-                playerInput.Left = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                playerInput.Left = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
             }
             else
             {
-                playerInput.Left = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                playerInput.Left = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
             }
 
             if (Input.IsActionPressed("forward"))
             {
-                playerInput.Up = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                playerInput.Up = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
             }
             else
             {
-                playerInput.Up = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                playerInput.Up = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
             }
 
             if (Input.IsActionPressed("backward"))
             {
-                playerInput.Down = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                playerInput.Down = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
             }
             else
             {
-                playerInput.Down = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                playerInput.Down = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
             }
 
             if (Input.IsActionPressed("reload"))
             {
-                playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
-                playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.RELOAD);
+                playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
+                playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
             }
             else
             {
                 if (Input.IsActionPressed("left_click"))
                 {
-                    playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                    playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
                 }
                 else
                 {
-                    playerInput.LeftWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                    playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
                 }
 
                 if (Input.IsActionPressed("right_click"))
                 {
-                    playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.TRIGGER);
+                    playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
                 }
                 else
                 {
-                    playerInput.RightWeaponAction = (int)(GameStates.PlayerInput.InputAction.NOT_TRIGGER);
+                    playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
                 }
             }
 
@@ -255,9 +250,9 @@ public class Player : Agent
             }
 
 
-            if (GetTree().IsNetworkServer())
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
-                gameStates.cacheInput(1, playerInput);
+                _gameWorld.GetNetworkSnasphotManager().CacheInput(1, playerInput);
             }
             else
             {
@@ -283,7 +278,7 @@ public class Player : Agent
 
         base.Explode();
 
-        if(_screenIndicator != null)
+        if (_screenIndicator != null)
         {
             _screenIndicator.SetActivate(false);
             _inventoryUI.Hide();
@@ -313,7 +308,7 @@ public class Player : Agent
         //some major lag in the game
         gameStates.currentTime -= gameStates.updateDelta;
 
-        if (GetTree().NetworkPeer != null && IsNetworkMaster())
+        if (GetTree().NetworkPeer == null || IsNetworkMaster())
         {
             gatherInput(delta);
         }

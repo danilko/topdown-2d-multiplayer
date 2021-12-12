@@ -38,7 +38,7 @@ public class MiniMap : MarginContainer
     {
         _capturableBaseManager = capturableBaseManager;
 
-        foreach (CapturableBase capturableBase in _capturableBaseManager.GetBases())
+        foreach (CapturableBase capturableBase in _capturableBaseManager.GetCapturableBases())
         {
             Sprite baseMarker = (Sprite)_baseMarker.Duplicate();
             baseMarker.Name = capturableBase.Name + "_marker";
@@ -82,17 +82,17 @@ public class MiniMap : MarginContainer
         }
     }
 
-    public void RemoveAgent(Agent agent)
+    public void RemoveAgent(String unitName)
     {
-        if (_agents.ContainsKey(agent.GetUnitName()))
+        if (_agents.ContainsKey(unitName))
         {
-            // Add agent to dictonary
-            _agents.Remove(agent.GetUnitName());
+            // Remove agent to dictonary
+            _agents.Remove(unitName);
 
-            Sprite agentMarker = _agentMarkers[agent.GetUnitName()];
+            Sprite agentMarker = _agentMarkers[unitName];
 
-            // Add marker to dictionary
-            _agentMarkers.Remove(agent.GetUnitName());
+            // Remove marker to dictionary
+            _agentMarkers.Remove(unitName);
 
             agentMarker.QueueFree();
         }
@@ -127,7 +127,7 @@ public class MiniMap : MarginContainer
         }
 
 
-        foreach (CapturableBase capturableBase in _capturableBaseManager.GetBases())
+        foreach (CapturableBase capturableBase in _capturableBaseManager.GetCapturableBases())
         {
             Vector2 markerPosition = ((capturableBase.GlobalPosition - _player.GlobalPosition) * _gridScale) + _grid.RectSize / 2.0f;
             markerPosition.x = Mathf.Clamp(markerPosition.x, 0, _grid.RectSize.x);

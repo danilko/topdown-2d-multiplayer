@@ -43,7 +43,7 @@ public class CapturableBase : Area2D
 
         _rng = new RandomNumberGenerator();
         _rng.Randomize();
-        
+
         _base = (Sprite)GetNode("Base");
         _boundry = (Sprite)GetNode("Boundry");
 
@@ -57,7 +57,7 @@ public class CapturableBase : Area2D
         }
 
         // Update unit display
-        SetCaptureBaseTeam(_team.CurrentTeamCode);
+        _setCaptureBaseTeam((int)_team.CurrentTeamCode);
     }
 
     public void Initialize(GameWorld gameWorld)
@@ -70,9 +70,10 @@ public class CapturableBase : Area2D
         return _team.CurrentTeamCode;
     }
 
-    public void SetCaptureBaseTeam(Team.TeamCode team)
+    [Remote]
+    private void _setCaptureBaseTeam(int teamCode)
     {
-        _team.CurrentTeamCode = team;
+        _team.CurrentTeamCode = (Team.TeamCode)teamCode;
         _base.Modulate = _team.getTeamColor(_team.CurrentTeamCode);
         _boundry.Modulate = _team.getTeamColor(_team.CurrentTeamCode);
         _unitDisplayLabel.Text = Name + " (" + _team.CurrentTeamCode + ")";
@@ -84,7 +85,7 @@ public class CapturableBase : Area2D
     public Vector2 GetRandomPositionWithinCaptureRadius()
     {
         Vector2 extents = (Vector2)_collisionShape.Shape.Get("extents");
-        Vector2 topLeftCorner =  _collisionShape.GlobalPosition - extents;
+        Vector2 topLeftCorner = _collisionShape.GlobalPosition - extents;
         float randX = _rng.RandfRange(topLeftCorner.x, topLeftCorner.x + extents.x);
         float randY = _rng.RandfRange(topLeftCorner.y, topLeftCorner.y + extents.y);
 
@@ -182,7 +183,17 @@ public class CapturableBase : Area2D
 
             if (_counter == _timeToCaptureBase)
             {
-                SetCaptureBaseTeam(_captureTeamCode);
+                // Client will rely on server to "notify capture of server"
+                // Server and signle player will capture itself
+                if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+                {
+                    _setCaptureBaseTeam((int)_captureTeamCode);
+
+                    if (GetTree().NetworkPeer != null)
+                    {
+                        Rpc(nameof(_setCaptureBaseTeam), (int)_captureTeamCode);
+                    }
+                }
             }
         }
         else

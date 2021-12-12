@@ -55,7 +55,7 @@ public class InventoryManager : Node
         ItemResource itemResource = _inventoryDatabase.GetItemByID(splitInfo[infoIndex]);
         infoIndex++;
 
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
         infoIndex++;
 
         Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
@@ -112,7 +112,7 @@ public class InventoryManager : Node
         int inventoryIndex = int.Parse(splitInfo[infoIndex]);
         infoIndex++;
 
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
         infoIndex++;
 
         Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
@@ -165,7 +165,7 @@ public class InventoryManager : Node
         ItemResource itemResource = _inventoryDatabase.GetItemByID(splitInfo[infoIndex]);
         infoIndex++;
 
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
         infoIndex++;
 
         Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
@@ -199,7 +199,7 @@ public class InventoryManager : Node
         int inventoryIndex = int.Parse(splitInfo[infoIndex]);
         infoIndex++;
 
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
         infoIndex++;
 
         Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
@@ -224,13 +224,19 @@ public class InventoryManager : Node
                     {
                         Vector2 itemPosition = agent.GlobalPosition + new Vector2(200f, 200f);
 
-                        _createPickUp(itemResource, itemPosition);
-
-                        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+                        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
                         {
                             String dropItemInfo = itemResource.ItemID + ";" + itemPosition.x + ";" + itemPosition.y + ";";
-                            Rpc(nameof(_clientCreatePickUp), dropItemInfo);
+
+                            // Call locally for server
+                            _clientCreatePickUp(dropItemInfo);
+
+                            if (GetTree().NetworkPeer != null)
+                            {
+                                Rpc(nameof(_clientCreatePickUp), dropItemInfo);
+                            }
                         }
+
                     }
                 }
 
@@ -268,7 +274,7 @@ public class InventoryManager : Node
 
             float positionY = float.Parse(splitInfo[infoIndex]);
             infoIndex++;
-            
+
             _createPickUp(itemResource, new Vector2(positionX, positionY));
         }
     }
@@ -315,7 +321,7 @@ public class InventoryManager : Node
     private void _serverEquipItem(String info)
     {
         int inventoryItemIndex = int.Parse(info.Split(";")[0]);
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(info.Split(";")[1])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(info.Split(";")[1])];
         Agent agent = teamMapAI.GetUnit(info.Split(";")[2]);
         Weapon.WeaponOrder weaponOrder = (Weapon.WeaponOrder)int.Parse(info.Split(";")[3]);
         int weaponIndex = int.Parse(info.Split(";")[4]);
@@ -365,7 +371,7 @@ public class InventoryManager : Node
         String[] splitInfo = info.Split(";");
         int infoIndex = 0;
 
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
         infoIndex++;
 
         Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
@@ -423,7 +429,7 @@ public class InventoryManager : Node
             String[] splitInfo = info.Split(",");
             int infoIndex = 0;
 
-            TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+            TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
             infoIndex++;
 
             Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);
@@ -470,7 +476,7 @@ public class InventoryManager : Node
         int inventoryIndex = int.Parse(splitInfo[infoIndex]);
         infoIndex++;
 
-        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
+        TeamMapAI teamMapAI = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[int.Parse(splitInfo[infoIndex])];
         infoIndex++;
 
         Agent agent = teamMapAI.GetUnit(splitInfo[infoIndex]);

@@ -89,7 +89,7 @@ public class Agent : KinematicBody2D
 
     protected DetectionZone DetectionZone;
 
-    protected bool isCurrentPlayer = false;
+    protected bool CurrentPlayer = false;
 
     protected Agent CurrentTargetAgent;
 
@@ -131,6 +131,11 @@ public class Agent : KinematicBody2D
     public DetectionZone GetDetectionZone()
     {
         return DetectionZone;
+    }
+
+    public Boolean IsCurrentPlayer()
+    {
+        return CurrentPlayer;
     }
 
     public Inventory GetInventory()
@@ -450,11 +455,11 @@ public class Agent : KinematicBody2D
 
         if (weapon != null)
         {
-            if (weaponAction == (int)GameStates.PlayerInput.InputAction.RELOAD)
+            if (weaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
             {
                 ReloadWeapon(weaponOrder);
             }
-            else if (weaponAction == (int)GameStates.PlayerInput.InputAction.TRIGGER)
+            else if (weaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER)
             {
 
                 Vector2 fireTarget = this.GlobalPosition + new Vector2(2000, 0).Rotated(GlobalRotation);
@@ -480,11 +485,6 @@ public class Agent : KinematicBody2D
     {
         // 100 is the tweak effect to have a nice knocback
         MoveAndSlide(force * 100);
-
-        if (isCurrentPlayer)
-        {
-            _gameWorld.StartScreenShake();
-        }
     }
 
     public void setHealth(int health)

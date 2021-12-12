@@ -18,8 +18,8 @@ public class ObstacleManager : Node2D
 
     public override void _Ready()
     {
-         _obstacles = new Dictionary<String, Vector2>();
-         _obstaclesDestroyed = new List<String>();
+        _obstacles = new Dictionary<String, Vector2>();
+        _obstaclesDestroyed = new List<String>();
         _traverableTiles = new List<Vector2>();
     }
 
@@ -35,12 +35,11 @@ public class ObstacleManager : Node2D
 
     // Build obstacles base on tile map
     // Will not build obstacles on the road automatically
-    public void Initialize(TileMap tileMap)
+    public void Initialize(GameWorld gameWorld)
     {
-        _tileMap = tileMap;
+        _tileMap = (TileMap)gameWorld.GetNode("Ground");
         _halfCellSize = _tileMap.CellSize / 2;
         buildObstacles();
-
     }
 
     public List<Vector2> GetTraversableTiles()
@@ -129,7 +128,7 @@ public class ObstacleManager : Node2D
                         _traverableTiles.Add(new Vector2(xIndex, yIndex));
                     }
 
-                   // mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
+                    // mapLabel.Set("custom_colors/font_color", new Color("#0016ff"));
                 }
 
                 //mapLabel.SetGlobalPosition(position + _halfCellSize);
@@ -148,7 +147,7 @@ public class ObstacleManager : Node2D
     {
         foreach (Node node in GetChildren())
         {
-            if(! node.HasMethod(nameof(Obstacle.TakeEnvironmentDamage)))
+            if (!node.HasMethod(nameof(Obstacle.TakeEnvironmentDamage)))
             {
                 continue;
             }
@@ -172,6 +171,7 @@ public class ObstacleManager : Node2D
     {
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
+
             if (_obstacles.ContainsKey(obstacleName))
             {
                 _obstacles.Remove(obstacleName);
@@ -181,7 +181,10 @@ public class ObstacleManager : Node2D
 
             destroyObstacle(obstacleName);
 
-            Rpc(nameof(destroyObstacle), obstacleName);
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(destroyObstacle), obstacleName);
+            }
         }
 
     }

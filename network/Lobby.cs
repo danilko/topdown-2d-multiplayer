@@ -87,7 +87,7 @@ public class Lobby : Control
         teamMapAISetting.TeamCode = team;
         teamMapAISetting.Budget = teamSettingPanel.GetTeamBudget();
         teamMapAISetting.AutoSpawnMember = teamSettingPanel.GetTeamAutoSpawnMember();
-
+        teamMapAISetting.TotalUnitCount = teamSettingPanel.GetTeamTotalUnitCount();
         _teamMapAISettings.Add(teamMapAISetting);
     }
 
@@ -137,6 +137,7 @@ public class Lobby : Control
             TeamMapAISetting teamMapAISetting = _teamMapAISettings[(int)teamSettingPanel.GetTeamCode()];
             teamMapAISetting.Budget = teamSettingPanel.GetTeamBudget();
             teamMapAISetting.AutoSpawnMember = teamSettingPanel.GetTeamAutoSpawnMember();
+            teamMapAISetting.TotalUnitCount = teamSettingPanel.GetTeamTotalUnitCount();
         }
 
         _gameStates.SetTeamMapAISettings(_teamMapAISettings);

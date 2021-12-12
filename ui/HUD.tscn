@@ -1,9 +1,10 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://ui/WeaponControl.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ui/CharacterDialog.tscn" type="PackedScene" id=4]
+[ext_resource path="res://assets/crosshair055.png" type="Texture" id=5]
 [ext_resource path="res://assets/fonts/Kenney Pixel Square.ttf" type="DynamicFontData" id=6]
 [ext_resource path="res://assets/fonts/Kenney Rocket Square.ttf" type="DynamicFontData" id=7]
 [ext_resource path="res://ui/MiniMap.tscn" type="PackedScene" id=8]
@@ -133,6 +134,7 @@ margin_bottom = 56.6489
 anims/MessageAnnounce = SubResource( 4 )
 
 [node name="GameControl" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 0.840942
@@ -162,6 +164,19 @@ margin_right = 983.561
 margin_bottom = 303.485
 
 [node name="InventoryUI" parent="GameControl" instance=ExtResource( 11 )]
+
+[node name="LockOnIndicator" type="TextureRect" parent="GameControl"]
+visible = false
+modulate = Color( 0, 1, 0.658824, 1 )
+anchor_right = 1.0
+margin_left = 236.159
+margin_top = 72.9999
+margin_right = -659.841
+margin_bottom = 201.0
+texture = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="CharacterDialog" parent="." instance=ExtResource( 4 )]
 visible = false

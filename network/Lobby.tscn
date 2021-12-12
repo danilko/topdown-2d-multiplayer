@@ -77,6 +77,7 @@ custom_fonts/font = SubResource( 1 )
 text = "Exit Lobby"
 
 [node name="Host" type="Popup" parent="."]
+visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 
@@ -186,9 +187,9 @@ __meta__ = {
 
 [node name="PanelTeamSetting" type="Panel" parent="Host"]
 visible = false
-margin_right = 767.0
+margin_right = 900.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 767, 50 )
+rect_min_size = Vector2( 900, 50 )
 script = ExtResource( 2 )
 
 [node name="TextrectTeam" type="TextureRect" parent="Host/PanelTeamSetting"]
@@ -214,9 +215,9 @@ __meta__ = {
 }
 
 [node name="LabelBugdet" type="Label" parent="Host/PanelTeamSetting"]
-margin_left = 219.226
+margin_left = 168.0
 margin_top = 13.8591
-margin_right = 319.226
+margin_right = 268.0
 margin_bottom = 27.8591
 rect_pivot_offset = Vector2( 30.2927, 7 )
 text = "BUDGETS:"
@@ -225,9 +226,9 @@ __meta__ = {
 }
 
 [node name="LabelAutoSapwnMembers" type="Label" parent="Host/PanelTeamSetting"]
-margin_left = 525.0
+margin_left = 384.0
 margin_top = 14.0
-margin_right = 683.0
+margin_right = 542.0
 margin_bottom = 28.0
 rect_pivot_offset = Vector2( 30.2927, 7 )
 text = "AUTO SPAWN MEMBERS:"
@@ -235,10 +236,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="LabelTotalUnitCount" type="Label" parent="Host/PanelTeamSetting"]
+margin_left = 592.0
+margin_top = 14.0
+margin_right = 750.0
+margin_bottom = 28.0
+rect_pivot_offset = Vector2( 30.2927, 7 )
+text = "TOTAL UNIT COUNT:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="SpinBoxTeamBudget" type="SpinBox" parent="Host/PanelTeamSetting"]
-margin_left = 330.415
+margin_left = 278.774
 margin_top = 8.0
-margin_right = 497.415
+margin_right = 352.774
 margin_bottom = 32.0
 max_value = 100000.0
 value = 10000.0
@@ -246,24 +258,38 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="SpinBoxTotalUnitCount" type="SpinBox" parent="Host/PanelTeamSetting"]
+margin_left = 752.0
+margin_top = 8.0
+margin_right = 826.0
+margin_bottom = 32.0
+value = 8.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="CheckBoxAutoSapwnMembers" type="CheckBox" parent="Host/PanelTeamSetting"]
-margin_left = 700.516
+margin_left = 544.0
 margin_top = 7.90778
-margin_right = 724.516
+margin_right = 568.0
 margin_bottom = 31.9078
 pressed = true
 
 [node name="MarginContainerTeamManagement" type="MarginContainer" parent="Host"]
-margin_left = 32.0
-margin_top = 197.0
-margin_right = 933.0
-margin_bottom = 516.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -490.0
+margin_top = -81.5
+margin_right = 490.0
+margin_bottom = 237.5
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="ScrollContainerTeamManagement" type="ScrollContainer" parent="Host/MarginContainerTeamManagement"]
-margin_right = 901.0
+margin_right = 980.0
 margin_bottom = 319.0
 scroll_horizontal_enabled = false
 __meta__ = {

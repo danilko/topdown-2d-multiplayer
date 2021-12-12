@@ -39,12 +39,14 @@ public class TeamMapAI : Node2D
 
     private int _unitCost = 100;
 
+    private int _totalUnitCount = 8;
+
     private Timer _advancedTimer;
 
     [Export]
     private Boolean _autoSpawnMember = true;
 
-    private  Godot.RandomNumberGenerator _randomNumberGenerator;
+    private Godot.RandomNumberGenerator _randomNumberGenerator;
 
     public override void _Ready()
     {
@@ -56,7 +58,17 @@ public class TeamMapAI : Node2D
         _advancedTimer = (Timer)GetNode("AdvancedTimer");
         _advancedTimer.WaitTime = _advancedWaitInterval;
 
-        _randomNumberGenerator =  new Godot.RandomNumberGenerator();
+        _randomNumberGenerator = new Godot.RandomNumberGenerator();
+    }
+
+    public int GetTeamTotalUnitCount()
+    {
+        return _totalUnitCount;
+    }
+
+    public void SetTeamInitialUnitCount(int totalUnitCount)
+    {
+        _totalUnitCount = totalUnitCount;
     }
 
     public Boolean GetAutoSpawnMember()
@@ -86,10 +98,22 @@ public class TeamMapAI : Node2D
 
         EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
 
-        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+
+            // Call locally for server
+            _clientSetAmount(_currentUnitUsageAmount);
+
+            if (GetTree().NetworkPeer != null)
+            {
+                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+            }
         }
+    }
+
+    public void ChargeUnitAmount()
+    {
+        ChargeAmount(_unitCost);
     }
 
     public bool ChargeAmount(int chargeAmount)
@@ -98,40 +122,35 @@ public class TeamMapAI : Node2D
         {
             return false;
         }
+        // Simulation will not cost money
+        else if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            return true;
+        }
         else
         {
             _currentUnitUsageAmount = _currentUnitUsageAmount - chargeAmount;
-            EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
 
-            if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+            if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
-                Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+                // Call locally for server
+                _clientSetAmount(_currentUnitUsageAmount);
+
+                if (GetTree().NetworkPeer != null)
+                {
+                    Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
+                }
             }
 
             return true;
         }
     }
 
-    public void SyncTeamMapAICurrentUnitAmount(int rpcId)
-    {
-        if (rpcId != -1)
-        {
-            RpcId(rpcId, nameof(_clientSetAmount), _currentUnitUsageAmount);
-        }
-        else
-        {
-            Rpc(nameof(_clientSetAmount), _currentUnitUsageAmount);
-        }
-    }
-
     [Remote]
     private void _clientSetAmount(int amount)
     {
-        if (!GetTree().IsNetworkServer())
-        {
-            _currentUnitUsageAmount = amount;
-            EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
-        }
+        _currentUnitUsageAmount = amount;
+        EmitSignal(nameof(TeamUnitUsageAmountChangeSignal), _currentUnitUsageAmount);
     }
 
     public bool isUnitUsageAmountAllowed()
@@ -218,7 +237,7 @@ public class TeamMapAI : Node2D
 
     private CapturableBase _getNextCapturableBase()
     {
-        List<CapturableBase> bases = _capturableBaseManager.GetBases();
+        List<CapturableBase> bases = _capturableBaseManager.GetCapturableBases();
 
         if (baseCaptureStartOrder == BaseCaptureStartOrder.LAST)
         {
@@ -284,92 +303,84 @@ public class TeamMapAI : Node2D
         // Set the info afterward as some of these depend on child node to be available
         unit.Initialize(_gameWorld, unitName, displayName, this, _pathFinding);
 
-        ChargeAmount(_unitCost);
-
-        if (!enableAI)
-        {
-            _assignDefaultWeapon(unit);
-        }
-        else
-        {
-            _assignDefaultAIRandomCombine(unit);
-        }
-
         return unit;
     }
 
-    private void _assignDefaultWeapon(Agent agent)
+
+    public void AssignDefaultWeapon(Agent agent)
     {
-        if (GetTree().NetworkPeer == null || IsNetworkMaster())
+        // Add default wepaons
+        _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+        _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+        _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-200"), agent.GetInventory());
+
+        _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
+        _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
+        _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-200"), Weapon.WeaponOrder.Left, 1);
+
+    }
+
+    public void AssignDefaultAIRandomCombine(Agent agent)
+    {
+        int weaponCombine = _randomNumberGenerator.RandiRange(0, 5);
+
+
+        // Simulation will set to specific
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
         {
-            // Add default wepaons
+            weaponCombine = 5;
+        }
+
+        if (weaponCombine == 0)
+        {
+            // Add Laser weapon
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-1000"), agent.GetInventory());
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-1000"), Weapon.WeaponOrder.Left, 0);
+        }
+        if (weaponCombine == 1)
+        {
+            // Add missle launcher + sheild
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-300"), agent.GetInventory());
+
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-300"), Weapon.WeaponOrder.Left, 0);
+        }
+        if (weaponCombine == 2)
+        {
+            // Add multi missle launcher + shield
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
+
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
+        }
+        if (weaponCombine == 3)
+        {
+            // Add multi missle launcher + shield
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
+
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Right, 0);
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
+        }
+        if (weaponCombine == 4)
+        {
+            // Add multi missle launcher + shield
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
+
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Right, 0);
+            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
+        }
+        if (weaponCombine == 5)
+        {
+            // Add rifile + sheild
             _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
             _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
-            _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-200"), agent.GetInventory());
 
             _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
             _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
-            _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-200"), Weapon.WeaponOrder.Left, 1);
-        }
-    }
-
-    private void _assignDefaultAIRandomCombine(Agent agent)
-    {
-        if (GetTree().NetworkPeer == null || IsNetworkMaster())
-        {
-            int weaponCombine = _randomNumberGenerator.RandiRange(0 , 5);
-
-            if (weaponCombine == 0)
-            {
-                // Add Laser weapon
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-1000"), agent.GetInventory());
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-1000"), Weapon.WeaponOrder.Left, 0);
-             }
-            if (weaponCombine == 1)
-            {
-                // Add missle launcher + sheild
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-300"), agent.GetInventory());
-
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-300"), Weapon.WeaponOrder.Left, 0);
-             }
-            if (weaponCombine == 2)
-            {
-                // Add multi missle launcher + shield
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
-
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
-             }
-            if (weaponCombine == 3)
-            {
-                // Add multi missle launcher + shield
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-310"), agent.GetInventory());
-
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Right, 0);
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-310"), Weapon.WeaponOrder.Left, 0);
-             }
-            if (weaponCombine == 4)
-            {
-                // Add multi missle launcher + shield
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
-
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Right, 0);
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
-             }
-            if (weaponCombine == 5)
-            {
-                // Add rifile + sheild
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-600"), agent.GetInventory());
-                _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-800"), agent.GetInventory());
-
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
-                _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
-            }
         }
     }
 
@@ -393,7 +404,7 @@ public class TeamMapAI : Node2D
         CapturableBase targetCaptureBase = null;
         CapturableBase neutralCaptureBase = null;
 
-        foreach (CapturableBase captureBase in _capturableBaseManager.GetBases())
+        foreach (CapturableBase captureBase in _capturableBaseManager.GetCapturableBases())
         {
             if (captureBase.GetCaptureBaseTeam() == _team.CurrentTeamCode)
             {

@@ -15,12 +15,6 @@ public class Trail : Node
     [Export]
     private float _minSpawnDistance = 5.0f;
 
-    [Export]
-    private float _wildness = 1.0f;
-
-    private float[] _lifetime = new float[] { 1.0f, 2.0f };
-
-    private Tween _tween;
     private Godot.RandomNumberGenerator _random;
 
 

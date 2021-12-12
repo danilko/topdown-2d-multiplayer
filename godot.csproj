@@ -28,12 +28,19 @@
     <Compile Include="effects\Trail.cs" />
     <Compile Include="environments\CapturableBaseManager.cs" />
     <Compile Include="environments\CapturableBase.cs" />
+    <Compile Include="environments\GameConditionManager.cs" />
+    <Compile Include="environments\GameStateManager.cs" />
+    <Compile Include="environments\GameTimerManager.cs" />
     <Compile Include="environments\ObstacleManager.cs" />
+    <Compile Include="environments\PathManager.cs" />
+    <Compile Include="environments\ProjectileManager.cs" />
+    <Compile Include="environments\TeamMapAIManager.cs" />
     <Compile Include="inventory\Inventory.cs" />
     <Compile Include="inventory\InventoryManager.cs" />
     <Compile Include="items\ItemResource.cs" />
     <Compile Include="map\SimulateGameWorld.cs" />
     <Compile Include="network\Lobby.cs" />
+    <Compile Include="network\NetworkSnapshotManager.cs" />
     <Compile Include="network\WaitingRoom.cs" />
     <Compile Include="PostProcess\PostProcess.cs" />
     <Compile Include="PostProcess\TestScene.cs" />
@@ -52,7 +59,7 @@
     <Compile Include="network\NetworkPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="inventory\InventoryDatabase.cs" />
-    <Compile Include="spawn\AgentSpawnSystem.cs" />
+    <Compile Include="environments\AgentSpawnManager.cs" />
     <Compile Include="ui\CharacterDialog.cs" />
     <Compile Include="ui\InventoryUI.cs" />
     <Compile Include="ui\ItemPanel.cs" />
@@ -79,7 +86,6 @@
     <Compile Include="ui\HealthBar.cs" />
     <Compile Include="ui\HUD.cs" />
     <Compile Include="ui\TitleScreen.cs" />
-    <Compile Include="ui\UIPlayerListEntry.cs" />
     <Compile Include="ui\UnitDisplay.cs" />
     <Compile Include="weapons\LaserGun.cs" />
     <Compile Include="weapons\LightSaber.cs" />

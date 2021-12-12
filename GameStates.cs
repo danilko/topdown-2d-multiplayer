@@ -5,6 +5,12 @@ using System.Collections.Generic;
 public class GameStates : Node
 {
 
+    public enum GameType {
+        SINGLE_PLAYER, MULTI_PLAYER, SIMULATION
+    }
+
+    private GameType _gameType = GameType.SIMULATION;
+
     public int current_level = 0;
 
     // How many game updates per second
@@ -16,34 +22,6 @@ public class GameStates : Node
     public String endResultScreen = "res://ui/EndGameScreen.tscn";
 
     public float currentTime = 0;
-
-    public class PlayerInput
-    {
-        public enum InputAction {
-            NOT_TRIGGER,
-            TRIGGER,
-            RELOAD
-        }
-
-        public int Up;
-
-        public int Down;
-
-        public int Left;
-
-        public int Right;
-
-        public Vector2 MousePosition;
-
-        public int RightWeaponAction;
-        public int LeftWeaponAction;
-        public int RightWeaponIndex;
-        public int LeftWeaponIndex;
-    }
-
-    // Holds player input data (including the local one) which will be used to update the game state
-    //This will be filled only on the server
-    public Dictionary<int, Dictionary<int, PlayerInput>> playerInputs = new Dictionary<int, Dictionary<int, PlayerInput>>();
 
     public List<TeamMapAISetting> _teamMapAISettings = null;
 
@@ -64,20 +42,6 @@ public class GameStates : Node
         _teamMapAISettings = teamMapAISettings;
     }
 
-    public void cacheInput(int net_id, PlayerInput playerInput)
-    {
-        if (!GetTree().IsNetworkServer())
-        {
-            return;
-        }
-
-        if (! playerInputs.ContainsKey(net_id))
-        {
-            playerInputs.Add(net_id, new Dictionary<int, PlayerInput>());
-        }
-
-        playerInputs[net_id].Add(playerInputs[net_id].Count, playerInput);
-    }
 
     public void setMessagesForNextScene(String inputMessages)
     {
@@ -88,6 +52,11 @@ public class GameStates : Node
     public String getMessgesForNextScene()
     {
         return messages;
+    }
+
+    public GameType GetGameType()
+    {
+        return _gameType;
     }
 
     private void set_update_rate(float rate)
@@ -104,7 +73,7 @@ public class GameStates : Node
     private void noSet(float rate) { }
 
     public void endGameScreen()
-    {   
+    {
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         GetTree().ChangeScene(endResultScreen);
@@ -112,23 +81,29 @@ public class GameStates : Node
 
     public void restart()
     {
+        Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 0;
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 
     public void EnterLobbyScreen()
     {
+        _gameType = GameType.MULTI_PLAYER;
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 1;
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 
     public void EnterTitleScreen()
     {
+        _gameType = GameType.SIMULATION;
         // In menu, enable mouse
         Input.SetMouseMode(Input.MouseMode.Visible);
         current_level = 0;
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 
@@ -137,6 +112,7 @@ public class GameStates : Node
         current_level = 2;
         // In game, disable mouse
         Input.SetMouseMode(Input.MouseMode.Hidden);
+        GetTree().CurrentScene.QueueFree();
         GetTree().ChangeScene(levels[current_level]);
     }
 }
