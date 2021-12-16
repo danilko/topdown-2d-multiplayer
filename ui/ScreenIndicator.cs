@@ -73,10 +73,10 @@ public class ScreenIndicator : Node2D
 
     public void AddAgent(Agent agent)
     {
-        if (!_agents.ContainsKey(agent.GetUnitName()))
+        if (!_agents.ContainsKey(agent.GetUnitID()))
         {
             Node2D agentMarker = (Node2D)_agentMarker.Duplicate();
-            agentMarker.Name = agent.GetUnitName() + "_marker";
+            agentMarker.Name = agent.GetUnitID() + "_marker";
 
             agentMarker.Modulate = Team.TeamColor[(int)agent.GetTeam()];
 
@@ -85,16 +85,16 @@ public class ScreenIndicator : Node2D
             agentMarker.Show();
 
             // Add agent to dictonary
-            _agents.Add(agent.GetUnitName(), agent);
+            _agents.Add(agent.GetUnitID(), agent);
 
             // Add marker to dictionary
-            _agentMarkers.Add(agent.GetUnitName(), agentMarker);
+            _agentMarkers.Add(agent.GetUnitID(), agentMarker);
         }
     }
 
     public void RemoveAgent(Agent agent)
     {
-        _removeAgent(agent.GetUnitName());
+        _removeAgent(agent.GetUnitID());
     }
 
     private void _removeAgent(String agentUnitName)
@@ -140,13 +140,13 @@ public class ScreenIndicator : Node2D
             Agent agent = _agents[agentUnitName];
             if (agent != null && IsInstanceValid(agent))
             {
-                Node2D agentMarker = _agentMarkers[agent.GetUnitName()];
+                Node2D agentMarker = _agentMarkers[agent.GetUnitID()];
                 agentMarker.GlobalRotation = agent.GlobalRotation + Mathf.Pi / 2.0f;
 
                 // Update marker
                 agentMarker.LookAt(agent.GlobalPosition);
                 float distance = agentMarker.GlobalPosition.DistanceTo(agent.GlobalPosition);
-                ((Label)agentMarker.GetNode("Text")).Text = agent.GetUnitName() + " " + distance;
+                ((Label)agentMarker.GetNode("Text")).Text = agent.GetUnitID() + " " + distance;
             }
             else
             {

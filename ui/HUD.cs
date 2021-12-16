@@ -46,10 +46,10 @@ public class HUD : CanvasLayer
         _weaponControls.Add(Weapon.WeaponOrder.Right, (WeaponControl)(_gameControl.GetNode("RightWeaponControl")));
         _weaponControls.Add(Weapon.WeaponOrder.Left, (WeaponControl)(_gameControl.GetNode("LeftWeaponControl")));
 
-        _miniMap = (MiniMap)_gameControl.GetNode("MiniMap");
+        _miniMap = (MiniMap)GetNode("MiniMap");
         _popUpMessage = (PopUpMessage)GetNode("PopUpMessage");
 
-        _miniMap.Iniitialize(gameWorld.GetCapturableBaseManager());
+        _miniMap.Iniitialize(gameWorld);
 
         //_postProcess = (PostProcess)GetNode("PostProcess");
 
@@ -57,21 +57,54 @@ public class HUD : CanvasLayer
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreatedSignal), this, nameof(_onPlayerCreated));
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentDefeatedSignal), this, nameof(_onAgentDefeated));
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
+
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentConfigSignal), this, nameof(_onAgentConfig));
+
+        // Simulation will not have HUD
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            _miniMap.Hide();
+            _popUpMessage.Hide();
+            _timerTickLabel.Hide();
+        }
     }
 
-    private void _onAgentDefeated(String unitId, Team.TeamCode teamCode, String unitName, String displayName)
+    private void _onAgentConfig(String unitID)
     {
-        _miniMap.RemoveAgent(unitName);
+        if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
+        int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
+        {
+
+            _setMapMode(MiniMap.MapMode.BIGMAP);
+            ((Popup)GetNode("UnitSpawnSetting")).PopupCentered();
+        }
+    }
+
+    private void _onAgentDefeated(String unitID, Team.TeamCode teamCode, String unitName, String displayName)
+    {
+        if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
+          int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
+        {
+            _miniMap.Hide();
+            _miniMap.RemovePlayer();
+        }
+        else
+        {
+            _miniMap.RemoveAgent(unitName);
+        }
+
         _popUpMessage.NotifyMessage("NOTIFICATION", unitName + " (" + teamCode + ") IS ELIMINATED");
     }
 
     private void _onAgentCreated(String unitName, Team.TeamCode teamCode)
     {
         Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode].GetUnit(unitName);
-        
+
         if (agent.IsCurrentPlayer())
         {
             _miniMap.SetPlayer(agent);
+            _setMapMode(MiniMap.MapMode.MINIMAP);
+            ((Popup)GetNode("UnitSpawnSetting")).Hide();
         }
         else
         {
@@ -106,6 +139,7 @@ public class HUD : CanvasLayer
     {
         _gameControl.Visible = true;
         _overallMessageControll.Visible = false;
+        ((Popup)GetNode("UnitSpawnSetting")).Hide();
     }
 
     private void _onPlayerDefeated()
@@ -138,6 +172,24 @@ public class HUD : CanvasLayer
         _timerTickLabel.Text = message;
     }
 
+    private void _setMapMode(MiniMap.MapMode mapMode)
+    {
+        _miniMap.Show();
+
+        if (mapMode == MiniMap.MapMode.BIGMAP)
+        {
+            _miniMap.RectPosition = new Vector2(20, 20);
+            _miniMap.RectSize = new Vector2(512, 512);
+            _miniMap.SetMapMode(MiniMap.MapMode.BIGMAP);
+        }
+        else
+        {
+            _miniMap.RectPosition = new Vector2(800, 20);
+            _miniMap.RectSize = new Vector2(200, 200);
+            _miniMap.SetMapMode(MiniMap.MapMode.MINIMAP);
+        }
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         if (lblMessage && Input.IsKeyPressed((int)Godot.KeyList.Space))
@@ -145,6 +197,16 @@ public class HUD : CanvasLayer
             _overallMessageControll.Visible = false;
             lblMessage = false;
         }
+
+        if (_gameControl.Visible && Input.IsKeyPressed((int)Godot.KeyList.Tab))
+        {
+            _setMapMode(MiniMap.MapMode.BIGMAP);
+        }
+        else if (_gameControl.Visible)
+        {
+            _setMapMode(MiniMap.MapMode.MINIMAP);
+        }
+
 
         // COmment out for now as part of test
         //if (!_characterDialog.Visible && Input.IsKeyPressed((int)Godot.KeyList.Space))

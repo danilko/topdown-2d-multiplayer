@@ -64,7 +64,7 @@ public class DetectionZone : Area2D
 
         if (body.HasMethod(nameof(Agent.GetTeam))
                 && body != _agent
-                && !_detectedAgents.ContainsKey(((Agent)body).GetUnitName()))
+                && !_detectedAgents.ContainsKey(((Agent)body).GetUnitID()))
         {
 
             Agent agent = (Agent)body;
@@ -72,7 +72,7 @@ public class DetectionZone : Area2D
             EmitSignal(nameof(AgentEnteredSignal), agent);
 
 
-            _detectedAgents.Add(agent.GetUnitName(), agent);
+            _detectedAgents.Add(agent.GetUnitID(), agent);
 
             // If not same team identifier, identify as target
             if (agent.GetTeam() != _agent.GetTeam())
@@ -83,7 +83,7 @@ public class DetectionZone : Area2D
                     EmitSignal(nameof(TargetAgentChangeSignal));
                 }
 
-                _targetAgents.Add(agent.GetUnitName());
+                _targetAgents.Add(agent.GetUnitID());
 
             }
         }
@@ -95,7 +95,7 @@ public class DetectionZone : Area2D
     {
         if (body.HasMethod(nameof(Agent.GetTeam))
             && body != _agent
-            && _detectedAgents.ContainsKey(((Agent)body).GetUnitName()))
+            && _detectedAgents.ContainsKey(((Agent)body).GetUnitID()))
         {
             Agent agent = (Agent)body;
 
@@ -111,8 +111,8 @@ public class DetectionZone : Area2D
             }
 
             
-             _targetAgents.Remove(agent.GetUnitName());
-            _detectedAgents.Remove(agent.GetUnitName());
+             _targetAgents.Remove(agent.GetUnitID());
+            _detectedAgents.Remove(agent.GetUnitID());
 
            
             // If target is not vaild, then will try to check for next target
@@ -146,7 +146,7 @@ public class DetectionZone : Area2D
             if (targetAgent != null && IsInstanceValid(targetAgent))
             {
                 // Identify the agent is different from current agent
-                if (_targetAgent != null && targetAgent.GetUnitName() != _targetAgent.GetUnitName())
+                if (_targetAgent != null && targetAgent.GetUnitID() != _targetAgent.GetUnitID())
                 {
                     break;
                 }

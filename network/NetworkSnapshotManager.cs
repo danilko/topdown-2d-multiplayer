@@ -105,7 +105,7 @@ public class NetworkSnapshotManager : Node
 
     public void CacheInput(int net_id, PlayerInput playerInput)
     {
-        if (!GetTree().IsNetworkServer())
+        if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
         {
             return;
         }

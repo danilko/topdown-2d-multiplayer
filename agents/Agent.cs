@@ -56,7 +56,7 @@ public class Agent : KinematicBody2D
     protected float PositionReachedRadius = 5.0f;
 
     [Export]
-    private String _unitName = "Default";
+    private String _unitID = "Default";
 
     [Export]
     private String _displayName = "Default";
@@ -143,14 +143,14 @@ public class Agent : KinematicBody2D
         return CurrentInventory;
     }
 
-    public virtual void Initialize(GameWorld gameWorld, String unitName, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
+    public virtual void Initialize(GameWorld gameWorld, String unitID, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
     {
         _team = (Team)GetNode("Team");
         _teamMapAI = teamMapAI;
 
         _gameWorld = gameWorld;
         SetCurrentTeam(_teamMapAI.GetTeam());
-        SetUnitName(unitName);
+        SetUnitID(unitID);
         SetDisplayName(displayName);
 
         _health = MaxHealth;
@@ -369,9 +369,9 @@ public class Agent : KinematicBody2D
         return _displayName;
     }
 
-    public void SetUnitName(String unitName)
+    public void SetUnitID(String unitID)
     {
-        _unitName = unitName;
+        _unitID = unitID;
     }
 
     public void SetDisplayName(String displayName)
@@ -380,9 +380,9 @@ public class Agent : KinematicBody2D
         _setUnitDisplay();
     }
 
-    public String GetUnitName()
+    public String GetUnitID()
     {
-        return _unitName;
+        return _unitID;
     }
 
     public virtual void _Control(float delta) { }

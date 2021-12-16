@@ -38,7 +38,6 @@
     <Compile Include="inventory\Inventory.cs" />
     <Compile Include="inventory\InventoryManager.cs" />
     <Compile Include="items\ItemResource.cs" />
-    <Compile Include="map\SimulateGameWorld.cs" />
     <Compile Include="network\Lobby.cs" />
     <Compile Include="network\NetworkSnapshotManager.cs" />
     <Compile Include="network\WaitingRoom.cs" />
@@ -64,6 +63,7 @@
     <Compile Include="ui\InventoryUI.cs" />
     <Compile Include="ui\ItemPanel.cs" />
     <Compile Include="ui\MiniMap.cs" />
+    <Compile Include="ui\OverallMap.cs" />
     <Compile Include="ui\PopUpMessage.cs" />
     <Compile Include="ui\ScreenIndicator.cs" />
     <Compile Include="ui\Settings.cs" />

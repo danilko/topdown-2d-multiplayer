@@ -73,12 +73,12 @@ public class GameConditionManager : Node
             {
                 String unitId = AgentSpawnManager.AgentPlayerPrefix + item.Value.net_id;
                 Team.TeamCode team = (Team.TeamCode)item.Value.team;
-                String unitName = unitId;
+
                 String displayName = item.Value.name;
 
                 teamMemberDictionary[(int)item.Value.team] += 1;
 
-                _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+                _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
 
             }
         }
@@ -88,12 +88,12 @@ public class GameConditionManager : Node
             {
                 String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
                 Team.TeamCode team = (Team.TeamCode)0;
-                String unitName = unitId;
-                String displayName = "Player";
+
+                String displayName = "Player_" + 1;
 
                 teamMemberDictionary[0] += 1;
 
-                _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+                _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
             }
         }
 
@@ -120,7 +120,7 @@ public class GameConditionManager : Node
                     String unitName = unitId;
                     String displayName = "Player " + counter;
 
-                    _agentSpawnManager.PlaceNewUnit(unitId, team, unitName, displayName, AgentSpawnManager.INIT_DELAY);
+                    _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
                     counter++;
                 }
             }

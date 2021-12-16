@@ -38,7 +38,7 @@ public class GameWorld : Node2D
         _initializeCapaturableBaseManager();
         _initializePathManager();
         _initializeTeamMapAIManager();
- 
+
         _initailizeAgentSpawnManager();
         _initailizeGameConditionManager();
 
@@ -65,11 +65,8 @@ public class GameWorld : Node2D
 
     protected void _initializeHUD()
     {
-        if(HasNode("HUD"))
-        {
         _hud = (HUD)GetNode("HUD");
         _hud.Initailize(this);
-        }
     }
 
     public HUD GetHUD()
@@ -134,7 +131,7 @@ public class GameWorld : Node2D
 
     private void _initailizeGameConditionManager()
     {
-        _gameConditionManager =  (GameConditionManager)GetNode("GameConditionManager");
+        _gameConditionManager = (GameConditionManager)GetNode("GameConditionManager");
         _gameConditionManager.Initialize(this);
     }
 
@@ -145,7 +142,7 @@ public class GameWorld : Node2D
 
     private void _initailizeAgentSpawnManager()
     {
-        _agentSpawnManager =  (AgentSpawnManager)GetNode("AgentSpawnManager");
+        _agentSpawnManager = (AgentSpawnManager)GetNode("AgentSpawnManager");
         _agentSpawnManager.Initialize(this);
     }
 
@@ -161,7 +158,7 @@ public class GameWorld : Node2D
 
     private void _initializeObsctacleManager()
     {
-  
+
         TileMap tileMap = (TileMap)GetNode("Ground");
         _obstacleManager = (ObstacleManager)GetNode("ObstacleManager");
 
@@ -186,7 +183,7 @@ public class GameWorld : Node2D
 
     private void _initializeTeamMapAIManager()
     {
-        _teamMapAIManager  = (TeamMapAIManager)GetNode("TeamMapAIManager");
+        _teamMapAIManager = (TeamMapAIManager)GetNode("TeamMapAIManager");
         _teamMapAIManager.Initialize(this);
     }
 

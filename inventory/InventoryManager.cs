@@ -33,7 +33,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
         {
-            String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
+            String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID();
 
             if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
             {
@@ -89,7 +89,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID();
 
             if (GetTree().NetworkPeer != null && !GetTree().IsNetworkServer())
             {
@@ -148,7 +148,7 @@ public class InventoryManager : Node
         {
             if (inventory != null && itemResource != null && IsInstanceValid(inventory) && IsInstanceValid(itemResource))
             {
-                String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
+                String info = itemResource.ItemID + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID();
 
                 _serverAddItem(info);
             }
@@ -283,7 +283,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (dropItem ? 1 : 0);
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID() + ";" + (dropItem ? 1 : 0);
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -304,7 +304,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryItemIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex;
+            String info = inventoryItemIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID() + ";" + (int)weaponOrder + ";" + weaponIndex;
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -352,7 +352,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName() + ";" + (int)weaponOrder + ";" + weaponIndex + ";" + dropWeapon;
+            String info = (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID() + ";" + (int)weaponOrder + ";" + weaponIndex + ";" + dropWeapon;
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {
@@ -407,7 +407,7 @@ public class InventoryManager : Node
     {
         if (agent != null && IsInstanceValid(agent))
         {
-            String info = (int)agent.GetTeam() + "," + agent.GetUnitName() + "," + agent.GetInventory().GetInventoryState();
+            String info = (int)agent.GetTeam() + "," + agent.GetUnitID() + "," + agent.GetInventory().GetInventoryState();
 
             if (rpcId != -1)
             {
@@ -452,7 +452,7 @@ public class InventoryManager : Node
     {
         if (inventory != null && IsInstanceValid(inventory))
         {
-            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitName();
+            String info = inventoryIndex + ";" + (int)inventory.GetAgent().GetTeam() + ";" + inventory.GetAgent().GetUnitID();
 
             if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
             {

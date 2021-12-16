@@ -5,11 +5,16 @@ using System.Collections.Generic;
 
 public class AgentSpawnInfo : Godot.Object
 {
-    public Team.TeamCode Team;
-    public String UnitName;
-    public String UnitId;
-    public String DisplayName;
-    public int Delay;
+    public Team.TeamCode Team { get; set; }
+    public String UnitId { get; set; }
+    public String DisplayName { get; set; }
+    public int Delay { get; set; }
+    public int CaptureBaseIndex { get; set; }
+
+    public AgentSpawnInfo()
+    {
+        CaptureBaseIndex = -1;
+    }
 }
 
 public class AgentSpawnManager : Node
@@ -30,6 +35,9 @@ public class AgentSpawnManager : Node
     [Signal]
     public delegate void AgentStartToCreateSignal();
 
+    [Signal]
+    public delegate void AgentConfigSignal();
+
     private List<AgentSpawnInfo> _spawnList;
 
     private GameWorld _gameWorld;
@@ -48,7 +56,10 @@ public class AgentSpawnManager : Node
     private Observer _observer;
     private Timer _counterTimer;
 
-    public static int INIT_DELAY = 1;
+    public static int UNIT_CONFIG_TIME = 12;
+
+    public static int ALLOW_UNIT_CONFIG_TIME = 10;
+
     public static int DEFAULT_DELAY = 20;
 
     // Called when the node enters the scene tree for the first time.
@@ -90,18 +101,17 @@ public class AgentSpawnManager : Node
         _observer = (Observer)_gameWorld.GetNode("Observer");
     }
 
-    public void PlaceNewUnit(String unitId, Team.TeamCode team, String unitName, String displayName, int delay)
+    public void PlaceNewUnit(String unitId, Team.TeamCode team, String displayName, int delay)
     {
         AgentSpawnInfo agentSpawnInfo = new AgentSpawnInfo();
         agentSpawnInfo.UnitId = unitId;
         agentSpawnInfo.Team = team;
-        agentSpawnInfo.UnitName = unitName;
         agentSpawnInfo.Delay = delay;
 
         _spawnList.Add(agentSpawnInfo);
     }
 
-    private void _placeDefeatedUnitIntoCreationQueue(String unitId, Team.TeamCode team, String unitName, String displayName)
+    private void _placeDefeatedUnitIntoCreationQueue(String unitId, Team.TeamCode team, String displayName)
     {
         // Check if this player need to be respawn
         if (!_gameWorld.GetGameConditionManager().CheckIfPlayerNeedToBeRespawn(unitId))
@@ -109,7 +119,7 @@ public class AgentSpawnManager : Node
             return;
         }
 
-        PlaceNewUnit(unitId, team, unitName, displayName, DEFAULT_DELAY);
+        PlaceNewUnit(unitId, team, displayName, DEFAULT_DELAY);
     }
 
     public void PlaceRemoveUnit(String id)
@@ -122,6 +132,57 @@ public class AgentSpawnManager : Node
             if (GetTree().NetworkPeer != null)
             {
                 Rpc(nameof(_placeRemoveUnit), id);
+            }
+        }
+    }
+
+    public void UpdateNewUnitConfig(String unitId, int captureBase)
+    {
+        if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
+        {
+            _updateNewUnitConfig(unitId, captureBase);
+        }
+        else
+        {
+            RpcId(1, nameof(_updateNewUnitConfigServer), captureBase);
+        }
+    }
+
+    public void _updateNewUnitConfigServer(int captureBase)
+    {
+        String unitId = AgentPlayerPrefix + GetTree().GetRpcSenderId();
+
+        _updateNewUnitConfig(unitId, captureBase);
+    }
+
+    private void _updateNewUnitConfig(String unitId, int captureBase)
+    {
+        // Ensure it is one of selectable base
+        captureBase = captureBase % _gameWorld.GetTeamMapAIManager().GetTeamMapAIs().Count;
+
+        // Ensure it is positive number
+        if (captureBase < 0)
+        {
+            captureBase *= -1;
+        }
+
+        foreach (AgentSpawnInfo agentSpawnInfo in _spawnList)
+        {
+            // Confirm the unit is in spawn list 
+            if (agentSpawnInfo.UnitId == unitId)
+            {
+                // Confirm if
+                // It is still in allowance time to change
+                // The target team is same team as the base
+                // Reason to not allow 0 or 1 count down setting to have conflict during creation and map setting
+                if (agentSpawnInfo.Delay >= (UNIT_CONFIG_TIME - ALLOW_UNIT_CONFIG_TIME) &&
+                _gameWorld.GetCapturableBaseManager().GetCapturableBases()[captureBase].GetCaptureBaseTeam() == agentSpawnInfo.Team)
+                {
+                    // Update the index
+                    agentSpawnInfo.CaptureBaseIndex = captureBase;
+                }
+
+                break;
             }
         }
     }
@@ -148,7 +209,7 @@ public class AgentSpawnManager : Node
         {
             existingPosition = currentSpawnCache[id].GlobalPosition;
 
-            EmitSignal(nameof(AgentDefeatedSignal), id, currentSpawnCache[id].GetTeam(), currentSpawnCache[id].GetUnitName(), currentSpawnCache[id].GetDisplayName());
+            EmitSignal(nameof(AgentDefeatedSignal), currentSpawnCache[id].GetUnitID(), currentSpawnCache[id].GetTeam(), currentSpawnCache[id].GetDisplayName());
 
             _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)currentSpawnCache[id].GetTeam()].RemoveUnit(currentSpawnCache[id].Name);
         }
@@ -184,8 +245,18 @@ public class AgentSpawnManager : Node
     {
         foreach (AgentSpawnInfo agentSpawnInfo in _spawnList)
         {
+            // If this is the time allow user config, notify unit's owner
+            if (agentSpawnInfo.Delay == UNIT_CONFIG_TIME)
+            {
+                EmitSignal(nameof(AgentConfigSignal), agentSpawnInfo.UnitId);
+            }
+
+            // Count down the time
             agentSpawnInfo.Delay--;
         }
+
+        // Sort by delay
+        _spawnList.Sort((a, b) => a.Delay.CompareTo(b.Delay));
 
         while (_spawnList.Count > 0)
         {
@@ -213,11 +284,11 @@ public class AgentSpawnManager : Node
         if (!_gameWorld.GetGameConditionManager().CheckIfCanSpawn(unitSpawnInfo.Team))
         {
             unitSpawnInfo.Delay = DEFAULT_DELAY;
-            PlaceNewUnit(unitSpawnInfo.UnitId, unitSpawnInfo.Team, unitSpawnInfo.UnitName, unitSpawnInfo.DisplayName, DEFAULT_DELAY);
+            PlaceNewUnit(unitSpawnInfo.UnitId, unitSpawnInfo.Team, unitSpawnInfo.DisplayName, DEFAULT_DELAY);
             return;
         }
 
-        String agentInfo = unitSpawnInfo.UnitId + ";" + (int)unitSpawnInfo.Team + ";" + unitSpawnInfo.UnitName + ";" + unitSpawnInfo.DisplayName + ";";
+        String agentInfo = unitSpawnInfo.UnitId + ";" + (int)unitSpawnInfo.Team + ";" + unitSpawnInfo.DisplayName + ";" + unitSpawnInfo.CaptureBaseIndex + ";";
 
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
@@ -225,6 +296,7 @@ public class AgentSpawnManager : Node
             // Call locally for server
             _spawnAgentClient(agentInfo);
 
+            // Charge unit amount
             _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].ChargeUnitAmount();
 
             if (GetTree().NetworkPeer != null)
@@ -248,33 +320,42 @@ public class AgentSpawnManager : Node
     [Remote]
     private void _spawnAgentClient(String agentInfo)
     {
-        String unitId = agentInfo.Split(";")[0];
-        Team.TeamCode unitTeam = (Team.TeamCode)(int.Parse(agentInfo.Split(";")[1]));
-        String unitName = agentInfo.Split(";")[2];
-        String unitDisplayName = agentInfo.Split(";")[3];
+        int parseIndex = 0;
+
+        String unitId = agentInfo.Split(";")[parseIndex];
+        parseIndex++;
+
+        Team.TeamCode unitTeam = (Team.TeamCode)(int.Parse(agentInfo.Split(";")[parseIndex]));
+        parseIndex++;
+
+        String unitDisplayName = agentInfo.Split(";")[parseIndex];
+        parseIndex++;
+
+        int captureBase = int.Parse(agentInfo.Split(";")[parseIndex]);
+        parseIndex++;
 
         if (unitId.Contains(AgentPlayerPrefix))
         {
-            _spawnPlayer(unitId, unitTeam, unitName, unitDisplayName);
+            _spawnPlayer(unitId, unitTeam, unitDisplayName, captureBase);
         }
         else
         {
-            _spawnBot(unitId, unitTeam, unitName, unitDisplayName);
+            _spawnBot(unitId, unitTeam, unitDisplayName, captureBase);
         }
     }
 
-    private void _spawnPlayer(String playerId, Team.TeamCode team, String unitName, String displayName)
+    private void _spawnPlayer(String unitId, Team.TeamCode team, String displayName, int captureBase)
     {
         // Already generated
-        if (_spawnPlayers.ContainsKey(playerId))
+        if (_spawnPlayers.ContainsKey(unitId))
         {
             return;
         }
 
-        int netId = int.Parse(playerId.Replace(AgentPlayerPrefix, ""));
+        int netId = int.Parse(unitId.Replace(AgentPlayerPrefix, ""));
 
         // Load the scene and create an instance
-        Player agent = (Player)(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitName, displayName, false));
+        Player agent = (Player)(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitId, displayName, captureBase, false));
 
         // If this actor is the current client controlled, add camera and attach HUD
         if (netId == _network.gamestateNetworkPlayer.net_id)
@@ -288,16 +369,16 @@ public class AgentSpawnManager : Node
         // This one is important so a player cannot control unit does not belong to player
         agent.SetNetworkMaster(netId);
 
-        _spawnPlayers.Add(playerId, agent);
+        _spawnPlayers.Add(unitId, agent);
 
         EmitSignal(nameof(PlayerCreatedSignal));
-        EmitSignal(nameof(AgentCreatedSignal), unitName, team);
+        EmitSignal(nameof(AgentCreatedSignal), unitId, team);
     }
 
-    private void _spawnBot(String botId, Team.TeamCode team, String unitName, String displayName)
+    private void _spawnBot(String unitId, Team.TeamCode team,String displayName, int captureBase)
     {
         // Already generated
-        if (_spawnBots.ContainsKey(unitName))
+        if (_spawnBots.ContainsKey(unitId))
         {
             return;
         }
@@ -309,10 +390,10 @@ public class AgentSpawnManager : Node
             enableAI = true;
         }
 
-        Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitName, displayName, enableAI);
-        _spawnBots.Add(unitName, agent);
+        Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitId, displayName, captureBase, enableAI);
+        _spawnBots.Add(unitId, agent);
 
-        EmitSignal(nameof(AgentCreatedSignal), unitName, team);
+        EmitSignal(nameof(AgentCreatedSignal), unitId, team);
 
     }
 

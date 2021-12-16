@@ -157,12 +157,6 @@ margin_top = 429.302
 margin_right = 1000.0
 margin_bottom = 529.302
 
-[node name="MiniMap" parent="GameControl" instance=ExtResource( 8 )]
-margin_left = 789.561
-margin_top = 109.485
-margin_right = 983.561
-margin_bottom = 303.485
-
 [node name="InventoryUI" parent="GameControl" instance=ExtResource( 11 )]
 
 [node name="LockOnIndicator" type="TextureRect" parent="GameControl"]
@@ -182,3 +176,30 @@ __meta__ = {
 visible = false
 margin_top = 325.403
 margin_bottom = -74.5967
+
+[node name="MiniMap" parent="." instance=ExtResource( 8 )]
+visible = false
+margin_left = 800.0
+margin_top = 20.0
+margin_right = 1000.0
+margin_bottom = 220.0
+
+[node name="UnitSpawnSetting" type="Popup" parent="."]
+visible = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -97.0
+margin_bottom = -57.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Confirm" type="Button" parent="UnitSpawnSetting"]
+margin_left = 543.421
+margin_top = 488.448
+margin_right = 616.421
+margin_bottom = 508.448
+text = "CONFIRM"
+__meta__ = {
+"_edit_use_anchors_": false
+}
