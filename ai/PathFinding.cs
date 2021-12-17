@@ -117,11 +117,6 @@ public class PathFinding : Node2D
 
 			int id = _getPointID((int)tile.x, (int)tile.y);
 
-			if (id < 0)
-			{
-				GD.Print("id = " + id + " with tileX " + (int)tile.x + " tileY " + (int)tile.y);
-			}
-
 			// TEST ONLY BEGIN
 			//Vector2 test = _extractVectorFromPointID(id);
 			//if (!(test.x == (int)tile.x && test.y == (int)tile.y))
@@ -239,6 +234,12 @@ public class PathFinding : Node2D
 			{
 				for (int indexY = -1; indexY < 2; indexY++)
 				{
+					// No diagnoal for now to improve performance
+					// https://stackoverflow.com/questions/12417925/a-star-pathfinding-choosing-bad-waypoints
+					if(indexY == indexX || indexY == -1 * indexX)
+					{
+						continue;
+					}
 					Vector2 targetTile = new Vector2(tile.x + indexX, tile.y + indexY);
 					int toId = _getPointID((int)targetTile.x, (int)targetTile.y);
 					int fromId = _getPointID((int)tile.x, (int)tile.y);
