@@ -21,7 +21,7 @@ public class PathManager : Node
         {
             _pathFinding = (PathFinding)((PackedScene)GD.Load("res://ai/PathFinding.tscn")).Instance(); ;
             this.AddChild(_pathFinding);
-            _pathFinding.Initialize(_tileMap, _gameWorld.GetObstacleManager());
+            _pathFinding.Initialize(gameWorld, _tileMap, _gameWorld.GetObstacleManager());
         }
     }
 

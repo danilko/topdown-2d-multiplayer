@@ -33,7 +33,7 @@ public class TeamMapAI : Node2D
     private int _maxConcurrentUnit = 10;
 
     [Export]
-    private int _advancedWaitInterval = 20;
+    private int _advancedWaitInterval = 5;
 
     private int _currentUnitUsageAmount;
 
@@ -60,6 +60,7 @@ public class TeamMapAI : Node2D
 
         _randomNumberGenerator = new Godot.RandomNumberGenerator();
     }
+
 
     public int GetTeamTotalUnitCount()
     {
@@ -212,7 +213,29 @@ public class TeamMapAI : Node2D
         _pathFinding = pathFinding;
         _advancedTimer.Start();
 
-        CheckForCapturableBase();
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentConfigSignal), this, nameof(_onAgentConfig));
+    }
+
+    private void _onAgentConfig(String unitID, Team.TeamCode teamCode)
+    {
+        // It is not for this team, just ignore it
+        if (teamCode != _team.CurrentTeamCode)
+        {
+            return;
+        }
+
+        List<CapturableBase> baseList = _capturableBaseManager.GetAvailableBases(teamCode);
+
+
+        // Only make a selection if base is availble
+        if (baseList.Count > 1)
+        {
+            // Random select
+            int selectedBase = _randomNumberGenerator.RandiRange(0, baseList.Count - 1);
+
+            _gameWorld.GetAgentSpawnManager().UpdateNewUnitConfig(unitID, baseList[selectedBase].GetCapturableBaseIndex());
+        }
+
     }
 
     public void CheckForCapturableBase()

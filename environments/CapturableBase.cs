@@ -28,6 +28,8 @@ public class CapturableBase : Area2D
     private CollisionShape2D _collisionShape;
     private RandomNumberGenerator _rng;
 
+    private int _captureBaseIndex = -1;
+
     private int _counter = 0;
 
     public override void _Ready()
@@ -60,9 +62,15 @@ public class CapturableBase : Area2D
         _setCaptureBaseTeam((int)_team.CurrentTeamCode);
     }
 
-    public void Initialize(GameWorld gameWorld)
+    public void Initialize(GameWorld gameWorld, int captureBaseIndex)
     {
+        _captureBaseIndex = captureBaseIndex;
         _gameWorld = gameWorld;
+    }
+
+    public int GetCapturableBaseIndex()
+    {
+        return _captureBaseIndex;
     }
 
     public Team.TeamCode GetCaptureBaseTeam()

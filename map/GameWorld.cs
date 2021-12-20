@@ -148,6 +148,11 @@ public class GameWorld : Node2D
 
     public AgentSpawnManager GetAgentSpawnManager()
     {
+        if (_agentSpawnManager == null)
+        {
+            _agentSpawnManager = (AgentSpawnManager)GetNode("AgentSpawnManager");
+        }
+
         return _agentSpawnManager;
     }
 

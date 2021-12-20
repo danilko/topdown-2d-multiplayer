@@ -7,7 +7,8 @@ public class MiniMap : MarginContainer
     public enum MapMode
     {
         MINIMAP,
-        BIGMAP
+        BIGMAP,
+        BIGMAP_SELECT
     }
 
     private float _zoom = 1.5f;
@@ -35,15 +36,17 @@ public class MiniMap : MarginContainer
     private ColorRect _background;
     private Vector2 _mapLength;
 
+    private CapturableBase _selectedCapturableBase;
+
     public override void _Ready()
     {
-        _grid = (TextureRect)GetNode("MarginContainer/Grid");
+        _grid = (TextureRect)GetNode("Grid");
 
         _agentMarker = (Sprite)_grid.GetNode("AgentMarker");
         _baseMarker = (Sprite)_grid.GetNode("BaseMarker");
 
-        _map = (TextureRect)GetNode("MarginContainer/Map");
-        _background = (ColorRect)GetNode("MarginContainer/Background");
+        _map = (TextureRect)_grid.GetNode("Map");
+        _background = (ColorRect)_grid.GetNode("Background");
 
         _agents = new Dictionary<String, Agent>();
         _agentMarkers = new Dictionary<String, Sprite>();
@@ -87,17 +90,58 @@ public class MiniMap : MarginContainer
 
     public void SetMapMode(MapMode mapMode)
     {
+        // Only continue if mode different from previous mode
+        if (_mapMode == mapMode)
+        {
+            return;
+        }
+
+        // If previous mode is select, clean the marker scale
+        if (_mapMode == MapMode.BIGMAP_SELECT)
+        {
+            // Clean marker
+            SelectBase(null);
+        }
+
         _mapMode = mapMode;
 
         if (_mapMode == MapMode.BIGMAP)
         {
+            RectPosition = new Vector2(20, 20);
+            RectSize = new Vector2(512, 512);
+            _map.Show();
+            _background.Hide();
+        }
+        else if (_mapMode == MapMode.BIGMAP_SELECT)
+        {
+            RectPosition = new Vector2(20, 20);
+            RectSize = new Vector2(512, 512);
             _map.Show();
             _background.Hide();
         }
         else
         {
+            RectPosition = new Vector2(800, 20);
+            RectSize = new Vector2(200, 200);
+
             _map.Hide();
             _background.Show();
+        }
+    }
+
+    public void SelectBase(String baseName)
+    {
+        foreach (String currentBaseName in _baseMarkers.Keys)
+        {
+            if (currentBaseName == baseName)
+            {
+                // Scale up markers to indicate as selection
+                _baseMarkers[currentBaseName].Scale = new Vector2(0.6f, 0.6f);
+            }
+            else
+            {
+                _baseMarkers[currentBaseName].Scale = new Vector2(0.3f, 0.3f);
+            }
         }
     }
 
@@ -171,7 +215,6 @@ public class MiniMap : MarginContainer
 
             _agentMarker.Position = markerPosition;
             _agentMarker.Rotation = _player.GlobalRotation + Mathf.Pi / 2.0f;
-
         }
 
         foreach (Agent agent in _agents.Values)
@@ -260,8 +303,7 @@ public class MiniMap : MarginContainer
         {
             _updateMiniMap();
         }
-
-        if (_mapMode == MapMode.BIGMAP)
+        else
         {
             _updateBigMap();
         }

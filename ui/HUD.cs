@@ -4,215 +4,204 @@ using System.Collections.Generic;
 
 public class HUD : CanvasLayer
 {
-	bool lblMessage = false;
+    bool lblMessage = false;
 
-	private Dictionary<Weapon.WeaponOrder, WeaponControl> _weaponControls;
+    private Dictionary<Weapon.WeaponOrder, WeaponControl> _weaponControls;
 
-	private Control _gameControl;
-	private MiniMap _miniMap;
+    private Control _gameControl;
+    private MiniMap _miniMap;
 
-	private Control _overallMessageControll;
+    private Control _overallMessageControll;
 
-	private CharacterDialog _characterDialog;
+    private CharacterDialog _characterDialog;
 
-	private PopUpMessage _popUpMessage;
+    private PopUpMessage _popUpMessage;
 
-	private GameTimerManager _gameTimerManager;
+    private GameTimerManager _gameTimerManager;
 
-	private GameWorld _gameWorld;
+    private GameWorld _gameWorld;
 
-	private Label _timerTickLabel;
+    private Label _timerTickLabel;
 
-	public override void _Ready()
-	{
+	private UnitLaunchSetupUI _unitLaunchSetupUI;
 
-	}
+    public override void _Ready()
+    {
+        _timerTickLabel = ((Label)GetNode("lblTimerStatus"));
 
-	public void Initailize(GameWorld gameWorld)
-	{
-		_gameWorld = gameWorld;
-		_gameTimerManager = _gameWorld.GetGameTimerManager();
-		_gameTimerManager.Connect(nameof(GameTimerManager.GameTimerTickSignal), this, nameof(_onUpdateTimerTick));
+        _characterDialog = (CharacterDialog)GetNode("CharacterDialog");
 
-		_timerTickLabel = ((Label)GetNode("lblTimerStatus"));
+        _gameControl = (Control)(GetNode("GameControl"));
+        _overallMessageControll = ((Control)GetNode("controlOverallMessage"));
+        _overallMessageControll.Visible = false;
 
-		_characterDialog = (CharacterDialog)GetNode("CharacterDialog");
+        _weaponControls = new Dictionary<Weapon.WeaponOrder, WeaponControl>();
+        _weaponControls.Add(Weapon.WeaponOrder.Right, (WeaponControl)(_gameControl.GetNode("RightWeaponControl")));
+        _weaponControls.Add(Weapon.WeaponOrder.Left, (WeaponControl)(_gameControl.GetNode("LeftWeaponControl")));
 
-		_gameControl = (Control)(GetNode("GameControl"));
-		_overallMessageControll = ((Control)GetNode("controlOverallMessage"));
-		_overallMessageControll.Visible = false;
+        _miniMap = (MiniMap)GetNode("MiniMap");
+        _popUpMessage = (PopUpMessage)GetNode("PopUpMessage");
 
-		_weaponControls = new Dictionary<Weapon.WeaponOrder, WeaponControl>();
-		_weaponControls.Add(Weapon.WeaponOrder.Right, (WeaponControl)(_gameControl.GetNode("RightWeaponControl")));
-		_weaponControls.Add(Weapon.WeaponOrder.Left, (WeaponControl)(_gameControl.GetNode("LeftWeaponControl")));
+		_unitLaunchSetupUI = (UnitLaunchSetupUI)GetNode("UnitLaunchSetupUI");
+    }
 
-		_miniMap = (MiniMap)GetNode("MiniMap");
-		_popUpMessage = (PopUpMessage)GetNode("PopUpMessage");
+    public void Initailize(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld;
+        _gameTimerManager = _gameWorld.GetGameTimerManager();
+        _gameTimerManager.Connect(nameof(GameTimerManager.GameTimerTickSignal), this, nameof(_onUpdateTimerTick));
 
-		_miniMap.Iniitialize(gameWorld);
+        _miniMap.Iniitialize(gameWorld);
 
-		//_postProcess = (PostProcess)GetNode("PostProcess");
+		_unitLaunchSetupUI.Initalize(_gameWorld, _miniMap);
+        //_postProcess = (PostProcess)GetNode("PostProcess");
 
-		_gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerDefeatedSignal), this, nameof(_onPlayerDefeated));
-		_gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreatedSignal), this, nameof(_onPlayerCreated));
-		_gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentDefeatedSignal), this, nameof(_onAgentDefeated));
-		_gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerDefeatedSignal), this, nameof(_onPlayerDefeated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerCreatedSignal), this, nameof(_onPlayerCreated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentDefeatedSignal), this, nameof(_onAgentDefeated));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
 
-		_gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentConfigSignal), this, nameof(_onAgentConfig));
+        _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentConfigSignal), this, nameof(_onAgentConfig));
 
-		// Simulation will not have HUD
-		if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
-		{
-			_miniMap.Hide();
-			_popUpMessage.Hide();
-			_timerTickLabel.Hide();
-		}
-	}
+        // Simulation will not have HUD
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            _miniMap.Hide();
+            _popUpMessage.Hide();
+            _timerTickLabel.Hide();
+        }
+    }
 
-	private void _onAgentConfig(String unitID)
-	{
-		if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
-		int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
-		{
+    private void _onAgentConfig(String unitID, Team.TeamCode teamCode)
+    {
+        if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
+        int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
+        {
+            _setMapMode(MiniMap.MapMode.BIGMAP_SELECT);
+			_unitLaunchSetupUI.EnableSetup(unitID, teamCode);
+        }
+    }
 
-			_setMapMode(MiniMap.MapMode.BIGMAP);
-			((Popup)GetNode("UnitSpawnSetting")).PopupCentered();
-		}
-	}
+    private void _onAgentDefeated(String unitID, Team.TeamCode teamCode, String displayName)
+    {
+        if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
+          int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
+        {
+            _miniMap.Hide();
+            _miniMap.RemovePlayer();
+        }
+        else
+        {
+            _miniMap.RemoveAgent(unitID);
+        }
 
-	private void _onAgentDefeated(String unitID, Team.TeamCode teamCode, String displayName)
-	{
-		if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
-		  int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
-		{
-			_miniMap.Hide();
-			_miniMap.RemovePlayer();
-		}
-		else
-		{
-			_miniMap.RemoveAgent(unitID);
-		}
+        _popUpMessage.NotifyMessage("NOTIFICATION", displayName + " (" + teamCode + ") IS ELIMINATED");
+    }
 
-		_popUpMessage.NotifyMessage("NOTIFICATION", displayName + " (" + teamCode + ") IS ELIMINATED");
-	}
+    private void _onAgentCreated(String unitID, Team.TeamCode teamCode)
+    {
+        Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode].GetUnit(unitID);
 
-	private void _onAgentCreated(String unitID, Team.TeamCode teamCode)
-	{
-		Agent agent = _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)teamCode].GetUnit(unitID);
+        if (agent.IsCurrentPlayer())
+        {
+            _miniMap.SetPlayer(agent);
+            _setMapMode(MiniMap.MapMode.MINIMAP);
+        }
+        else
+        {
+            _miniMap.AddAgent(agent);
+        }
 
-		if (agent.IsCurrentPlayer())
-		{
-			_miniMap.SetPlayer(agent);
-			_setMapMode(MiniMap.MapMode.MINIMAP);
-			((Popup)GetNode("UnitSpawnSetting")).Hide();
-		}
-		else
-		{
-			_miniMap.AddAgent(agent);
-		}
+        _popUpMessage.NotifyMessage("NOTIFICATION", agent.GetDisplayName() + " (" + teamCode + ") IS IDENTITIED");
+    }
 
-		_popUpMessage.NotifyMessage("NOTIFICATION", agent.GetDisplayName() + " (" + teamCode + ") IS IDENTITIED");
-	}
+    public InventoryUI GetInventoryUI()
+    {
+        return (InventoryUI)GetNode("GameControl/InventoryUI");
+    }
 
-	public InventoryUI GetInventoryUI()
-	{
-		return (InventoryUI)GetNode("GameControl/InventoryUI");
-	}
+    public PopUpMessage GetPopUpMessage()
+    {
+        return _popUpMessage;
+    }
 
-	public PopUpMessage GetPopUpMessage()
-	{
-		return _popUpMessage;
-	}
+    private void _onNetworkRateUpdate(String message)
+    {
+        // Updating the network rate for local machine
+        ((Label)GetNode("lblNetworkRate")).Text = "Network Rate: " + message;
+    }
 
-	private void _onNetworkRateUpdate(String message)
-	{
-		// Updating the network rate for local machine
-		((Label)GetNode("lblNetworkRate")).Text = "Network Rate: " + message;
-	}
+    public void UpdateWeapon(ItemResource itemResource, Weapon.WeaponOrder weaponOrder, int weaponIndex)
+    {
+        _weaponControls[weaponOrder].UpdateWeapon(itemResource, weaponOrder, weaponIndex);
+    }
 
-	public void UpdateWeapon(ItemResource itemResource, Weapon.WeaponOrder weaponOrder, int weaponIndex)
-	{
-		_weaponControls[weaponOrder].UpdateWeapon(itemResource, weaponOrder, weaponIndex);
-	}
+    private void _onPlayerCreated()
+    {
+        _gameControl.Visible = true;
+        _overallMessageControll.Visible = false;
+    }
 
-	private void _onPlayerCreated()
-	{
-		_gameControl.Visible = true;
-		_overallMessageControll.Visible = false;
-		((Popup)GetNode("UnitSpawnSetting")).Hide();
-	}
+    private void _onPlayerDefeated()
+    {
+        _overallMessageControll.Visible = true;
 
-	private void _onPlayerDefeated()
-	{
-		_overallMessageControll.Visible = true;
+        _gameControl.Visible = false;
+        lblMessage = false;
+    }
 
-		_gameControl.Visible = false;
-		lblMessage = false;
-	}
+    public void UpdateTeamUnitUsageAmount(int cost)
+    {
+        ((Label)GetNode("lblTeamUnitUsageAmount")).Text = "" + cost;
+    }
 
-	public void UpdateTeamUnitUsageAmount(int cost)
-	{
-		((Label)GetNode("lblTeamUnitUsageAmount")).Text = "" + cost;
-	}
+    private void _onUpdateTimerTick(int time)
+    {
+        String message = _gameTimerManager.ConvertToDateFormat(time) + " " + _gameTimerManager.GetGameTimerState();
 
-	private void _onUpdateTimerTick(int time)
-	{
-		String message = _gameTimerManager.ConvertToDateFormat(time) + " " + _gameTimerManager.GetGameTimerState();
+        // If less than 60 seconds, modify color
+        if (time < 60)
+        {
+            _timerTickLabel.Set("custom_colors/font_color", new Color("#ffc65b"));
+        }
+        else
+        {
+            _timerTickLabel.Set("custom_colors/font_color", new Color("#96ff5b"));
+        }
 
-		// If less than 60 seconds, modify color
-		if (time < 60)
-		{
-			_timerTickLabel.Set("custom_colors/font_color", new Color("#ffc65b"));
-		}
-		else
-		{
-			_timerTickLabel.Set("custom_colors/font_color", new Color("#96ff5b"));
-		}
+        _timerTickLabel.Text = message;
+    }
 
-		_timerTickLabel.Text = message;
-	}
+    private void _setMapMode(MiniMap.MapMode mapMode)
+    {
+        _miniMap.SetMapMode(mapMode);
+        _miniMap.Show();
 
-	private void _setMapMode(MiniMap.MapMode mapMode)
-	{
-		_miniMap.Show();
+    }
 
-		if (mapMode == MiniMap.MapMode.BIGMAP)
-		{
-			_miniMap.RectPosition = new Vector2(20, 20);
-			_miniMap.RectSize = new Vector2(512, 512);
-			_miniMap.SetMapMode(MiniMap.MapMode.BIGMAP);
-		}
-		else
-		{
-			_miniMap.RectPosition = new Vector2(800, 20);
-			_miniMap.RectSize = new Vector2(200, 200);
-			_miniMap.SetMapMode(MiniMap.MapMode.MINIMAP);
-		}
-	}
+    public override void _PhysicsProcess(float delta)
+    {
+        if (lblMessage && Input.IsKeyPressed((int)Godot.KeyList.Space))
+        {
+            _overallMessageControll.Visible = false;
+            lblMessage = false;
+        }
 
-	public override void _PhysicsProcess(float delta)
-	{
-		if (lblMessage && Input.IsKeyPressed((int)Godot.KeyList.Space))
-		{
-			_overallMessageControll.Visible = false;
-			lblMessage = false;
-		}
-
-		if (_gameControl.Visible && Input.IsKeyPressed((int)Godot.KeyList.Tab))
-		{
-			_setMapMode(MiniMap.MapMode.BIGMAP);
-		}
-		else if (_gameControl.Visible)
-		{
-			_setMapMode(MiniMap.MapMode.MINIMAP);
-		}
+        if (_gameControl.Visible && Input.IsKeyPressed((int)Godot.KeyList.Tab))
+        {
+            _setMapMode(MiniMap.MapMode.BIGMAP);
+        }
+        else if (_gameControl.Visible)
+        {
+            _setMapMode(MiniMap.MapMode.MINIMAP);
+        }
 
 
-		// COmment out for now as part of test
-		//if (!_characterDialog.Visible && Input.IsKeyPressed((int)Godot.KeyList.Space))
-		// {
-		//     _characterDialog.Activate();
-		// }
-	}
+        // COmment out for now as part of test
+        //if (!_characterDialog.Visible && Input.IsKeyPressed((int)Godot.KeyList.Space))
+        // {
+        //     _characterDialog.Activate();
+        // }
+    }
 
 }

@@ -248,7 +248,7 @@ public class AgentSpawnManager : Node
 			// If this is the time allow user config, notify unit's owner
 			if (agentSpawnInfo.Delay == UNIT_CONFIG_TIME)
 			{
-				EmitSignal(nameof(AgentConfigSignal), agentSpawnInfo.UnitId);
+				EmitSignal(nameof(AgentConfigSignal), agentSpawnInfo.UnitId, agentSpawnInfo.Team);
 			}
 
 			// Count down the time

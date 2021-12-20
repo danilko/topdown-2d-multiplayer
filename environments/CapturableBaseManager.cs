@@ -20,11 +20,28 @@ public class CapturableBaseManager : Node
     {
         _gameWorld = gameWorld;
 
+        int index = 0;
+
         foreach(CapturableBase capturableBase in GetChildren())
         {
             _bases.Add(capturableBase);
-            capturableBase.Initialize(_gameWorld);
+            capturableBase.Initialize(_gameWorld, index);
+            index++;
         }
     }
 
+    public List <CapturableBase> GetAvailableBases(Team.TeamCode teamCode)
+    {
+        List <CapturableBase> baseList = new List<CapturableBase>();
+
+       foreach(CapturableBase capturableBase in GetChildren())
+        {
+            if(capturableBase.GetCaptureBaseTeam() == teamCode)
+            {
+                baseList.Add(capturableBase);
+            }
+        }
+
+        return baseList;
+    }
 }
