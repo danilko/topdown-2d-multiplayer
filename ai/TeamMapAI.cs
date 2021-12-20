@@ -219,7 +219,8 @@ public class TeamMapAI : Node2D
     private void _onAgentConfig(String unitID, Team.TeamCode teamCode)
     {
         // It is not for this team, just ignore it
-        if (teamCode != _team.CurrentTeamCode)
+        // If it is player, also ignore it (only make decision for AI)
+        if (teamCode != _team.CurrentTeamCode || unitID.Contains(AgentSpawnManager.AgentPlayerPrefix))
         {
             return;
         }
