@@ -1,0 +1,55 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ui/Settings.tscn" type="PackedScene" id=1]
+[ext_resource path="res://ui/InGameControlUI.cs" type="Script" id=2]
+
+[node name="InGameControlUI" type="Popup"]
+visible = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+modulate = Color( 1, 1, 1, 0.576471 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.239216, 0.239216, 0.239216, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+custom_constants/separation = 50
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MenuLabel" type="Label" parent="VBoxContainer"]
+margin_right = 1004.0
+margin_bottom = 14.0
+text = "MENU"
+align = 1
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer"]
+margin_top = 64.0
+margin_right = 1004.0
+margin_bottom = 84.0
+text = "SETTINGS"
+
+[node name="ExitButton" type="Button" parent="VBoxContainer"]
+margin_top = 134.0
+margin_right = 1004.0
+margin_bottom = 154.0
+custom_constants/hseparation = 50
+text = "EXIT GAME"
+
+[node name="Settings" parent="." instance=ExtResource( 1 )]
+
+[connection signal="pressed" from="VBoxContainer/SettingsButton" to="." method="_onEnableSettingUI"]
+[connection signal="pressed" from="VBoxContainer/ExitButton" to="." method="_onExitGame"]

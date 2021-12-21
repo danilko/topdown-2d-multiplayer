@@ -60,6 +60,7 @@
     <Compile Include="inventory\InventoryDatabase.cs" />
     <Compile Include="environments\AgentSpawnManager.cs" />
     <Compile Include="ui\CharacterDialog.cs" />
+    <Compile Include="ui\InGameControlUI.cs" />
     <Compile Include="ui\InventoryUI.cs" />
     <Compile Include="ui\ItemPanel.cs" />
     <Compile Include="ui\MiniMap.cs" />

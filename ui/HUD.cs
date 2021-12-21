@@ -23,7 +23,8 @@ public class HUD : CanvasLayer
 
     private Label _timerTickLabel;
 
-	private UnitLaunchSetupUI _unitLaunchSetupUI;
+    private UnitLaunchSetupUI _unitLaunchSetupUI;
+    private InGameControlUI _inGameControlUI;
 
     public override void _Ready()
     {
@@ -42,7 +43,9 @@ public class HUD : CanvasLayer
         _miniMap = (MiniMap)GetNode("MiniMap");
         _popUpMessage = (PopUpMessage)GetNode("PopUpMessage");
 
-		_unitLaunchSetupUI = (UnitLaunchSetupUI)GetNode("UnitLaunchSetupUI");
+        _unitLaunchSetupUI = (UnitLaunchSetupUI)GetNode("UnitLaunchSetupUI");
+
+        _inGameControlUI = (InGameControlUI)GetNode("InGameControlUI");
     }
 
     public void Initailize(GameWorld gameWorld)
@@ -53,7 +56,7 @@ public class HUD : CanvasLayer
 
         _miniMap.Iniitialize(gameWorld);
 
-		_unitLaunchSetupUI.Initalize(_gameWorld, _miniMap);
+        _unitLaunchSetupUI.Initalize(_gameWorld, _miniMap);
         //_postProcess = (PostProcess)GetNode("PostProcess");
 
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.PlayerDefeatedSignal), this, nameof(_onPlayerDefeated));
@@ -62,6 +65,8 @@ public class HUD : CanvasLayer
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentCreatedSignal), this, nameof(_onAgentCreated));
 
         _gameWorld.GetAgentSpawnManager().Connect(nameof(AgentSpawnManager.AgentConfigSignal), this, nameof(_onAgentConfig));
+
+        _inGameControlUI.Initialize(_gameWorld);
 
         // Simulation will not have HUD
         if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
@@ -74,11 +79,17 @@ public class HUD : CanvasLayer
 
     private void _onAgentConfig(String unitID, Team.TeamCode teamCode)
     {
+        // If simulation, no need to setup
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+        {
+            return;
+        }
+
         if (unitID.Contains(AgentSpawnManager.AgentPlayerPrefix) &&
         int.Parse(unitID.Replace(AgentSpawnManager.AgentPlayerPrefix, "")) == _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id)
         {
             _setMapMode(MiniMap.MapMode.BIGMAP_SELECT);
-			_unitLaunchSetupUI.EnableSetup(unitID, teamCode);
+            _unitLaunchSetupUI.EnableSetup(unitID, teamCode);
         }
     }
 
@@ -194,6 +205,18 @@ public class HUD : CanvasLayer
         else if (_gameControl.Visible)
         {
             _setMapMode(MiniMap.MapMode.MINIMAP);
+        }
+
+        
+        if (!_inGameControlUI.Visible && Input.IsActionJustReleased("ui_cancel") && _gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION)
+        {
+            Input.SetMouseMode(Input.MouseMode.Visible);
+            _inGameControlUI.PopupCentered();
+        }
+        else if (_inGameControlUI.Visible && Input.IsActionJustReleased("ui_cancel"))
+        {
+            Input.SetMouseMode(Input.MouseMode.Hidden);
+            _inGameControlUI.Hide();
         }
 
 

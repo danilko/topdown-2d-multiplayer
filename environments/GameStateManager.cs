@@ -46,7 +46,7 @@ public class GameStateManager : Node
 
     private void _onGameExit()
     {
-        _gamestates.restart();
+        _gamestates.EnterTitleScreen();
     }
 
     private void _onPlayerRemoved(int playerId)
@@ -130,8 +130,8 @@ public class GameStateManager : Node
                         moveDir.x -= input.Value.Left;
                         moveDir.x += input.Value.Right;
 
-                        playerNode.changeWeapon(input.Value.RightWeaponIndex, Weapon.WeaponOrder.Right);
-                        playerNode.changeWeapon(input.Value.LeftWeaponIndex, Weapon.WeaponOrder.Left);
+                        playerNode.ChangeWeapon(input.Value.RightWeaponIndex, Weapon.WeaponOrder.Right);
+                        playerNode.ChangeWeapon(input.Value.LeftWeaponIndex, Weapon.WeaponOrder.Left);
 
                         if (isGamingPeriod)
                         {
@@ -282,8 +282,8 @@ public class GameStateManager : Node
             return;
         }
 
-        agent.changeWeapon(item.RightWeaponIndex, Weapon.WeaponOrder.Right);
-        agent.changeWeapon(item.LeftWeaponIndex, Weapon.WeaponOrder.Left);
+        agent.ChangeWeapon(item.RightWeaponIndex, Weapon.WeaponOrder.Right);
+        agent.ChangeWeapon(item.LeftWeaponIndex, Weapon.WeaponOrder.Left);
 
         agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.LeftWeapon);
         agent.setHealth(item.Health);

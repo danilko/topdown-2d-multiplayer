@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://ui/WeaponControl.tscn" type="PackedScene" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://ui/UnitLaunchBaseSelectPanel.cs" type="Script" id=10]
 [ext_resource path="res://ui/InventoryUI.tscn" type="PackedScene" id=11]
 [ext_resource path="res://ui/UnitLaunchSetupUI.cs" type="Script" id=12]
+[ext_resource path="res://ui/InGameControlUI.tscn" type="PackedScene" id=13]
 
 [sub_resource type="DynamicFont" id=1]
 size = 15
@@ -263,6 +264,8 @@ text = "CONFIRM"
 
 [node name="SelectionTimer" type="Timer" parent="UnitLaunchSetupUI"]
 one_shot = true
+
+[node name="InGameControlUI" parent="." instance=ExtResource( 13 )]
 
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel/BaseButton" to="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel" method="SelectBase"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/ConfirmButton" to="UnitLaunchSetupUI" method="_confirmSelection"]

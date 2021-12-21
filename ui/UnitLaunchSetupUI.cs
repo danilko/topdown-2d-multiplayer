@@ -56,8 +56,6 @@ public class UnitLaunchSetupUI : Popup
             // Add panel to dictionary
             _basePanels.Add(capturableBase.Name, basePanel);
         }
-
-        _timer.Start();
     }
 
     public void EnableSetup(String unitID, Team.TeamCode teamCode)
@@ -69,6 +67,8 @@ public class UnitLaunchSetupUI : Popup
 
         Visible = true;
         Input.SetMouseMode(Input.MouseMode.Visible);
+
+        _timer.Start();
     }
 
     public void UpdateBaseSelection()

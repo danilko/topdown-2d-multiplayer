@@ -182,7 +182,7 @@ public class Agent : KinematicBody2D
         return CurrentWeaponIndex[weaponOrder];
     }
 
-    public virtual void changeWeapon(int weaponIndex, Weapon.WeaponOrder weaponOrder)
+    public virtual void ChangeWeapon(int weaponIndex, Weapon.WeaponOrder weaponOrder)
     {
         weaponIndex = Mathf.Abs(weaponIndex);
         List<Weapon> weapons = GetWeapons(weaponOrder);
@@ -292,7 +292,7 @@ public class Agent : KinematicBody2D
         // If it is current weapon, then perform weapon change
         if (index == CurrentWeaponIndex[weaponOrder])
         {
-            changeWeapon(index, weaponOrder);
+            ChangeWeapon(index, weaponOrder);
         }
 
         return true;

@@ -415,6 +415,10 @@ public class TeamMapAI : Node2D
             _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-600"), Weapon.WeaponOrder.Right, 0);
             _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-800"), Weapon.WeaponOrder.Left, 0);
         }
+
+        // Add short range weapon
+        _inventoryManager.AddItem(_inventoryManager.GetPurchasableItemByID("SYC-200"), agent.GetInventory());
+        _inventoryManager.EquipItem(agent.GetInventory(), agent.GetInventory().GetItemIndex("SYC-200"), Weapon.WeaponOrder.Left, 1);
     }
 
 

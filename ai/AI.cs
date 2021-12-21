@@ -53,7 +53,7 @@ public class AI : Node2D
 
 
     private Vector2 _engagePositionOrign;
-    private Boolean _engagePOsitionSet;
+    private Boolean _engagePositionSet;
 
     private RandomNumberGenerator _random;
 
@@ -84,7 +84,7 @@ public class AI : Node2D
         SetState(State.PATROL);
 
         _engagePositionOrign = Vector2.Zero;
-        _engagePOsitionSet = false;
+        _engagePositionSet = false;
     }
 
     private void _setPathLine(List<Vector2> points)
@@ -141,6 +141,12 @@ public class AI : Node2D
         if (newState == State.ADVANCE)
         {
             _patrolOrigin = _nextBasePosition;
+        }
+
+        // Default all state will change to weapon 0
+        if (_agent.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left) != 0)
+        {
+            _agent.ChangeWeapon(0, Weapon.WeaponOrder.Left);
         }
 
         _currentState = newState;
@@ -230,6 +236,12 @@ public class AI : Node2D
 
                 if (_targetAgent != null && IsInstanceValid(_targetAgent))
                 {
+                    // Default all state will change to weapon 0 for long range
+                    if (_agent.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left) != 0)
+                    {
+                        _agent.ChangeWeapon(0, Weapon.WeaponOrder.Left);
+                    }
+
                     _agent.RotateToward(_targetAgent.GlobalPosition, delta);
 
                     // Calculate rotation
@@ -243,8 +255,13 @@ public class AI : Node2D
                     }
 
                     // Chanse engaged agent closer if possible
-                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 150.0f)
+                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 250.0f)
                     {
+                        if (_agent.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left) != 0)
+                        {
+                            _agent.ChangeWeapon(0, Weapon.WeaponOrder.Left);
+                        }
+
                         // If wait for Path
                         if (_pathRequestState == PathRequestState.NONE)
                         {
@@ -279,14 +296,21 @@ public class AI : Node2D
                             SetState(State.PATROL);
                             _pathLine.ClearPoints();
                         }
+
                     }
                     else
                     {
+                        // Default all state will change to weapon 0
+                        if (_agent.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left) != 1)
+                        {
+                            _agent.ChangeWeapon(1, Weapon.WeaponOrder.Left);
+                        }
+
                         // Random position in current position to avoid being hit
-                        if (!_engagePOsitionSet)
+                        if (!_engagePositionSet)
                         {
                             _engagePositionOrign = _agent.GlobalPosition;
-                            _engagePOsitionSet = true;
+                            _engagePositionSet = true;
                         }
 
                         Vector2 randomPosition = new Vector2(_engagePositionOrign.x + _random.RandfRange(20.0f, -20.0f), _engagePositionOrign.y + _random.RandfRange(20.0f, -20.0f));
@@ -298,6 +322,11 @@ public class AI : Node2D
                 break;
 
             case State.ADVANCE:
+
+                if (_agent.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left) != 0)
+                {
+                    _agent.ChangeWeapon(0, Weapon.WeaponOrder.Left);
+                }
 
                 // If wait for Path
                 if (_pathRequestState == PathRequestState.NONE)

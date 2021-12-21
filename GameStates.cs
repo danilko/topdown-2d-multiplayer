@@ -79,14 +79,6 @@ public class GameStates : Node
         GetTree().ChangeScene(endResultScreen);
     }
 
-    public void restart()
-    {
-        Input.SetMouseMode(Input.MouseMode.Visible);
-        current_level = 0;
-        GetTree().CurrentScene.QueueFree();
-        GetTree().ChangeScene(levels[current_level]);
-    }
-
     public void EnterLobbyScreen()
     {
         _gameType = GameType.MULTI_PLAYER;
