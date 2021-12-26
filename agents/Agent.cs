@@ -194,7 +194,7 @@ public class Agent : KinematicBody2D
 
         Weapon currentWeapon = ((Weapon)weapons[originalWeaponIndex]);
 
-        if (currentWeapon != null)
+        if (currentWeapon != null && IsInstanceValid(currentWeapon))
         {
             DisconnectWeapon(currentWeapon, weaponOrder);
         }
@@ -203,12 +203,12 @@ public class Agent : KinematicBody2D
         currentWeapon = ((Weapon)weapons[CurrentWeaponIndex[weaponOrder]]);
 
 
-        if (currentWeapon != null)
+        if (currentWeapon != null && IsInstanceValid(currentWeapon))
         {
             ConnectWeapon(currentWeapon, weaponOrder);
 
             // This is re-click, no need to submit signal
-            if(originalWeaponIndex != weaponIndex)
+            if (originalWeaponIndex != weaponIndex)
             {
                 EmitSignal(nameof(WeaponChangeSignal), CurrentInventory.GetItems()[CurrentInventory.GetEquipItemIndex(weaponOrder, weaponIndex)], weaponOrder, weaponIndex);
             }
@@ -220,7 +220,7 @@ public class Agent : KinematicBody2D
         {
 
             // This is re-click, no need to submit signal
-            if(originalWeaponIndex != weaponIndex)
+            if (originalWeaponIndex != weaponIndex)
             {
                 EmitSignal(nameof(WeaponChangeSignal), null, weaponOrder, weaponIndex);
             }
@@ -229,7 +229,7 @@ public class Agent : KinematicBody2D
 
     protected virtual void DisconnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
-        if (currentWeapon != null)
+        if (currentWeapon != null && IsInstanceValid(currentWeapon))
         {
             currentWeapon.EquipWeapon(false);
             currentWeapon.Hide();
@@ -238,7 +238,7 @@ public class Agent : KinematicBody2D
 
     protected virtual void ConnectWeapon(Weapon currentWeapon, Weapon.WeaponOrder weaponOrder)
     {
-        if (currentWeapon != null)
+        if (currentWeapon != null && IsInstanceValid(currentWeapon))
         {
             currentWeapon.EquipWeapon(true);
 
@@ -247,9 +247,10 @@ public class Agent : KinematicBody2D
             {
                 currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal), weaponOrder);
             }
-        }
 
-        currentWeapon.Show();
+
+            currentWeapon.Show();
+        }
     }
 
     public Boolean HasReachedPosition(Vector2 targetPosition)

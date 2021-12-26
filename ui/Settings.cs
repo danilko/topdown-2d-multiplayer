@@ -6,17 +6,36 @@ public class Settings : Popup
     AudioManager _audioManager;
     HScrollBar _soundVolume;
 
+    private Input.MouseMode _previousMouseState;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         _audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         _soundVolume = (HScrollBar)GetNode("CenterContainer/VBoxContainer/SoundVolumeSetting");
 
+        _previousMouseState = Input.MouseMode.Hidden;
     }
 
-    public void Initialize()
+    public void Activate(Boolean activate)
     {
-        _initializeSoundVolume();
+        // Enable mouse
+        if(activate)
+        { 
+            _initializeSoundVolume();
+            _previousMouseState = Input.GetMouseMode();
+            // Enable mouse for selecting item
+            Input.SetMouseMode(Input.MouseMode.Visible);
+            // Use exclusive to force user must use command to close instead of random click in game screen cause unexpected weapon firing
+            PopupExclusive = true;
+            PopupCentered();
+        }
+        else
+        {
+            // Enable mouse for selecting item
+            Input.SetMouseMode(_previousMouseState);
+            Hide();
+        }
     }
 
     private void _initializeSoundVolume()
@@ -31,6 +50,6 @@ public class Settings : Popup
 
     private void _onClosePressed()
     {
-        this.Hide();
+        Activate(false);
     }
 }

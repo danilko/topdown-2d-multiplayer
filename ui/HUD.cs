@@ -190,7 +190,7 @@ public class HUD : CanvasLayer
 
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _Process(float delta)
     {
         if (lblMessage && Input.IsKeyPressed((int)Godot.KeyList.Space))
         {
@@ -208,15 +208,10 @@ public class HUD : CanvasLayer
         }
 
         
-        if (!_inGameControlUI.Visible && Input.IsActionJustReleased("ui_cancel") && _gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION)
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION 
+            && Input.IsActionJustReleased("ui_cancel"))
         {
-            Input.SetMouseMode(Input.MouseMode.Visible);
-            _inGameControlUI.PopupCentered();
-        }
-        else if (_inGameControlUI.Visible && Input.IsActionJustReleased("ui_cancel"))
-        {
-            Input.SetMouseMode(Input.MouseMode.Hidden);
-            _inGameControlUI.Hide();
+            _inGameControlUI.Activate(!_inGameControlUI.Visible);
         }
 
 

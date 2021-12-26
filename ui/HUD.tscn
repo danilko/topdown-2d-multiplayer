@@ -59,8 +59,8 @@ margin_left = 25.0
 margin_top = 565.0
 margin_right = 322.0
 margin_bottom = 590.0
-custom_fonts/font = SubResource( 1 )
 custom_colors/font_color = Color( 0.588235, 1, 0.356863, 1 )
+custom_fonts/font = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -101,10 +101,10 @@ margin_right = 1026.0
 margin_bottom = 363.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
-custom_fonts/font = SubResource( 3 )
 custom_colors/font_color = Color( 1, 0, 0, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 3 )
 text = "YOU ARE ELIMINATED"
 align = 1
 valign = 1
@@ -266,7 +266,9 @@ text = "CONFIRM"
 one_shot = true
 
 [node name="InGameControlUI" parent="." instance=ExtResource( 13 )]
+visible = false
 
+[connection signal="focus_entered" from="UnitLaunchSetupUI" to="UnitLaunchSetupUI" method="_onFocusEntered"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel/BaseButton" to="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel" method="SelectBase"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/ConfirmButton" to="UnitLaunchSetupUI" method="_confirmSelection"]
 [connection signal="timeout" from="UnitLaunchSetupUI/SelectionTimer" to="UnitLaunchSetupUI" method="_confirmSelection"]

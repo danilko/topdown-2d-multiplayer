@@ -57,7 +57,7 @@ public class UnitLaunchSetupUI : Popup
             _basePanels.Add(capturableBase.Name, basePanel);
         }
     }
-
+    
     public void EnableSetup(String unitID, Team.TeamCode teamCode)
     {
         _unitID = unitID;

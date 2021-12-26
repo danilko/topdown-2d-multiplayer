@@ -44,6 +44,9 @@ public class PathFinding : Node2D
 
     private List<PathRequest> _pathRequestList;
 
+    // Test count, 3 seem to be more stable with 40 AI
+    private int _processedPathRequestsPerCheck = 3;
+
     // Debug flag
     private bool debug = false;
 
@@ -240,22 +243,32 @@ public class PathFinding : Node2D
         _pathRequestList.RemoveAll(pathRequest => pathRequest.Agent == null || !IsInstanceValid(pathRequest.Agent));
     }
 
-    // Check queue periodically and process one request at a time to not slow down whole game
+    // Check queue periodically and process fixed request at a time to not slow down whole game
     private void _checkPathRequestQueue()
     {
         _cleanUpPathRequestList();
 
-    
-        if (_pathRequestList.Count > 0)
+
+        // Processed through fixed path request count
+        // This allow large amount of AI requests to be processed without "slow" down AI movement
+        for (int index = 0; index < _processedPathRequestsPerCheck; index++)
         {
-            PathRequest pathRequest = _pathRequestList[0];
-
-            _pathRequestList.RemoveAt(0);
-
-            if (pathRequest.Agent != null && IsInstanceValid(pathRequest.Agent))
+            if (_pathRequestList.Count > 0)
             {
-                List<Vector2> pathPoints = _getPath(pathRequest.Source, pathRequest.Target);
-                ((AIAgent)pathRequest.Agent).GetAI().SetPathResult(pathPoints);
+                PathRequest pathRequest = _pathRequestList[0];
+
+                _pathRequestList.RemoveAt(0);
+
+                if (pathRequest.Agent != null && IsInstanceValid(pathRequest.Agent))
+                {
+                    List<Vector2> pathPoints = _getPath(pathRequest.Source, pathRequest.Target);
+                    ((AIAgent)pathRequest.Agent).GetAI().SetPathResult(pathPoints);
+                }
+            }
+            else
+            {
+                // No need to loop through as there is no more request
+                break;
             }
         }
 
