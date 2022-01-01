@@ -356,9 +356,7 @@ public class AI : Node2D
                     if (_agent.HasReachedPosition(nextPoint))
                     {
                         // Search for next path
-                        //_resetPath();
-
-                        _pathPoints.RemoveAt(1);
+                        _resetPath();
                     }
                 }
                 else
