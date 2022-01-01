@@ -40,12 +40,12 @@ public class PathFinding : Node2D
     private float UpdateTraversableTilesTime = 10.0f;
 
     [Export]
-    private float UpdatePathRequestTime = 0.01f;
+    private float UpdatePathRequestTime = 0.05f;
 
     private List<PathRequest> _pathRequestList;
 
-    // Test count, 3 seem to be more stable with 40 AI
-    private int _processedPathRequestsPerCheck = 3;
+    // Maximum timeframe per execution
+    private int _maximumProcessMilliseconds = 30;
 
     // Debug flag
     private bool debug = false;
@@ -248,10 +248,10 @@ public class PathFinding : Node2D
     {
         _cleanUpPathRequestList();
 
+        int overallProcessMilliseconds = 0;
 
-        // Processed through fixed path request count
-        // This allow large amount of AI requests to be processed without "slow" down AI movement
-        for (int index = 0; index < _processedPathRequestsPerCheck; index++)
+        // Will process as long as overall process time is less than max time
+        while (overallProcessMilliseconds < _maximumProcessMilliseconds)
         {
             if (_pathRequestList.Count > 0)
             {
@@ -261,8 +261,14 @@ public class PathFinding : Node2D
 
                 if (pathRequest.Agent != null && IsInstanceValid(pathRequest.Agent))
                 {
+                    DateTime startTime = DateTime.UtcNow;
                     List<Vector2> pathPoints = _getPath(pathRequest.Source, pathRequest.Target);
                     ((AIAgent)pathRequest.Agent).GetAI().SetPathResult(pathPoints);
+                    DateTime finishTime = DateTime.UtcNow;
+
+                    overallProcessMilliseconds += (int)finishTime.Subtract(startTime).TotalMilliseconds;
+                    // Debug only
+                    //GD.Print("PROCESSING ASTAR: " + overallProcessMilliseconds + " WITH STEPS: " + pathPoints.Count); 
                 }
             }
             else
@@ -271,9 +277,6 @@ public class PathFinding : Node2D
                 break;
             }
         }
-
-        // Start timer again afterward
-        _updatePathRequestTimer.Start();
     }
 
     private List<Vector2> _getPath(Vector2 source, Vector2 target)

@@ -288,7 +288,8 @@ public class AI : Node2D
                             if (_agent.HasReachedPosition(nextPoint))
                             {
                                 // Search for next path
-                                _resetPath();
+                                // _resetPath();
+                                _pathPoints.RemoveAt(1);
                             }
                         }
                         else
@@ -355,7 +356,9 @@ public class AI : Node2D
                     if (_agent.HasReachedPosition(nextPoint))
                     {
                         // Search for next path
-                        _resetPath();
+                        //_resetPath();
+
+                        _pathPoints.RemoveAt(1);
                     }
                 }
                 else
