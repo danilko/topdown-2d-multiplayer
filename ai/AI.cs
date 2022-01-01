@@ -255,13 +255,8 @@ public class AI : Node2D
                     }
 
                     // Chanse engaged agent closer if possible
-                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 250.0f)
+                    if (_agent.GlobalPosition.DistanceTo(_targetAgent.GlobalPosition) > 180.0f)
                     {
-                        if (_agent.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left) != 0)
-                        {
-                            _agent.ChangeWeapon(0, Weapon.WeaponOrder.Left);
-                        }
-
                         // If wait for Path
                         if (_pathRequestState == PathRequestState.NONE)
                         {
@@ -293,8 +288,7 @@ public class AI : Node2D
                         }
                         else
                         {
-                            SetState(State.PATROL);
-                            _pathLine.ClearPoints();
+                            _resetPath();
                         }
 
                     }
