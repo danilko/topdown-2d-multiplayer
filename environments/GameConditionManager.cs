@@ -67,33 +67,37 @@ public class GameConditionManager : Node
         }
 
 
-        if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
+        // Will not generate player under simulation
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION)
         {
-            foreach (KeyValuePair<int, NetworkPlayer> item in _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers)
+            if (GetTree().NetworkPeer != null && GetTree().IsNetworkServer())
             {
-                String unitId = AgentSpawnManager.AgentPlayerPrefix + item.Value.net_id;
-                Team.TeamCode team = (Team.TeamCode)item.Value.team;
+                foreach (KeyValuePair<int, NetworkPlayer> item in _gameWorld.GetNetworkSnasphotManager().GetNetwork().networkPlayers)
+                {
+                    String unitId = AgentSpawnManager.AgentPlayerPrefix + item.Value.net_id;
+                    Team.TeamCode team = (Team.TeamCode)item.Value.team;
 
-                String displayName = item.Value.name;
+                    String displayName = item.Value.name;
 
-                teamMemberDictionary[(int)item.Value.team] += 1;
+                    teamMemberDictionary[(int)item.Value.team] += 1;
 
-                _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
+                    _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
 
+                }
             }
-        }
-        else if (GetTree().NetworkPeer == null)
-        {
-            if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION)
+            else if (GetTree().NetworkPeer == null)
             {
-                String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
-                Team.TeamCode team = (Team.TeamCode)0;
+                if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION)
+                {
+                    String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
+                    Team.TeamCode team = (Team.TeamCode)0;
 
-                String displayName = "Player_" + 1;
+                    String displayName = "Player_" + 1;
 
-                teamMemberDictionary[0] += 1;
+                    teamMemberDictionary[0] += 1;
 
-                _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
+                    _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
+                }
             }
         }
 
@@ -102,16 +106,16 @@ public class GameConditionManager : Node
 
         foreach (TeamMapAI currentAI in _teamMapAIManager.GetTeamMapAIs())
         {
-            if (currentAI.GetAutoSpawnMember() && CheckIfCanSpawn(currentAI.GetTeam()))
+            if (currentAI.GetAIControl() && CheckIfCanSpawn(currentAI.GetTeam()))
             {
 
                 int teamPlayers = currentAI.GetTeamTotalUnitCount() - teamMemberDictionary[(int)currentAI.GetTeam()];
 
-        // If it is simulation, only did 1
-        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
-        {
-            teamPlayers = 1;
-        }
+                // If it is simulation, only did 1
+                if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+                {
+                    teamPlayers = 1;
+                }
 
                 for (int index = 0; index < teamPlayers; index++)
                 {

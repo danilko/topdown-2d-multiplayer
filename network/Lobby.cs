@@ -10,7 +10,7 @@ public class Lobby : Control
 
     private GameModeState gameModeState;
 
-    private OptionButton playerTeams;
+    private OptionButton _playerTeams;
 
     private List<TeamMapAISetting> _teamMapAISettings;
     private GridContainer _gridcontainerTeamManagement;
@@ -45,7 +45,7 @@ public class Lobby : Control
 
         _gridcontainerTeamManagement = (GridContainer)_host.GetNode("MarginContainerTeamManagement/ScrollContainerTeamManagement/GridContainerTeamManagement");
 
-        playerTeams = (OptionButton)_player.GetNode("optPlayerTeam");
+        _playerTeams = (OptionButton)_player.GetNode("optPlayerTeam");
 
         _teamMapAISettings = new List<TeamMapAISetting>();
 
@@ -55,23 +55,23 @@ public class Lobby : Control
     private void setPlayerInfo()
     {
         _network.gamestateNetworkPlayer.name = ((LineEdit)GetNode("Player/txtPlayerName")).Text;
-        _network.gamestateNetworkPlayer.team = playerTeams.Selected;
+        _network.gamestateNetworkPlayer.team = _playerTeams.Selected;
     }
 
     private void _populatePlayerTeams()
     {
-        playerTeams.Connect("item_selected", this, "_playerTeamSelected");
+        _playerTeams.Connect("item_selected", this, "_playerTeamSelected");
 
         for (int index = 0; index < (int)(Team.TeamCode.NEUTRAL); index++)
         {
             Team.TeamCode team = (Team.TeamCode)index;
-            playerTeams.AddItem("" + team);
+            _playerTeams.AddItem("" + team);
 
             _populateTeamSettings(team);
         }
 
         // Pre Select the 0 index
-        playerTeams.Select(0);
+        _playerTeams.Select(0);
         _playerTeamSelected(0);
     }
 
@@ -85,8 +85,9 @@ public class Lobby : Control
 
         TeamMapAISetting teamMapAISetting = new TeamMapAISetting();
         teamMapAISetting.TeamCode = team;
+        teamMapAISetting.TeamAILevel = teamSettingPanel.GetAILevel();
         teamMapAISetting.Budget = teamSettingPanel.GetTeamBudget();
-        teamMapAISetting.AutoSpawnMember = teamSettingPanel.GetTeamAutoSpawnMember();
+        teamMapAISetting.AIControl = teamSettingPanel.GetTeamAIControl();
         teamMapAISetting.TotalUnitCount = teamSettingPanel.GetTeamTotalUnitCount();
         _teamMapAISettings.Add(teamMapAISetting);
     }
@@ -135,8 +136,9 @@ public class Lobby : Control
         foreach (TeamSettingPanel teamSettingPanel in _gridcontainerTeamManagement.GetChildren())
         {
             TeamMapAISetting teamMapAISetting = _teamMapAISettings[(int)teamSettingPanel.GetTeamCode()];
+            teamMapAISetting.TeamAILevel = teamSettingPanel.GetAILevel();
             teamMapAISetting.Budget = teamSettingPanel.GetTeamBudget();
-            teamMapAISetting.AutoSpawnMember = teamSettingPanel.GetTeamAutoSpawnMember();
+            teamMapAISetting.AIControl = teamSettingPanel.GetTeamAIControl();
             teamMapAISetting.TotalUnitCount = teamSettingPanel.GetTeamTotalUnitCount();
         }
 

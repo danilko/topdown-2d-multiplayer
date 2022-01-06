@@ -5,7 +5,8 @@ public class TeamSettingPanel : Panel
 {
     private SpinBox _spinBoxBudget;
     private SpinBox _spinBoxTotalCount;
-    private CheckBox _checkboxAutoSpawnMember;
+    private CheckBox _checkboxAIControl;
+    private OptionButton _optionsAILevel;
 
     private Team.TeamCode _teamCode;
 
@@ -13,7 +14,8 @@ public class TeamSettingPanel : Panel
     {
         _spinBoxBudget = (SpinBox)GetNode("SpinBoxTeamBudget");
         _spinBoxTotalCount = (SpinBox)GetNode("SpinBoxTotalUnitCount");
-        _checkboxAutoSpawnMember = (CheckBox)GetNode("CheckBoxAutoSapwnMembers");
+        _checkboxAIControl = (CheckBox)GetNode("CheckBoxAIControl");
+        _optionsAILevel = (OptionButton)GetNode("OptAILevel");
     }
 
     public void Initialize(Team.TeamCode teamCode)
@@ -25,6 +27,20 @@ public class TeamSettingPanel : Panel
 
         Label labelTeamName = (Label)GetNode("LabelTeamName");
         labelTeamName.Text = "" + _teamCode;
+
+        _populateTeamAILevels();
+    }
+
+    private void _populateTeamAILevels()
+    {
+        for (int index = 0; index <= (int)(TeamMapAISetting.AILevel.STRONG); index++)
+        {
+            TeamMapAISetting.AILevel aiLevel = (TeamMapAISetting.AILevel)index;
+            _optionsAILevel.AddItem("" + aiLevel, index);
+        }
+
+        // Pre Select the 0 index
+        _optionsAILevel.Select(0);
     }
 
     public Team.TeamCode GetTeamCode()
@@ -32,14 +48,19 @@ public class TeamSettingPanel : Panel
         return _teamCode;
     }
 
+    public TeamMapAISetting.AILevel GetAILevel()
+    {
+        return (TeamMapAISetting.AILevel)_optionsAILevel.Selected;
+    }
+
     public int GetTeamBudget()
     {
         return (int)_spinBoxBudget.Value;
     }
 
-    public bool GetTeamAutoSpawnMember()
+    public bool GetTeamAIControl()
     {
-        return _checkboxAutoSpawnMember.Pressed;
+        return _checkboxAIControl.Pressed;
     }
 
     public int GetTeamTotalUnitCount()

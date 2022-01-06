@@ -187,10 +187,13 @@ __meta__ = {
 
 [node name="PanelTeamSetting" type="Panel" parent="Host"]
 visible = false
-margin_right = 900.0
+margin_right = 960.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 900, 50 )
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TextrectTeam" type="TextureRect" parent="Host/PanelTeamSetting"]
 margin_left = 27.7983
@@ -228,21 +231,49 @@ __meta__ = {
 [node name="LabelAutoSapwnMembers" type="Label" parent="Host/PanelTeamSetting"]
 margin_left = 384.0
 margin_top = 14.0
-margin_right = 542.0
+margin_right = 480.0
 margin_bottom = 28.0
 rect_pivot_offset = Vector2( 30.2927, 7 )
-text = "AUTO SPAWN MEMBERS:"
+text = "AI CONTROL"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LabelTotalUnitCount" type="Label" parent="Host/PanelTeamSetting"]
-margin_left = 592.0
+[node name="LabelUnitCount" type="Label" parent="Host/PanelTeamSetting"]
+margin_left = 713.0
 margin_top = 14.0
-margin_right = 750.0
+margin_right = 809.0
 margin_bottom = 28.0
 rect_pivot_offset = Vector2( 30.2927, 7 )
-text = "TOTAL UNIT COUNT:"
+text = "UNIT COUNT:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelUnitCount2" type="Label" parent="Host/PanelTeamSetting"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 54.0
+margin_top = -10.0
+margin_right = 116.0
+margin_bottom = 4.0
+rect_pivot_offset = Vector2( 30.2927, 7 )
+text = "AI Level"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OptAILevel" type="OptionButton" parent="Host/PanelTeamSetting"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 122.0
+margin_top = -13.0
+margin_right = 218.0
+margin_bottom = 7.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -259,19 +290,19 @@ __meta__ = {
 }
 
 [node name="SpinBoxTotalUnitCount" type="SpinBox" parent="Host/PanelTeamSetting"]
-margin_left = 752.0
+margin_left = 817.0
 margin_top = 8.0
-margin_right = 826.0
+margin_right = 891.0
 margin_bottom = 32.0
 value = 3.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CheckBoxAutoSapwnMembers" type="CheckBox" parent="Host/PanelTeamSetting"]
-margin_left = 544.0
+[node name="CheckBoxAIControl" type="CheckBox" parent="Host/PanelTeamSetting"]
+margin_left = 481.0
 margin_top = 7.90778
-margin_right = 568.0
+margin_right = 505.0
 margin_bottom = 31.9078
 pressed = true
 

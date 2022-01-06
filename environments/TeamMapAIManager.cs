@@ -39,8 +39,9 @@ public class TeamMapAIManager : Node
             if (teamMapAISettings != null)
             {
                 ai.SetMaxUnitUsageAmount(teamMapAISettings[index].Budget);
-                ai.SetAutoSpawnMember(teamMapAISettings[index].AutoSpawnMember);
+                ai.SetAIControl(teamMapAISettings[index].AIControl);
                 ai.SetTeamInitialUnitCount(teamMapAISettings[index].TotalUnitCount);
+                ai.SetTeamAILevel(teamMapAISettings[index].TeamAILevel);
             }
 
             _teamMapAIs.Add(ai);

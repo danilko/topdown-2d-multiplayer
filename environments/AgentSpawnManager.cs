@@ -10,10 +10,12 @@ public class AgentSpawnInfo : Godot.Object
     public String DisplayName { get; set; }
     public int Delay { get; set; }
     public int CaptureBaseIndex { get; set; }
+    public int WeaponSetupIndex { get; set; }
 
     public AgentSpawnInfo()
     {
         CaptureBaseIndex = -1;
+        WeaponSetupIndex = 0;
     }
 }
 
@@ -136,43 +138,52 @@ public class AgentSpawnManager : Node
         }
     }
 
-    public void UpdateNewUnitConfig(String unitId, int captureBase)
+    public void UpdateNewUnitConfig(String unitId, int captureBase, int weaponSetup)
     {
         if (GetTree().NetworkPeer == null || GetTree().IsNetworkServer())
         {
-            _updateNewUnitConfig(unitId, captureBase);
+            _updateNewUnitConfig(unitId, captureBase, weaponSetup);
         }
         else
         {
-            RpcId(1, nameof(_updateNewUnitConfigServer), captureBase);
+            RpcId(1, nameof(_updateNewUnitConfigServer), captureBase, weaponSetup);
         }
     }
 
-	[Remote]
-    private void _updateNewUnitConfigServer(int captureBase)
+    [Remote]
+    private void _updateNewUnitConfigServer(int captureBaseIndex, int weaponSetupIndex)
     {
         String unitId = AgentPlayerPrefix + GetTree().GetRpcSenderId();
 
-        _updateNewUnitConfig(unitId, captureBase);
+        _updateNewUnitConfig(unitId, captureBaseIndex, weaponSetupIndex);
     }
 
-    private void _updateNewUnitConfig(String unitId, int captureBase)
+    private void _updateNewUnitConfig(String unitId, int captureBase, int weaponSetupIndex)
     {
-		
-        // Ensure it is one of selectable base
-        captureBase = captureBase % _gameWorld.GetTeamMapAIManager().GetTeamMapAIs().Count;
-
-        // Ensure it is positive number
-        if (captureBase < 0)
-        {
-            captureBase *= -1;
-        }
-
         foreach (AgentSpawnInfo agentSpawnInfo in _spawnList)
         {
             // Confirm the unit is in spawn list 
             if (agentSpawnInfo.UnitId == unitId)
             {
+                weaponSetupIndex = weaponSetupIndex % _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)agentSpawnInfo.Team].GetMaxWeaponSetupCount();
+
+                // Ensure it is positive number
+                if (weaponSetupIndex < 0)
+                {
+                    weaponSetupIndex *= -1;
+                }
+
+                agentSpawnInfo.WeaponSetupIndex = weaponSetupIndex;
+
+                // Ensure it is one of selectable base
+                captureBase = captureBase % _gameWorld.GetCapturableBaseManager().GetCapturableBases().Count;
+
+                // Ensure it is positive number
+                if (captureBase < 0)
+                {
+                    captureBase *= -1;
+                }
+
                 // Confirm if
                 // It is still in allowance time to change
                 // The target team is same team as the base
@@ -245,14 +256,14 @@ public class AgentSpawnManager : Node
 
     private void _notifyAgentConfigServer(String unitID, Team.TeamCode team)
     {
-		// No need to check for server as this logic will only run on server
+        // No need to check for server as this logic will only run on server
 
         String message = unitID + ";" + (int)team;
 
-		// Only need to send RPC if:
-		// There are more peers to connect to
-		// and
-		// The unit is player
+        // Only need to send RPC if:
+        // There are more peers to connect to
+        // and
+        // The unit is player
         if (GetTree().NetworkPeer != null && unitID.Contains(AgentPlayerPrefix))
         {
             // Notify the target client to show the UI
@@ -262,11 +273,11 @@ public class AgentSpawnManager : Node
             if (client != 1)
             {
                 RpcId(client, nameof(_notifyAgentConfigClient), message);
-				return;
-			}
+                return;
+            }
         }
 
-		_notifyAgentConfigClient(message);
+        _notifyAgentConfigClient(message);
     }
 
     [Remote]
@@ -347,11 +358,11 @@ public class AgentSpawnManager : Node
             // Equip weapons, on server side only and sync to client, note
             if (unitSpawnInfo.UnitId.Contains(AgentPlayerPrefix))
             {
-                _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].AssignDefaultWeapon(_spawnPlayers[unitSpawnInfo.UnitId]);
+                _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].AssignDefaultWeaponSetup(_spawnPlayers[unitSpawnInfo.UnitId], unitSpawnInfo.WeaponSetupIndex);
             }
             else
             {
-                _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].AssignDefaultAIRandomCombine(_spawnBots[unitSpawnInfo.UnitId]);
+                _gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)unitSpawnInfo.Team].AssignDefaultWeaponSetup(_spawnBots[unitSpawnInfo.UnitId], unitSpawnInfo.WeaponSetupIndex);
             }
         }
     }

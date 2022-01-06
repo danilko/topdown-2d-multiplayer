@@ -71,6 +71,7 @@
     <Compile Include="ui\TeamSettingPanel.cs" />
     <Compile Include="ui\UnitLaunchBaseSelectPanel.cs" />
     <Compile Include="ui\UnitLaunchSetupUI.cs" />
+    <Compile Include="ui\UnitLaunchWeaponSetupSelectPanel.cs" />
     <Compile Include="ui\WeaponControl.cs" />
     <Compile Include="ui\WeaponSlotPanel.cs" />
     <Compile Include="weapons\LightSaberAttack.cs" />

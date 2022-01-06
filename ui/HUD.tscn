@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://ui/HUD.cs" type="Script" id=1]
 [ext_resource path="res://ui/WeaponControl.tscn" type="PackedScene" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://ui/InventoryUI.tscn" type="PackedScene" id=11]
 [ext_resource path="res://ui/UnitLaunchSetupUI.cs" type="Script" id=12]
 [ext_resource path="res://ui/InGameControlUI.tscn" type="PackedScene" id=13]
+[ext_resource path="res://ui/UnitLaunchWeaponSetupSelectPanel.cs" type="Script" id=14]
 
 [sub_resource type="DynamicFont" id=1]
 size = 15
@@ -237,38 +238,71 @@ custom_constants/separation = 40
 alignment = 1
 script = ExtResource( 10 )
 
-[node name="BaseName" type="Label" parent="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel"]
-margin_left = 143.0
-margin_top = 3.0
-margin_right = 187.0
-margin_bottom = 17.0
+[node name="BaseName" type="RichTextLabel" parent="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel"]
+margin_left = 15.0
+margin_right = 315.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 300, 10 )
 text = "BASE 1"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="BaseButton" type="Button" parent="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel"]
-margin_left = 227.0
-margin_right = 282.0
+margin_left = 355.0
+margin_right = 410.0
 margin_bottom = 20.0
 text = "SELECT"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ConfirmButton" type="Button" parent="UnitLaunchSetupUI/VBoxContainer"]
+[node name="WeaponSetSelectionLabel" type="Label" parent="UnitLaunchSetupUI/VBoxContainer"]
 margin_top = 34.0
 margin_right = 426.0
-margin_bottom = 54.0
+margin_bottom = 48.0
+text = "SELECT DEFAULT WEAPON SETUP"
+align = 1
+
+[node name="WeaponSetupVBoxContainer" type="VBoxContainer" parent="UnitLaunchSetupUI/VBoxContainer"]
+margin_top = 58.0
+margin_right = 426.0
+margin_bottom = 58.0
+
+[node name="UnitLaunchWeaponSetupSelectPanel" type="HBoxContainer" parent="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer"]
+visible = false
+margin_right = 426.0
+margin_bottom = 50.0
+custom_constants/separation = 40
+alignment = 1
+script = ExtResource( 14 )
+
+[node name="WeaponSetupDescription" type="RichTextLabel" parent="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer/UnitLaunchWeaponSetupSelectPanel"]
+margin_left = 15.0
+margin_right = 315.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 300, 50 )
+text = "Multi-Missile Launcher(SYC-310) + Multi-Missile Launcher(SYC-310)"
+
+[node name="WeaponSetupButton" type="Button" parent="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer/UnitLaunchWeaponSetupSelectPanel"]
+margin_left = 355.0
+margin_right = 410.0
+margin_bottom = 50.0
+text = "SELECT"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ConfirmButton" type="Button" parent="UnitLaunchSetupUI/VBoxContainer"]
+margin_top = 68.0
+margin_right = 426.0
+margin_bottom = 88.0
 text = "CONFIRM"
 
 [node name="SelectionTimer" type="Timer" parent="UnitLaunchSetupUI"]
 one_shot = true
 
 [node name="InGameControlUI" parent="." instance=ExtResource( 13 )]
-visible = false
 
 [connection signal="focus_entered" from="UnitLaunchSetupUI" to="UnitLaunchSetupUI" method="_onFocusEntered"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel/BaseButton" to="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel" method="SelectBase"]
+[connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer/UnitLaunchWeaponSetupSelectPanel/WeaponSetupButton" to="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer/UnitLaunchWeaponSetupSelectPanel" method="SelectWeaponSetup"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/ConfirmButton" to="UnitLaunchSetupUI" method="_confirmSelection"]
 [connection signal="timeout" from="UnitLaunchSetupUI/SelectionTimer" to="UnitLaunchSetupUI" method="_confirmSelection"]

@@ -67,7 +67,7 @@ public class Inventory : Node
         return _items[index];
     }
 
-    public int GetItemIndex(String itemID)
+    public int GetItemIndex(String itemID, Boolean ignoreEquip = true)
     {
         int foundIndex = -1;
         if (_items.Count > 0)
@@ -76,7 +76,13 @@ public class Inventory : Node
             {
                 if (_items[index] != null && itemID == _items[index].ItemID)
                 {
-                    foundIndex = index;
+                    // If get command does not care whatever is equip
+                    // or if the item is not equip
+                    if (ignoreEquip || !_usedIndex.Contains(index))
+                    {
+                        foundIndex = index;
+                        break;
+                    }
                 }
             }
         }

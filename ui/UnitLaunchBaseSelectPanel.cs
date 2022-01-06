@@ -7,13 +7,13 @@ public class UnitLaunchBaseSelectPanel : HBoxContainer
 	public delegate void BaseSelectSignal();
 
     private Button _button;
-    private Label _label;
+    private RichTextLabel _label;
     private CapturableBase _capturableBase;
 
     public override void _Ready()
     {
         _button = (Button)GetNode("BaseButton");
-        _label = (Label)GetNode("BaseName");
+        _label = (RichTextLabel)GetNode("BaseName");
     }
 
     public void Initialize(CapturableBase capturableBase)
