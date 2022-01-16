@@ -89,7 +89,8 @@ public class UnitLaunchSetupUI : Popup
         _playerTeamCode = teamCode;
         _selectedCapturableBase = null;
         _updateBaseSelection();
-
+        _updateWeaponSetupSelection();
+        
         Visible = true;
         Input.SetMouseMode(Input.MouseMode.Visible);
 

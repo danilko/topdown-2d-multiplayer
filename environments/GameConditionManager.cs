@@ -7,6 +7,10 @@ public class GameConditionManager : Node
     private TeamMapAIManager _teamMapAIManager;
     private GameTimerManager _gameTimerManager;
 
+    private List<String> _randomFirstNames;
+
+    private List<String> _randomLastNames;
+
     private AgentSpawnManager _agentSpawnManager;
 
     private GameWorld _gameWorld;
@@ -28,10 +32,15 @@ public class GameConditionManager : Node
         public String ElapsedTime { get; set; }
     }
 
+    private Godot.RandomNumberGenerator _random;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-
+        _randomFirstNames = new List<string>(){"John", "Bob", "Joe", "Jose", "Alice", "Ethan", "Vicent", "Allen", "Elisa", "Peter", "Harry", "Arthur", "Carlos"};
+        _randomLastNames = new List<string>(){"Wood", "Mars", "Park", "Venus", "Sun", "Dong", "Stone", "Pipe", "Garden", "Booker", "Keeper", "Firework"};
+    
+        _random = new RandomNumberGenerator();
     }
 
     public void Initialize(GameWorld gameWorld)
@@ -92,8 +101,7 @@ public class GameConditionManager : Node
                     String unitId = AgentSpawnManager.AgentPlayerPrefix + _gameWorld.GetNetworkSnasphotManager().GetNetwork().gamestateNetworkPlayer.net_id;
                     Team.TeamCode team = (Team.TeamCode)0;
 
-                    String displayName = "Player_" + 1;
-
+                    String displayName = "Player";
                     teamMemberDictionary[0] += 1;
 
                     _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
@@ -122,7 +130,9 @@ public class GameConditionManager : Node
                     String unitId = AgentSpawnManager.AgentBotPrefix + counter;
                     Team.TeamCode team = currentAI.GetTeam();
                     String unitName = unitId;
-                    String displayName = "Player " + counter;
+                    // Generate random names for AI controlled agent
+                    String displayName = _randomFirstNames[(counter + _random.RandiRange(0, 1000))% (_randomFirstNames.Count - 1)] + "_" + _randomLastNames[ (counter + _random.RandiRange(0, 1000)) % (_randomLastNames.Count - 1)];
+
 
                     _agentSpawnManager.PlaceNewUnit(unitId, team, displayName, AgentSpawnManager.UNIT_CONFIG_TIME);
                     counter++;

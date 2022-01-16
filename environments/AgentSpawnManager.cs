@@ -107,6 +107,7 @@ public class AgentSpawnManager : Node
     {
         AgentSpawnInfo agentSpawnInfo = new AgentSpawnInfo();
         agentSpawnInfo.UnitId = unitId;
+        agentSpawnInfo.DisplayName = displayName;
         agentSpawnInfo.Team = team;
         agentSpawnInfo.Delay = delay;
 
@@ -394,18 +395,20 @@ public class AgentSpawnManager : Node
         }
     }
 
-    private void _spawnPlayer(String unitId, Team.TeamCode team, String displayName, int captureBase)
+    private void _spawnPlayer(String unitID, Team.TeamCode team, String displayName, int captureBase)
     {
+        GD.Print("_spawnPlayer unit DISPLAY NAME SET: " + displayName + " FOR UNIT: " + unitID);
+
         // Already generated
-        if (_spawnPlayers.ContainsKey(unitId))
+        if (_spawnPlayers.ContainsKey(unitID))
         {
             return;
         }
 
-        int netId = int.Parse(unitId.Replace(AgentPlayerPrefix, ""));
+        int netId = int.Parse(unitID.Replace(AgentPlayerPrefix, ""));
 
         // Load the scene and create an instance
-        Player agent = (Player)(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitId, displayName, captureBase, false));
+        Player agent = (Player)(_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)team].CreateUnit(unitID, displayName, captureBase, false));
 
         // If this actor is the current client controlled, add camera and attach HUD
         if (netId == _network.gamestateNetworkPlayer.net_id)
@@ -419,10 +422,10 @@ public class AgentSpawnManager : Node
         // This one is important so a player cannot control unit does not belong to player
         agent.SetNetworkMaster(netId);
 
-        _spawnPlayers.Add(unitId, agent);
+        _spawnPlayers.Add(unitID, agent);
 
         EmitSignal(nameof(PlayerCreatedSignal));
-        EmitSignal(nameof(AgentCreatedSignal), unitId, team);
+        EmitSignal(nameof(AgentCreatedSignal), unitID, team);
     }
 
     private void _spawnBot(String unitId, Team.TeamCode team, String displayName, int captureBase)
