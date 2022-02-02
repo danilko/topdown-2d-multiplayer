@@ -461,6 +461,8 @@ public class InventoryManager : Node
 			else
 			{
 				RpcId(1, nameof(_serverUseItem), info);
+				// Local sync
+				_serverUseItem(info);
 			}
 
 		}
@@ -496,7 +498,11 @@ public class InventoryManager : Node
 					inventory.RemoveItem(inventoryIndex);
 					if (itemResource.ItemID == "SYC-010")
 					{
-						agent.Heal(agent.MaxHealth);
+						agent.Heal(100);
+					}
+					if (itemResource.ItemID == "SYC-10000")
+					{
+						agent.SetEngineType(Agent.EngineType.NuclearReactor);
 					}
 				}
 
@@ -508,6 +514,4 @@ public class InventoryManager : Node
 			}
 		}
 	}
-
-
 }

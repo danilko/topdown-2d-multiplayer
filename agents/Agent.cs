@@ -93,9 +93,17 @@ public class Agent : KinematicBody2D
 
     protected Agent CurrentTargetAgent;
 
+    public enum EngineType {
+        Battery,
+        NuclearReactor
+    } 
+
+    protected EngineType CurrentEngineType;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        CurrentEngineType = EngineType.Battery;
 
         RightWeapons = new List<Weapon>();
         LeftWeapons = new List<Weapon>();
@@ -141,6 +149,18 @@ public class Agent : KinematicBody2D
     public Inventory GetInventory()
     {
         return CurrentInventory;
+    }
+
+    public void SetEngineType(EngineType engineType)
+    {
+        CurrentEngineType = engineType;       
+
+        // Reload the current weapon to let it get the benefit
+        for(int index = 0; index < Enum.GetNames(typeof(Weapon.WeaponOrder)).Length; index++)
+        {
+        ChangeWeapon(GetCurrentWeaponIndex((Weapon.WeaponOrder)index), (Weapon.WeaponOrder)index);
+        }
+
     }
 
     public virtual void Initialize(GameWorld gameWorld, String unitID, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
@@ -246,6 +266,15 @@ public class Agent : KinematicBody2D
             if (currentWeapon.GetAmmo() == 0)
             {
                 currentWeapon.EmitSignal(nameof(Weapon.AmmoOutSignal), weaponOrder);
+            }
+
+            // If engine is reactor, need to set the time
+            if (CurrentEngineType == EngineType.NuclearReactor)
+            {
+                if (currentWeapon.GetReloadTime() > 0.5f)
+                {
+                    currentWeapon.SetReloadTime(0.5f);
+                }
             }
 
 

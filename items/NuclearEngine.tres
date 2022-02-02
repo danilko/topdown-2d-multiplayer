@@ -6,10 +6,10 @@
 [resource]
 script = ExtResource( 1 )
 CurrentItemType = 1
-ItemID = "SYC-010"
-Name = "REPAIR KIT"
-Description = "Repair unit with 100 unit point"
-Price = 10
+ItemID = "SYC-10000"
+Name = "NUCLEAR REACTOR ENGINE"
+Description = "Replace default output system with nuclear reactor engine. All weapon reload/cooldown time to 0.5s."
+Price = 10000
 Stackable = false
 MaxStackableCount = 0
 ReferenceTexture = ExtResource( 2 )

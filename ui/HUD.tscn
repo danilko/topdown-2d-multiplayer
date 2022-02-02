@@ -301,6 +301,16 @@ one_shot = true
 
 [node name="InGameControlUI" parent="." instance=ExtResource( 13 )]
 
+[node name="FPS" type="Label" parent="."]
+margin_left = 17.0
+margin_top = 576.0
+margin_right = 163.0
+margin_bottom = 590.0
+text = "FPS"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [connection signal="focus_entered" from="UnitLaunchSetupUI" to="UnitLaunchSetupUI" method="_onFocusEntered"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel/BaseButton" to="UnitLaunchSetupUI/VBoxContainer/BaseVBoxContainer/UnitLaunchBaseSelectPanel" method="SelectBase"]
 [connection signal="pressed" from="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer/UnitLaunchWeaponSetupSelectPanel/WeaponSetupButton" to="UnitLaunchSetupUI/VBoxContainer/WeaponSetupVBoxContainer/UnitLaunchWeaponSetupSelectPanel" method="SelectWeaponSetup"]

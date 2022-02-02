@@ -101,4 +101,5 @@ modulate = Color( 0, 1, 0.0392157, 0.336369 )
 position = Vector2( 0, -85 )
 scale = Vector2( 0.567274, 0.567274 )
 texture = ExtResource( 4 )
+
 [connection signal="body_entered" from="." to="." method="_onPickupBodyEntered"]

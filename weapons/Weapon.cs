@@ -78,6 +78,23 @@ public class Weapon : Node2D
         ReloadTimer.WaitTime = ReloadTime;
     }
 
+    public float GetReloadTime()
+    {
+        return ReloadTime;
+    }
+
+    public void SetReloadTime(float reloadTime)
+    {
+        ReloadTime = reloadTime;
+        ReloadTimer.WaitTime = ReloadTime;
+        if(!ReloadTimer.IsStopped())
+        {
+            // Reload the timer
+            ReloadTimer.Stop();
+            ReloadTimer.Start();
+        }
+    }
+
     public virtual void Initialize(GameWorld gameWorld, Agent agent, WeaponOrder weaponOrder, int weaponIndex)
     {
         Agent = agent;

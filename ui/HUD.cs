@@ -22,6 +22,7 @@ public class HUD : CanvasLayer
     private GameWorld _gameWorld;
 
     private Label _timerTickLabel;
+    private Label _fps;
 
     private UnitLaunchSetupUI _unitLaunchSetupUI;
     private InGameControlUI _inGameControlUI;
@@ -29,6 +30,7 @@ public class HUD : CanvasLayer
     public override void _Ready()
     {
         _timerTickLabel = ((Label)GetNode("lblTimerStatus"));
+        _fps = ((Label)GetNode("FPS"));
 
         _characterDialog = (CharacterDialog)GetNode("CharacterDialog");
 
@@ -207,8 +209,8 @@ public class HUD : CanvasLayer
             _setMapMode(MiniMap.MapMode.MINIMAP);
         }
 
-        
-        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION 
+
+        if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION
             && Input.IsActionJustReleased("ui_cancel"))
         {
             _inGameControlUI.Activate(!_inGameControlUI.Visible);
@@ -220,6 +222,11 @@ public class HUD : CanvasLayer
         // {
         //     _characterDialog.Activate();
         // }
+    }
+
+    public override void _PhysicsProcess(float delta)
+    {
+        _fps.Text = "FPS: " + 1 / delta;
     }
 
 }
