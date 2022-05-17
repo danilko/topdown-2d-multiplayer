@@ -5,106 +5,106 @@ using System.Collections.Generic;
 public class GameStates : Node
 {
 
-    public enum GameType {
-        SINGLE_PLAYER, MULTI_PLAYER, SIMULATION
-    }
+	public enum GameType {
+		SINGLE_PLAYER, MULTI_PLAYER, SIMULATION
+	}
 
-    private GameType _gameType = GameType.SIMULATION;
+	private GameType _gameType = GameType.SIMULATION;
 
-    public int current_level = 0;
+	public int current_level = 0;
 
-    // How many game updates per second
-    public float updateRate = 60;
-    public float updateDelta = 0;
+	// How many game updates per second
+	public float updateRate = 60;
+	public float updateDelta = 0;
 
-    public String[] levels = { "res://ui/TitleScreen.tscn", "res://network/Lobby.tscn", "res://map/GameWorld.tscn" };
+	public String[] levels = { "res://ui/TitleScreen.tscn", "res://network/Lobby.tscn", "res://map/GameWorld.tscn" };
 
-    public String endResultScreen = "res://ui/EndGameScreen.tscn";
+	public String endResultScreen = "res://ui/EndGameScreen.tscn";
 
-    public float currentTime = 0;
+	public float currentTime = 0;
 
-    public List<TeamMapAISetting> _teamMapAISettings = null;
+	public List<TeamMapAISetting> _teamMapAISettings = null;
 
-    private String messages;
+	private String messages;
 
-    public override void _Ready()
-    {
-        set_update_rate(updateRate);
-    }
+	public override void _Ready()
+	{
+		set_update_rate(updateRate);
+	}
 
-    public List<TeamMapAISetting> GetTeamMapAISettings()
-    {
-        return _teamMapAISettings;
-    }
+	public List<TeamMapAISetting> GetTeamMapAISettings()
+	{
+		return _teamMapAISettings;
+	}
 
-    public void SetTeamMapAISettings(List<TeamMapAISetting> teamMapAISettings)
-    {
-        _teamMapAISettings = teamMapAISettings;
-    }
+	public void SetTeamMapAISettings(List<TeamMapAISetting> teamMapAISettings)
+	{
+		_teamMapAISettings = teamMapAISettings;
+	}
 
 
-    public void setMessagesForNextScene(String inputMessages)
-    {
-        messages = inputMessages;
+	public void setMessagesForNextScene(String inputMessages)
+	{
+		messages = inputMessages;
 
-    }
+	}
 
-    public String getMessgesForNextScene()
-    {
-        return messages;
-    }
+	public String getMessgesForNextScene()
+	{
+		return messages;
+	}
 
-    public GameType GetGameType()
-    {
-        return _gameType;
-    }
+	public GameType GetGameType()
+	{
+		return _gameType;
+	}
 
-    private void set_update_rate(float rate)
-    {
-        this.updateRate = rate;
-        this.updateDelta = 1.0f / updateRate;
-    }
+	private void set_update_rate(float rate)
+	{
+		this.updateRate = rate;
+		this.updateDelta = 1.0f / updateRate;
+	}
 
-    private float getUpdateDelta()
-    {
-        return updateDelta;
-    }
+	private float getUpdateDelta()
+	{
+		return updateDelta;
+	}
 
-    private void noSet(float rate) { }
+	private void noSet(float rate) { }
 
-    public void endGameScreen()
-    {
-        // In menu, enable mouse
-        Input.SetMouseMode(Input.MouseMode.Visible);
-        GetTree().ChangeScene(endResultScreen);
-    }
+	public void endGameScreen()
+	{
+		// In menu, enable mouse
+		Input.SetMouseMode(Input.MouseMode.Visible);
+		GetTree().ChangeScene(endResultScreen);
+	}
 
-    public void EnterLobbyScreen()
-    {
-        _gameType = GameType.MULTI_PLAYER;
-        // In menu, enable mouse
-        Input.SetMouseMode(Input.MouseMode.Visible);
-        current_level = 1;
-        GetTree().CurrentScene.QueueFree();
-        GetTree().ChangeScene(levels[current_level]);
-    }
+	public void EnterLobbyScreen()
+	{
+		_gameType = GameType.MULTI_PLAYER;
+		// In menu, enable mouse
+		Input.SetMouseMode(Input.MouseMode.Visible);
+		current_level = 1;
+		GetTree().CurrentScene.QueueFree();
+		GetTree().ChangeScene(levels[current_level]);
+	}
 
-    public void EnterTitleScreen()
-    {
-        _gameType = GameType.SIMULATION;
-        // In menu, enable mouse
-        Input.SetMouseMode(Input.MouseMode.Visible);
-        current_level = 0;
-        GetTree().CurrentScene.QueueFree();
-        GetTree().ChangeScene(levels[current_level]);
-    }
+	public void EnterTitleScreen()
+	{
+		_gameType = GameType.SIMULATION;
+		// In menu, enable mouse
+		Input.SetMouseMode(Input.MouseMode.Visible);
+		current_level = 0;
+		GetTree().CurrentScene.QueueFree();
+		GetTree().ChangeScene(levels[current_level]);
+	}
 
-    public void EnterNetworkLevel()
-    {
-        current_level = 2;
-        // In game, disable mouse
-        Input.SetMouseMode(Input.MouseMode.Hidden);
-        GetTree().CurrentScene.QueueFree();
-        GetTree().ChangeScene(levels[current_level]);
-    }
+	public void EnterNetworkLevel()
+	{
+		current_level = 2;
+		// In game, disable mouse
+		Input.SetMouseMode(Input.MouseMode.Hidden);
+		GetTree().CurrentScene.QueueFree();
+		GetTree().ChangeScene(levels[current_level]);
+	}
 }

@@ -48,12 +48,13 @@ public class RemoteWeapon : Sprite
         Velocity = moveDir.Normalized() * MaxSpeed;
         Rotation = moveDir.Angle();
         GlobalPosition += Transform.x * MaxSpeed * delta;
+        LookAt(_target.GlobalPosition);
     }
 
 
     public Boolean isReachedPosition(Vector2 targetPosition)
     {
-        if(GlobalPosition.DistanceTo(targetPosition) <= _withinRange)
+        if (GlobalPosition.DistanceTo(targetPosition) <= _withinRange)
         {
             return true;
         }
@@ -62,36 +63,38 @@ public class RemoteWeapon : Sprite
     }
 
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-  public override void _Process(float delta)
-  {
-      if(_activate)
-      {
-          if(isReachedPosition(_nextTargetPosition))
-          {
-              _nextTargetPosition = GetRandomPositionWithinTarget();
-
-                GD.Print("GEt next position");
-          }
-        
-          MoveToward((_nextTargetPosition - GlobalPosition).Normalized(), delta);
-      }
-  }
-
-   public Vector2 GetRandomPositionWithinTarget()
+    //  // Called every frame. 'delta' is the elapsed time since the previous frame.
+    public override void _PhysicsProcess(float delta)
     {
-        if(_target != null && IsInstanceValid(_target))
+        if (_activate)
         {
-        Vector2 topLeftCorner =  _target.GlobalPosition - _distance;
-        Vector2 bottomRightCorner =  _target.GlobalPosition + _distance;
+            if (isReachedPosition(_nextTargetPosition))
+            {
+                _nextTargetPosition = GetRandomPositionWithinTarget();
+            }
 
-        float randX = _rand.RandfRange(topLeftCorner.x, bottomRightCorner.x);
-        float randY = _rand.RandfRange(topLeftCorner.y, bottomRightCorner.y);
+            MoveToward((_nextTargetPosition - GlobalPosition).Normalized(), delta);
 
-        return new Vector2(randX, randY);
-         }
+        }
 
-    return Vector2.Zero;
+
+
+    }
+
+    public Vector2 GetRandomPositionWithinTarget()
+    {
+        if (_target != null && IsInstanceValid(_target))
+        {
+            Vector2 topLeftCorner = _target.GlobalPosition - _distance;
+            Vector2 bottomRightCorner = _target.GlobalPosition + _distance;
+
+            float randX = _rand.RandfRange(topLeftCorner.x, bottomRightCorner.x);
+            float randY = _rand.RandfRange(topLeftCorner.y, bottomRightCorner.y);
+
+            return new Vector2(randX, randY);
+        }
+
+        return Vector2.Zero;
     }
 
 }

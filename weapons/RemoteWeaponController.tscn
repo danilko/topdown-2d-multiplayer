@@ -14,9 +14,12 @@ position = Vector2( 736.639, 307.015 )
 scale = Vector2( 1.50404, 1.50404 )
 texture = ExtResource( 3 )
 
-[node name="Containers" type="Node2D" parent="." index="4"]
+[node name="Source" type="Sprite" parent="." index="4"]
+texture = ExtResource( 3 )
 
-[node name="RemoteWeapon1" type="Sprite" parent="Containers" index="0"]
+[node name="Containers" type="Node2D" parent="Source" index="0"]
+
+[node name="RemoteWeapon1" type="Sprite" parent="Source/Containers" index="0"]
 texture = ExtResource( 4 )
 region_enabled = true
 region_rect = Rect2( 55, 14, 64, 30 )
