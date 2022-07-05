@@ -11,7 +11,7 @@ CurrentWeaponAmmoType = 1
 KnockbackForce = 20.0
 ItemResourceID = "SYC-300"
 MaxAmmo = 20
-CooldownTime = 2.0
+CooldownTime = 1.0
 ReloadTime = 2.0
 Bullet = ExtResource( 4 )
 

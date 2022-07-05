@@ -63,6 +63,7 @@ public class TeamMapAI : Node2D
         _advancedTimer.WaitTime = _advancedWaitInterval;
 
         _randomNumberGenerator = new Godot.RandomNumberGenerator();
+		_randomNumberGenerator.Randomize();
 
         weaponSetupDescriptionList = new List<String>();
         _populateWeaponSetupDescriptionList();

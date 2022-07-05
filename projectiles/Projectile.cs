@@ -143,6 +143,11 @@ public class Projectile : Area2D
                return;
            }
 
+            if(body is RemoteWeapon && ((RemoteWeapon)body).GetTeam() == GetTeam())
+           {
+               // This is from same team, ignore it
+               return;
+           }
 
             if(body is Agent && ((Agent)body).GetTeam() == GetTeam())
            {

@@ -69,6 +69,15 @@ public class LaserRay : RayCast2D
                     collider.Explode();
                 }
             }
+            if (GetCollider() is RemoteWeapon)
+            {
+                Projectile collider = (Projectile)GetCollider();
+                // Only bullets from different team will cloide
+                if (collider.GetTeam() != _sourceTeam.CurrentTeamCode)
+                {
+                    collider.Explode();
+                }
+            }
             // shield will collide
             else if (GetCollider().HasMethod("_onShieldAreaEntered"))
             {

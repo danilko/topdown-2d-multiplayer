@@ -35,12 +35,15 @@ public class NetworkSnapshotManager : Node
     {
         public String Id;
         public int Health;
+        public int Energy;
         public Vector2 Position;
         public float Rotation;
-        public int RightWeapon;
-        public int LeftWeapon;
+        public int RightWeaponAction;
+        public int LeftWeaponAction;
+        public int RemoteWeaponAction;
         public int RightWeaponIndex;
         public int LeftWeaponIndex;
+        public String TargetAgentUnitID;
     }
 
     public class Snapshot : Godot.Object
@@ -58,6 +61,13 @@ public class NetworkSnapshotManager : Node
             RELOAD
         }
 
+        public enum TargetAction {
+            NOT_TRIGGER,
+            TRIGGER,
+            PREVIOUS,
+            NEXT
+        }
+
         public int Up;
 
         public int Down;
@@ -70,8 +80,11 @@ public class NetworkSnapshotManager : Node
 
         public int RightWeaponAction;
         public int LeftWeaponAction;
+        public int RemoteWeaponAction;
         public int RightWeaponIndex;
         public int LeftWeaponIndex;
+        public int TargetSelectionAction;
+
     }
 
     // Holds player input data (including the local one) which will be used to update the game state
@@ -292,10 +305,12 @@ public class NetworkSnapshotManager : Node
         _currentNetworkBytes += encodedData.Length * sizeof(Char);
         _currentNetworkSnapshots++;
 
+        String [] splitInfo = encodedData.Split(";");
+
         int parseIndex = 0;
 
         // Extract the signature
-        int signature = int.Parse(encodedData.Split(";")[parseIndex]);
+        int signature = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
 
         // If the received snapshot is older (or even equal) to the last received one, ignore the rest
@@ -310,7 +325,7 @@ public class NetworkSnapshotManager : Node
         // Initialize the player data and bot data arrays
 
         // Extract player data count
-        int clientCount = int.Parse(encodedData.Split(";")[parseIndex]);
+        int clientCount = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
 
         // Then the player data itself
@@ -324,7 +339,7 @@ public class NetworkSnapshotManager : Node
         }
 
         // Extract bot data count
-        clientCount = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientCount = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
 
         // Then the bot data
@@ -348,23 +363,31 @@ public class NetworkSnapshotManager : Node
 
     private int _parseClientData(String encodedData, ClientData clientData, int parseIndex)
     {
-        clientData.Id = encodedData.Split(";")[parseIndex];
+        String [] splitInfo = encodedData.Split(";");
+
+        clientData.Id = splitInfo[parseIndex];
         parseIndex++;
-        clientData.Health = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.Health = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.Position.x = float.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.Energy = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.Position.y = float.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.Position.x = float.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.Rotation = float.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.Position.y = float.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.RightWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.Rotation = float.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.LeftWeapon = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.RightWeaponAction = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.RightWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.LeftWeaponAction = int.Parse(splitInfo[parseIndex]);
         parseIndex++;
-        clientData.LeftWeaponIndex = int.Parse(encodedData.Split(";")[parseIndex]);
+        clientData.RemoteWeaponAction = int.Parse(splitInfo[parseIndex]);
+        parseIndex++;
+        clientData.RightWeaponIndex = int.Parse(splitInfo[parseIndex]);
+        parseIndex++;
+        clientData.LeftWeaponIndex = int.Parse(splitInfo[parseIndex]);
+        parseIndex++;
+        clientData.TargetAgentUnitID = splitInfo[parseIndex];
         parseIndex++;
 
         return parseIndex;
@@ -374,13 +397,16 @@ public class NetworkSnapshotManager : Node
     {
         String encodedData = "" + clientData.Id + ";";
         encodedData = encodedData + clientData.Health + ";";
+        encodedData = encodedData + clientData.Energy + ";";
         encodedData = encodedData + clientData.Position.x + ";";
         encodedData = encodedData + clientData.Position.y + ";";
         encodedData = encodedData + clientData.Rotation + ";";
-        encodedData = encodedData + clientData.RightWeapon + ";";
-        encodedData = encodedData + clientData.LeftWeapon + ";";
+        encodedData = encodedData + clientData.RightWeaponAction + ";";
+        encodedData = encodedData + clientData.LeftWeaponAction + ";";
+        encodedData = encodedData + clientData.RemoteWeaponAction + ";";
         encodedData = encodedData + clientData.RightWeaponIndex + ";";
         encodedData = encodedData + clientData.LeftWeaponIndex + ";";
+        encodedData = encodedData + clientData.TargetAgentUnitID + ";";
 
         return encodedData;
     }

@@ -2,20 +2,20 @@
 
 [ext_resource path="res://items/ItemResource.cs" type="Script" id=1]
 [ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=2]
-[ext_resource path="res://weapons/RemoteWeaponController.tscn" type="PackedScene" id=3]
+[ext_resource path="res://weapons/RemoteWeapon.tscn" type="PackedScene" id=3]
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 4
 atlas = ExtResource( 2 )
-region = Rect2( 184, 294, 45, 63 )
+region = Rect2( 58.5623, 14.7982, 59.8737, 28.9915 )
 
 [resource]
 script = ExtResource( 1 )
-CurrentItemType = 0
-ItemID = "SYC-310"
+CurrentItemType = 1
+ItemID = "SYC-1200"
 Name = "Remote Rifile"
-Description = "Remote Rifile (ATTACK = 10 x 2)"
-Price = 100
+Description = "Remote Rifile (ATTACK = 10 x 1)"
+Price = 50
 Stackable = false
 MaxStackableCount = 0
 ReferencePackedScene = ExtResource( 3 )

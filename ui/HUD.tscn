@@ -145,9 +145,6 @@ margin_left = 0.840942
 margin_top = 6.10352e-05
 margin_right = 0.840942
 margin_bottom = 6.10352e-05
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="LeftWeaponControl" parent="GameControl" instance=ExtResource( 2 )]
 margin_left = 800.0
@@ -165,13 +162,18 @@ margin_bottom = 529.302
 
 [node name="LockOnIndicator" type="TextureRect" parent="GameControl"]
 visible = false
-modulate = Color( 0, 1, 0.658824, 1 )
+modulate = Color( 0, 1, 0.658824, 0.470588 )
 anchor_right = 1.0
-margin_left = 236.159
-margin_top = 72.9999
-margin_right = -659.841
-margin_bottom = 201.0
+margin_right = -896.0
+margin_bottom = 128.0
 texture = ExtResource( 5 )
+
+[node name="TargetSelectionStatus" type="Label" parent="GameControl"]
+margin_left = 813.159
+margin_top = 335.0
+margin_right = 1004.16
+margin_bottom = 349.0
+text = "AUTO TARGET SELECTION: ON"
 __meta__ = {
 "_edit_use_anchors_": false
 }

@@ -97,17 +97,17 @@ public class ScreenIndicator : Node2D
         _removeAgent(agent.GetUnitID());
     }
 
-    private void _removeAgent(String agentUnitName)
+    private void _removeAgent(String agentUnitID)
     {
-        if (_agents.ContainsKey(agentUnitName))
+        if (_agents.ContainsKey(agentUnitID))
         {
             // Add agent to dictonary
-            _agents.Remove(agentUnitName);
+            _agents.Remove(agentUnitID);
 
-            Node2D agentMarker = _agentMarkers[agentUnitName];
+            Node2D agentMarker = _agentMarkers[agentUnitID];
 
             // Add marker to dictionary
-            _agentMarkers.Remove(agentUnitName);
+            _agentMarkers.Remove(agentUnitID);
 
             agentMarker.QueueFree();
         }
@@ -124,7 +124,8 @@ public class ScreenIndicator : Node2D
         {
             _lockonIndicator.Visible = true;
             // set the label position to the position of agent
-            _lockonIndicator.SetGlobalPosition(_currentTargetAgnet.GlobalPosition - new Vector2(_lockonIndicator.RectSize.x / 2, _lockonIndicator.RectSize.y / 2));
+            _lockonIndicator.RectPosition = new Vector2(_currentTargetAgnet.GetGlobalTransformWithCanvas().origin.x - (_lockonIndicator.RectSize.x / 2), _currentTargetAgnet.GetGlobalTransformWithCanvas().origin.y - (_lockonIndicator.RectSize.y/ 2));
+
         }
         else
         {
@@ -135,9 +136,9 @@ public class ScreenIndicator : Node2D
         Godot.Collections.Array<String> removeTargetList = new Godot.Collections.Array<String>();
 
 
-        foreach (String agentUnitName in _agents.Keys)
+        foreach (String agentUnitID in _agents.Keys)
         {
-            Agent agent = _agents[agentUnitName];
+            Agent agent = _agents[agentUnitID];
             if (agent != null && IsInstanceValid(agent))
             {
                 Node2D agentMarker = _agentMarkers[agent.GetUnitID()];
@@ -150,14 +151,14 @@ public class ScreenIndicator : Node2D
             }
             else
             {
-                removeTargetList.Add(agentUnitName);
+                removeTargetList.Add(agentUnitID);
             }
         }
 
         // Clean up the list
-        foreach (String targetAgentUnitName in removeTargetList)
+        foreach (String targetAgentUnitID in removeTargetList)
         {
-            _removeAgent(targetAgentUnitName);
+            _removeAgent(targetAgentUnitID);
         }
 
         _healthPanel.GlobalRotation = 0;

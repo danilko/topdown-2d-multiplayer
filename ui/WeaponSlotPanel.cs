@@ -46,7 +46,7 @@ public class WeaponSlotPanel : Panel
 
     private void _guiInput(InputEvent inputEvent)
     {
-        if (_isOnPanel && inputEvent.IsActionPressed("left_click"))
+        if (_isOnPanel && inputEvent.IsActionPressed("left_weapon_fire"))
         {
             EmitSignal(nameof(WeaponSlotPanelClickSignal), _weaponOrder, _weaponIndex);
         }

@@ -110,14 +110,16 @@ public class GameStateManager : Node
             float pRotation = playerNode.Rotation;
 
             // Only update if player is not dead yet 
-            if (playerNode.getHealth() > 0)
+            if (playerNode.GetHealth() > 0)
             {
                 // Check if there is any input for this player. In that case, update the state
                 if (_networkSnapshotManager.playerInputs.ContainsKey(networkPlayer.Key) && _networkSnapshotManager.playerInputs[networkPlayer.Key].Count > 0)
                 {
 
-                    int rightWeapon = 0;
-                    int leftWeapon = 0;
+
+                    int rightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+                    int leftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+                    int remoteWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
 
                     // Calculate the delta
                     float delta = _gamestates.updateDelta / (float)(_networkSnapshotManager.playerInputs[networkPlayer.Key].Count);
@@ -135,14 +137,30 @@ public class GameStateManager : Node
 
                         if (isGamingPeriod)
                         {
-                            rightWeapon = input.Value.RightWeaponAction;
-                            leftWeapon = input.Value.LeftWeaponAction;
+                            rightWeaponAction = input.Value.RightWeaponAction;
+                            leftWeaponAction = input.Value.LeftWeaponAction;
+                            remoteWeaponAction = input.Value.RemoteWeaponAction;
                         }
-                        playerNode.Fire(Weapon.WeaponOrder.Right, rightWeapon);
-                        playerNode.Fire(Weapon.WeaponOrder.Left, leftWeapon);
 
                         playerNode.RotateToward(input.Value.MousePosition, delta);
                         playerNode.MoveToward(moveDir, delta);
+
+                        playerNode.Fire(Weapon.WeaponOrder.Right, rightWeaponAction);
+                        playerNode.Fire(Weapon.WeaponOrder.Left, leftWeaponAction);
+                        playerNode.FireRemoteWeapon(remoteWeaponAction);
+
+                        if(input.Value.TargetSelectionAction == (int)NetworkSnapshotManager.PlayerInput.TargetAction.TRIGGER)
+                        {
+                            playerNode.TriggerTargetAgentSelection();
+                        }
+                        else if(input.Value.TargetSelectionAction == (int)NetworkSnapshotManager.PlayerInput.TargetAction.PREVIOUS)
+                        {
+                            playerNode.GetPreviousTargeAgent();
+                        }
+                        else if(input.Value.TargetSelectionAction == (int)NetworkSnapshotManager.PlayerInput.TargetAction.PREVIOUS)
+                        {
+                            playerNode.GetNextTargeAgent();
+                        }
                     }
 
                     // Cleanup the input vector
@@ -152,13 +170,17 @@ public class GameStateManager : Node
 
                     NetworkSnapshotManager.ClientData clientData = new NetworkSnapshotManager.ClientData();
                     clientData.Id = networkPlayer.Key + "";
-                    clientData.Position = playerNode.Position;
-                    clientData.Rotation = playerNode.Rotation;
-                    clientData.RightWeapon = rightWeapon;
-                    clientData.LeftWeapon = leftWeapon;
+                    clientData.Position = playerNode.GlobalPosition;
+                    clientData.Rotation = playerNode.GlobalRotation;
+                    clientData.Health = playerNode.GetHealth();
+                    clientData.Energy = playerNode.GetEnergy();
+                    clientData.RightWeaponAction = rightWeaponAction;
+                    clientData.LeftWeaponAction = leftWeaponAction;
+                    clientData.RemoteWeaponAction = remoteWeaponAction;
                     clientData.RightWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
                     clientData.LeftWeaponIndex = playerNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
-                    clientData.Health = playerNode.getHealth();
+
+                    clientData.TargetAgentUnitID = playerNode.GetTargetAgent() != null ? playerNode.GetTargetAgent().GetUnitID() : "";
 
                     snapshot.playerData.Add(networkPlayer.Key + "", clientData);
                 }
@@ -185,65 +207,75 @@ public class GameStateManager : Node
         foreach (Agent agent in _gameWorld.GetAgentSpawnManager().GetSpawnBots().Values)
         {
             // Locate the bot node
-            Agent enemyNode = (Agent)_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)agent.GetTeam()].GetUnit(agent.Name);
+            Agent agentNode = (Agent)_gameWorld.GetTeamMapAIManager().GetTeamMapAIs()[(int)agent.GetTeam()].GetUnit(agent.Name);
 
-            if (enemyNode == null || !IsInstanceValid(enemyNode))
+            if (agentNode == null || !IsInstanceValid(agentNode))
             {
                 // Ideally should give a warning that a bot node wasn't found
                 continue;
             }
 
 
-            int rightWeapon = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
-            int leftWeapon = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+            int rightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+            int leftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+            int remoteWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
 
             if (isGamingPeriod)
             {
-                rightWeapon = enemyNode.RightWeaponAction;
-                leftWeapon = enemyNode.LeftWeaponAction;
+                rightWeaponAction = agentNode.RightWeaponAction;
+                leftWeaponAction = agentNode.LeftWeaponAction;
+                remoteWeaponAction = agentNode.RemoteWeaponAction;
             }
 
-            enemyNode.Fire(Weapon.WeaponOrder.Right, rightWeapon);
-            enemyNode.Fire(Weapon.WeaponOrder.Left, leftWeapon);
+            agentNode.Fire(Weapon.WeaponOrder.Right, rightWeaponAction);
+            agentNode.Fire(Weapon.WeaponOrder.Left, leftWeaponAction);
+            agentNode.FireRemoteWeapon(remoteWeaponAction);
 
-            if (enemyNode.getHealth() > 0)
+            if (agentNode.GetHealth() > 0)
             {
                 // Build bot_data entry
                 NetworkSnapshotManager.ClientData clientData = new NetworkSnapshotManager.ClientData();
-                clientData.Id = enemyNode.Name;
-                clientData.Position = enemyNode.GlobalPosition;
-                clientData.Rotation = enemyNode.GlobalRotation;
-                clientData.Health = enemyNode.getHealth();
-                clientData.RightWeapon = rightWeapon;
-                clientData.LeftWeapon = leftWeapon;
-                clientData.RightWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
-                clientData.LeftWeaponIndex = enemyNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
+                clientData.Id = agentNode.Name;
+                clientData.Position = agentNode.GlobalPosition;
+                clientData.Rotation = agentNode.GlobalRotation;
+                clientData.Health = agentNode.GetHealth();
+                clientData.Energy = agentNode.GetEnergy();
+                clientData.RightWeaponAction = rightWeaponAction;
+                clientData.RightWeaponAction = leftWeaponAction;
+                clientData.RemoteWeaponAction = remoteWeaponAction;
+                clientData.RightWeaponIndex = agentNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Right);
+                clientData.LeftWeaponIndex = agentNode.GetCurrentWeaponIndex(Weapon.WeaponOrder.Left);
+                clientData.TargetAgentUnitID = agentNode.GetTargetAgent() != null ? agentNode.GetTargetAgent().GetUnitID() : "";
 
                 // Append into the snapshot
-                snapshot.botData.Add(enemyNode.Name, clientData);
+                snapshot.botData.Add(agentNode.Name, clientData);
 
                 // This logic is necessary to notify the AI that reload is pick up, so can continue with next state
-                if (rightWeapon == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
+                if (rightWeaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
                 {
-                    enemyNode.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+                    agentNode.RightWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
                 }
-                if (leftWeapon == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
+                if (leftWeaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
                 {
-                    enemyNode.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+                    agentNode.LeftWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
+                }
+                if (remoteWeaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
+                {
+                    agentNode.RemoteWeaponAction = (int)NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER;
                 }
             }
             else
             {
                 // Simulation will not remove bot, but rather just set its max health
-            if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
-            {
-                 enemyNode.setHealth(enemyNode.MaxHealth);
-            }
-            else
-            {
-                
-                removeSpawnBots.Insert(0, enemyNode.Name);
-            }
+                if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() == GameStates.GameType.SIMULATION)
+                {
+                    agentNode.SetHealth(agentNode.MaxHealth);
+                }
+                else
+                {
+
+                    removeSpawnBots.Insert(0, agentNode.Name);
+                }
 
             }
         }
@@ -252,6 +284,9 @@ public class GameStateManager : Node
         {
             _gameWorld.GetAgentSpawnManager().PlaceRemoveUnit(spawnBotId);
         }
+
+        // Sync Remote Weapon Manager before sync the snapshot
+        _gameWorld.GetRemoteWeaponManager().SyncState();
 
         // Encode and broadcast the snapshot - if there is at least one connected client
         if (_network.networkPlayers.Count > 1)
@@ -282,10 +317,6 @@ public class GameStateManager : Node
             return;
         }
 
-        agent.ChangeWeapon(item.RightWeaponIndex, Weapon.WeaponOrder.Right);
-        agent.ChangeWeapon(item.LeftWeaponIndex, Weapon.WeaponOrder.Left);
-
-        agent.Sync(item.Position, item.Rotation, item.RightWeapon, item.LeftWeapon);
-        agent.setHealth(item.Health);
+        agent.Sync(item);
     }
 }

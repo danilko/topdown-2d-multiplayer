@@ -26,10 +26,6 @@ public class Player : Agent
             parseIndex++;
             playerInput.Down = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
-            playerInput.RightWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
-            parseIndex++;
-            playerInput.LeftWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
-            parseIndex++;
             playerInput.MousePosition.x = float.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
             playerInput.MousePosition.y = float.Parse(inputData.Split(";")[parseIndex]);
@@ -37,6 +33,14 @@ public class Player : Agent
             playerInput.RightWeaponIndex = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
             playerInput.LeftWeaponIndex = Int32.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.RightWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.LeftWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.RemoteWeaponAction = Int32.Parse(inputData.Split(";")[parseIndex]);
+            parseIndex++;
+            playerInput.TargetSelectionAction = Int32.Parse(inputData.Split(";")[parseIndex]);
             parseIndex++;
 
             // Then cache the decoded data
@@ -78,11 +82,13 @@ public class Player : Agent
         _screenIndicator.SetActivate(true);
         Connect(nameof(Agent.HealthChangedSignal), _screenIndicator, nameof(ScreenIndicator.UpdateHealth));
 
-        setHealth(MaxHealth);
-        setEnergy(MaxEnergy);
+        SetHealth(MaxHealth);
+        SetEnergy(MaxEnergy);
 
         DetectionZone.Connect(nameof(DetectionZone.AgentEnteredSignal), _screenIndicator, "_onAgentEntered");
         DetectionZone.Connect(nameof(DetectionZone.AgentExitedSignal), _screenIndicator, "_onAgentExited");
+        DetectionZone.Connect(nameof(DetectionZone.AutoTargetAgentSelectionChangeSignal), _hud, "_updateAutoTargetSelection");
+
 
 
         // Setup Inventory UI
@@ -149,6 +155,16 @@ public class Player : Agent
         // Only read input if inventory is not open
         if (_inventoryUI == null || !_inventoryUI.Visible)
         {
+
+            if (Input.IsActionJustReleased("zoom_in"))
+            {
+                _gameWorld.GetGameCamera().ZoomIn();
+            }
+            else if (Input.IsActionJustReleased("zoom_out"))
+            {
+                _gameWorld.GetGameCamera().ZoomOut();
+            }
+
             NetworkSnapshotManager.PlayerInput playerInput = new NetworkSnapshotManager.PlayerInput();
 
             if (Input.IsActionPressed("turn_right"))
@@ -187,14 +203,32 @@ public class Player : Agent
                 playerInput.Down = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
             }
 
-            if (Input.IsActionPressed("reload"))
+            if (Input.IsActionJustReleased("trigger_target_selection"))
             {
-                playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
-                playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
+                playerInput.TargetSelectionAction = (int)(NetworkSnapshotManager.PlayerInput.TargetAction.TRIGGER);
+            }
+            else if (Input.IsActionJustReleased("next_target"))
+            {
+                playerInput.TargetSelectionAction = (int)(NetworkSnapshotManager.PlayerInput.TargetAction.NEXT);
+            }
+            else if (Input.IsActionJustReleased("previous_target"))
+            {
+                playerInput.TargetSelectionAction = (int)(NetworkSnapshotManager.PlayerInput.TargetAction.PREVIOUS);
             }
             else
             {
-                if (Input.IsActionPressed("left_click"))
+                playerInput.TargetSelectionAction = (int)(NetworkSnapshotManager.PlayerInput.TargetAction.NOT_TRIGGER);
+            }
+
+            if (Input.IsActionPressed("reload_weapon"))
+            {
+                playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
+                playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
+                playerInput.RemoteWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.RELOAD);
+            }
+            else
+            {
+                if (Input.IsActionPressed("left_weapon_fire"))
                 {
                     playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
                 }
@@ -203,13 +237,22 @@ public class Player : Agent
                     playerInput.LeftWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
                 }
 
-                if (Input.IsActionPressed("right_click"))
+                if (Input.IsActionPressed("right_weapon_fire"))
                 {
                     playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
                 }
                 else
                 {
                     playerInput.RightWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
+                }
+
+                if (Input.IsActionPressed("remote_weapon_fire"))
+                {
+                    playerInput.RemoteWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER);
+                }
+                else
+                {
+                    playerInput.RemoteWeaponAction = (int)(NetworkSnapshotManager.PlayerInput.InputAction.NOT_TRIGGER);
                 }
             }
 
@@ -261,12 +304,14 @@ public class Player : Agent
                 inputData = inputData + playerInput.Left + ";";
                 inputData = inputData + playerInput.Up + ";";
                 inputData = inputData + playerInput.Down + ";";
-                inputData = inputData + playerInput.RightWeaponAction + ";";
-                inputData = inputData + playerInput.LeftWeaponAction + ";";
                 inputData = inputData + playerInput.MousePosition.x + ";";
                 inputData = inputData + playerInput.MousePosition.y + ";";
                 inputData = inputData + playerInput.RightWeaponIndex + ";";
                 inputData = inputData + playerInput.LeftWeaponIndex + ";";
+                inputData = inputData + playerInput.RightWeaponAction + ";";
+                inputData = inputData + playerInput.LeftWeaponAction + ";";
+                inputData = inputData + playerInput.RemoteWeaponAction + ";";
+                inputData = inputData + playerInput.TargetSelectionAction + ";";
 
                 RpcUnreliableId(1, nameof(serverGetPlayerInput), inputData);
             }
@@ -275,7 +320,6 @@ public class Player : Agent
 
     public override void Explode()
     {
-
         base.Explode();
 
         if (_screenIndicator != null)

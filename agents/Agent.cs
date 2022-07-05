@@ -43,6 +43,7 @@ public class Agent : KinematicBody2D
 
     public int RightWeaponAction { set; get; }
     public int LeftWeaponAction { set; get; }
+    public int RemoteWeaponAction  { set; get; }
     protected List<Weapon> RightWeapons;
     protected List<Weapon> LeftWeapons;
 
@@ -93,6 +94,8 @@ public class Agent : KinematicBody2D
 
     protected Agent CurrentTargetAgent;
 
+    protected RemoteWeaponManager RemoteWeaponManager = null;
+
     public enum EngineType {
         Battery,
         NuclearReactor
@@ -129,7 +132,7 @@ public class Agent : KinematicBody2D
         CurrentWeaponIndex.Add(Weapon.WeaponOrder.Right, 0);
 
         EmitSignal(nameof(HealthChangedSignal), _health * 100 / MaxHealth);
-        EmitSignal(nameof(EnergyChangedSignal), _health * 100 / MaxHealth);
+        EmitSignal(nameof(EnergyChangedSignal), _energy * 100 / MaxEnergy);
 
         DetectionZone = (DetectionZone)(GetNode("DetectionZone"));
 
@@ -153,14 +156,24 @@ public class Agent : KinematicBody2D
 
     public void SetEngineType(EngineType engineType)
     {
+        Rpc(nameof(_clientSetEngineTypeClient), engineType);
+    }
+
+    public EngineType GetEngineType()
+    {
+        return CurrentEngineType;
+    }
+
+    [Remote]
+    public void _clientSetEngineTypeClient(EngineType engineType)
+    {
         CurrentEngineType = engineType;       
 
         // Reload the current weapon to let it get the benefit
         for(int index = 0; index < Enum.GetNames(typeof(Weapon.WeaponOrder)).Length; index++)
         {
-        ChangeWeapon(GetCurrentWeaponIndex((Weapon.WeaponOrder)index), (Weapon.WeaponOrder)index);
+            ChangeWeapon(GetCurrentWeaponIndex((Weapon.WeaponOrder)index), (Weapon.WeaponOrder)index);
         }
-
     }
 
     public virtual void Initialize(GameWorld gameWorld, String unitID, String displayName, TeamMapAI teamMapAI, PathFinding pathFinding)
@@ -182,6 +195,8 @@ public class Agent : KinematicBody2D
         _initializeWeapon(RightWeapons);
 
         DetectionZone.Initialize(gameWorld, this, DetectionRadius);
+
+        RemoteWeaponManager = _gameWorld.GetRemoteWeaponManager();
     }
 
     public GameWorld GetGameWorld()
@@ -328,6 +343,27 @@ public class Agent : KinematicBody2D
         return true;
     }
 
+    /**
+    AddRemoteWeapon
+    Assign weapon to target weaponOrder and index
+    **/
+    public void AddRemoteWeapon(PackedScene weaponScene)
+    {
+        RemoteWeaponManager.AddRemoteWeaponForAgent(this, weaponScene);
+    }
+
+    public Boolean IsMoreRemoteWeaponUnitsAllowed()
+    {
+        if (RemoteWeaponManager.GetRemoteWeaponUnitsCount(this) < MaxWeaponCount * 2)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public List<Weapon> GetWeapons(Weapon.WeaponOrder weaponOrder)
     {
         if (weaponOrder == Weapon.WeaponOrder.Right)
@@ -386,13 +422,10 @@ public class Agent : KinematicBody2D
         return _team.CurrentTeamCode;
     }
 
-
     public TeamMapAI GetTeamMapAI()
     {
         return _teamMapAI;
     }
-
-
 
     public String GetDisplayName()
     {
@@ -450,10 +483,10 @@ public class Agent : KinematicBody2D
     }
 
 
-    public void Sync(Vector2 position, float rotation, int rightWeapon, int leftWeapon)
+    public void Sync(NetworkSnapshotManager.ClientData snapshot)
     {
         // Move effect
-        if (position != Position)
+        if (snapshot.Position != Position)
         {
             //AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
             //audioManager.playSoundEffect(moveMusicClip);
@@ -465,18 +498,41 @@ public class Agent : KinematicBody2D
             slowDownBoostTrail();
         }
 
-        GlobalPosition = position;
-        GlobalRotation = rotation;
+        GlobalPosition = snapshot.Position;
+        GlobalRotation = snapshot.Rotation;
 
-        Fire(Weapon.WeaponOrder.Right, rightWeapon);
-        Fire(Weapon.WeaponOrder.Left, leftWeapon);
+        SetHealth(snapshot.Health);
+        SetHealth(snapshot.Energy);
 
+        // Update Target Agent
+        DetectionZone.SetTargetAgent(snapshot.TargetAgentUnitID);
+        
+        // Update and fire weapon
+        ChangeWeapon(snapshot.RightWeaponIndex, Weapon.WeaponOrder.Right);
+        ChangeWeapon(snapshot.LeftWeaponIndex, Weapon.WeaponOrder.Left);
+
+        Fire(Weapon.WeaponOrder.Right, snapshot.RightWeaponAction);
+        Fire(Weapon.WeaponOrder.Left,  snapshot.LeftWeaponAction);
+
+        FireRemoteWeapon(snapshot.RemoteWeaponAction);
     }
 
 
     public void RotateToward(Vector2 location, float delta)
     {
         GlobalRotation = Mathf.LerpAngle(GlobalRotation, GlobalPosition.DirectionTo(location).Angle(), RotationSpeed * delta);
+    }
+
+    public void FireRemoteWeapon(int weaponAction)
+    {
+        if(weaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.TRIGGER)
+        {
+            RemoteWeaponManager.Fire(this);
+        }
+        else if(weaponAction == (int)NetworkSnapshotManager.PlayerInput.InputAction.RELOAD)
+        {
+            RemoteWeaponManager.Reload(this);  
+        }
     }
 
     public void Fire(Weapon.WeaponOrder weaponOrder, int weaponAction)
@@ -517,22 +573,28 @@ public class Agent : KinematicBody2D
         MoveAndSlide(force * 100);
     }
 
-    public void setHealth(int health)
+    public void SetHealth(int health)
     {
         _health = health;
         EmitSignal(nameof(HealthChangedSignal), health * 100 / MaxHealth);
     }
 
-    public void setEnergy(int energy)
+    public void SetEnergy(int energy)
     {
         _energy = energy;
-        EmitSignal(nameof(HealthChangedSignal), energy * 100 / MaxEnergy);
+        EmitSignal(nameof(EnergyChangedSignal), energy * 100 / MaxEnergy);
     }
 
-    public int getHealth()
+    public int GetHealth()
     {
         return _health;
     }
+
+    public int GetEnergy()
+    {
+        return _energy;
+    }
+
 
     public void IncrementDefeatedAgentCount()
     {
@@ -634,6 +696,8 @@ public class Agent : KinematicBody2D
 
     public virtual void Explode()
     {
+        RemoteWeaponManager.DeleteRemoteWeaponForAgent(this);
+
         for (int index = 0; index <= (int)Weapon.WeaponOrder.Left; index++)
         {
             List<Weapon> weapons = GetWeapons((Weapon.WeaponOrder)index);
@@ -663,14 +727,34 @@ public class Agent : KinematicBody2D
 
         AudioManager audioManager = (AudioManager)GetNode("/root/AUDIOMANAGER");
         audioManager.playSoundEffect(explosionMusicClip);
+    }
 
+    // Change to target selection enable/disable
+    public void TriggerTargetAgentSelection()
+    {
+        DetectionZone.TriggerTargetAgentSelection();
+    }
 
+    // Change to next target (if available)
+    public void GetNextTargeAgent()
+    {
+        DetectionZone.GetNextTargetAgent();
+    }
 
+    // Change to previous target (if available)
+    public void GetPreviousTargeAgent()
+    {
+        DetectionZone.GetPreviousTargetAgent();
     }
 
     public virtual void OnTargetAgentChange()
     {
-        CurrentTargetAgent = DetectionZone.getTargetAgent();
+        CurrentTargetAgent = DetectionZone.GetTargetAgent();
+    }
+
+    public Agent GetTargetAgent()
+    {
+        return CurrentTargetAgent;
     }
 
     private void _OnExplosionAnimationFinished()
@@ -678,9 +762,4 @@ public class Agent : KinematicBody2D
         QueueFree();
         EmitSignal(nameof(DeadSignal));
     }
-
-    public override void _Process(float delta)
-    {
-    }
-
 }

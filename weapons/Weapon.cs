@@ -143,8 +143,6 @@ public class Weapon : Node2D
 
 			CooldownTimer.Start();
 
-	
-
 			Position2D triggerPoint = (Position2D)GetNode("TriggerPoint");
 
 			Vector2 dir = (targetGlobalPosition - triggerPoint.GlobalPosition).Normalized();

@@ -168,6 +168,11 @@ public class HUD : CanvasLayer
         ((Label)GetNode("lblTeamUnitUsageAmount")).Text = "" + cost;
     }
 
+   private void _updateAutoTargetSelection(Boolean autoTargetSelect)
+    {
+        ((Label)_gameControl.GetNode("TargetSelectionStatus")).Text = "AUTO TARGET SELECTION: " + (autoTargetSelect? "ON" : "OFF");
+    }
+
     private void _onUpdateTimerTick(int time)
     {
         String message = _gameTimerManager.ConvertToDateFormat(time) + " " + _gameTimerManager.GetGameTimerState();
@@ -191,7 +196,7 @@ public class HUD : CanvasLayer
         _miniMap.Show();
 
     }
-
+    
     public override void _Process(float delta)
     {
         if (lblMessage && Input.IsKeyPressed((int)Godot.KeyList.Space))
@@ -208,7 +213,6 @@ public class HUD : CanvasLayer
         {
             _setMapMode(MiniMap.MapMode.MINIMAP);
         }
-
 
         if (_gameWorld.GetGameStateManager().GetGameStates().GetGameType() != GameStates.GameType.SIMULATION
             && Input.IsActionJustReleased("ui_cancel"))

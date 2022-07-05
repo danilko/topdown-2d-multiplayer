@@ -14,6 +14,17 @@ public class GameCamera : Camera2D
 
     private int _pripority = 0;
 
+    [Export]
+    private int DefaultZoom = 2;
+
+    private int _currentZoom = 2;
+
+    [Export]
+    private int MaxZoom = 6;
+
+    [Export]
+    private int MinZoom = 1;
+
     private Godot.RandomNumberGenerator random;
 
 
@@ -26,6 +37,33 @@ public class GameCamera : Camera2D
 
         random = new RandomNumberGenerator();
         Current = true;
+
+        _currentZoom = DefaultZoom;
+    }
+
+    
+    public void ZoomIn()
+    {
+        _currentZoom--;
+
+        if(_currentZoom < MinZoom)
+        {
+            _currentZoom = MinZoom;
+        }
+
+        Zoom = new Vector2(_currentZoom, _currentZoom);
+    }
+
+    public void ZoomOut()
+    {
+        _currentZoom++;
+
+        if(_currentZoom > MaxZoom)
+        {
+            _currentZoom = MaxZoom;
+        }
+
+        Zoom = new Vector2(_currentZoom, _currentZoom);
     }
 
     public void StartScreenShake(float duration = 0.2f, float frequency = 15.0f, float amplitude = 15.0f, int pripority = 0)

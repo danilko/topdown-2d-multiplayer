@@ -1,0 +1,59 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://assets/allSprites_retina_rotated.png" type="Texture" id=1]
+[ext_resource path="res://weapons/RemoteWeapon.cs" type="Script" id=3]
+[ext_resource path="res://projectiles/RifileBullet.tscn" type="PackedScene" id=4]
+[ext_resource path="res://assets/onscreen_game_indicator.png" type="Texture" id=5]
+[ext_resource path="res://ui/UnitDisplay.tscn" type="PackedScene" id=6]
+[ext_resource path="res://effects/Smoke.tscn" type="PackedScene" id=7]
+[ext_resource path="res://effects/Explosion.tscn" type="PackedScene" id=8]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 31.5, 13.5 )
+
+[node name="RemoteWeapon" type="Area2D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource( 3 )
+MaxAmmo = 100
+CooldownTime = 0.1
+ReloadTime = 1.0
+Bullet = ExtResource( 4 )
+
+[node name="CooldownTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="TriggerPoint" type="Position2D" parent="."]
+
+[node name="ReloadTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="Body" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 58.988, 16.8344, 59.724, 25.596 )
+
+[node name="TeamIndicator" type="Sprite" parent="."]
+modulate = Color( 0.866667, 0.870588, 0.682353, 0.32549 )
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 5 )
+
+[node name="UnitDisplay" parent="." instance=ExtResource( 6 )]
+
+[node name="DamageEffectTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[node name="Smoke" parent="." instance=ExtResource( 7 )]
+visible = false
+
+[node name="Explosion" parent="." instance=ExtResource( 8 )]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
+
+[connection signal="timeout" from="CooldownTimer" to="." method="onWeaponTimerTimeout"]
+[connection signal="timeout" from="ReloadTimer" to="." method="_stopReload"]
+[connection signal="timeout" from="DamageEffectTimer" to="." method="_onDamageEffectTimerTimeout"]
+[connection signal="animation_finished" from="Explosion" to="." method="_onExplosionAnimationFinished"]

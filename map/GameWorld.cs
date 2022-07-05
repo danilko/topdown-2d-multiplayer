@@ -25,8 +25,12 @@ public class GameWorld : Node2D
 
     private ProjectileManager _projectileManager;
 
+    private RemoteWeaponManager _remoteWeaponManager;
+
     public override void _Ready()
     {
+         _initializeRemoteWeaponManager();
+
         _initializeInventoryManager();
 
         _initializeNetworkSnapshotManager();
@@ -201,6 +205,17 @@ public class GameWorld : Node2D
     {
         _inventoryManager = (InventoryManager)GetNode("InventoryManager");
         _inventoryManager.Initialize(this);
+    }
+
+    protected void _initializeRemoteWeaponManager()
+    {
+        _remoteWeaponManager = (RemoteWeaponManager)GetNode("RemoteWeaponManager");
+        _remoteWeaponManager.Initialize(this);
+    }
+
+    public RemoteWeaponManager GetRemoteWeaponManager()
+    {
+        return _remoteWeaponManager;
     }
 
     public override void _PhysicsProcess(float delta)

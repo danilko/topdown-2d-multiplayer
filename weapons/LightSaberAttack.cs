@@ -44,6 +44,17 @@ public class LightSaberAttack : Area2D
             obstacle.TakeEnvironmentDamage(Damage);
         }
 
+        if (body is RemoteWeapon)
+        {
+            RemoteWeapon remoteWeapon = (RemoteWeapon)body;
+
+            // Only bullets from different team will cloide
+            if (remoteWeapon.GetTeam() != SourceTeam.CurrentTeamCode)
+            {
+                remoteWeapon.TakeDamage(Damage, (remoteWeapon.GlobalPosition - Agent.GlobalPosition).Normalized(), Agent, SourceTeam);
+            }
+        }
+
         if (body is Agent)
         {
             Agent agent = (Agent)body;

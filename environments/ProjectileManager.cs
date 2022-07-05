@@ -14,7 +14,6 @@ public class ProjectileManager : Node
         _gameWorld = gameWorld;
     }
 
-
     private void _onProjectileShoot(PackedScene projectile, Vector2 _position, Vector2 _direction, Node2D source, Team sourceTeam, Node2D target, Vector2 defaultTarget)
     {
         Projectile newProjectile = (Projectile)projectile.Instance();
@@ -47,6 +46,12 @@ public class ProjectileManager : Node
                 Agent targetAgent = (Agent)(target);
                 Agent sourceAgent = (Agent)(source);
                 targetAgent.TakeDamage(damage, hitDir, sourceAgent, sourceTeam);
+            }
+            else if(target is RemoteWeapon)
+            {
+                RemoteWeapon remoteWeapon = (RemoteWeapon)(target);
+                Agent agent = (Agent)(source);
+                remoteWeapon.TakeDamage(damage, hitDir, agent, sourceTeam);
             }
             else if (target is Obstacle)
             {

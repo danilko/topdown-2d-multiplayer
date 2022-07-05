@@ -397,8 +397,6 @@ public class AgentSpawnManager : Node
 
 	private void _spawnPlayer(String unitID, Team.TeamCode team, String displayName, int captureBase)
 	{
-		GD.Print("_spawnPlayer unit DISPLAY NAME SET: " + displayName + " FOR UNIT: " + unitID);
-
 		// Already generated
 		if (_spawnPlayers.ContainsKey(unitID))
 		{

@@ -28,6 +28,7 @@ public class Trail : Node
         _line.ClearPoints();
 
         _random = new Godot.RandomNumberGenerator();
+		_random.Randomize();
 
         _line.GlobalPosition = Vector2.Zero;
         _line.GlobalRotation = 0;
